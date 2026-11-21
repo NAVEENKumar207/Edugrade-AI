@@ -1,3 +1,5 @@
+"""Tests for the AI academic advisor API, prompt generation, and chat persistence."""
+
 from django.test import TestCase
 from django.contrib.auth.models import User
 from rest_framework.test import APIClient

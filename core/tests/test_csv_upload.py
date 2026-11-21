@@ -1,3 +1,5 @@
+"""Tests for bulk CSV grades upload, CSV format validation, and atomic commits."""
+
 from django.test import TestCase
 from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile

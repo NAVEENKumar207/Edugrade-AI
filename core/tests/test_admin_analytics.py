@@ -1,3 +1,5 @@
+"""Tests for the faculty/admin analytics API and student risk metrics."""
+
 from django.test import TestCase
 from django.contrib.auth.models import User
 from rest_framework.test import APIClient
