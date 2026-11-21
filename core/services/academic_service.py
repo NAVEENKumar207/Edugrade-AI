@@ -4,8 +4,6 @@ Provides deterministic, credit-weighted academic calculations, CGPA simulation,
 placement eligibility assessment, and performance analytics.
 """
 
-from decimal import Decimal, ROUND_HALF_UP
-
 # Standard 10-Point Grade Scale Mapping
 GRADE_POINT_MAP = {
     'O': 10.0,

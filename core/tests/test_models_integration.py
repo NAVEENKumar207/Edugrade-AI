@@ -3,7 +3,7 @@ from django.test import TestCase, Client
 from django.contrib.auth.models import User
 from core.models import (
     UserProfile, SemesterRecord, SubjectInsight,
-    CourseResult, CompanyPlacementCriteria, AdvisorChatMessage
+    CourseResult, CompanyPlacementCriteria
 )
 from core.services.academic_service import (
     calculate_sgpa, calculate_cgpa, plan_target_cgpa,
@@ -236,7 +236,7 @@ class DatabaseCRUDAndIntegrityTests(TestCase):
             sgpa=8.0,
             credits_earned=20
         )
-        course = CourseResult.objects.create(
+        CourseResult.objects.create(
             student=self.profile,
             semester_record=sem,
             course_code='CS101',

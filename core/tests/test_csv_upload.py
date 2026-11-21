@@ -1,10 +1,9 @@
-import io
 from django.test import TestCase
 from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
 from rest_framework.test import APIClient
 from rest_framework import status
-from core.models import UserProfile, CourseResult, SemesterRecord, AcademicAuditLog
+from core.models import UserProfile, CourseResult, AcademicAuditLog
 
 
 class BulkCSVGradeUploadTests(TestCase):

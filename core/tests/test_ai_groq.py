@@ -6,7 +6,6 @@ error resilience, and offline execution via unittest.mock.
 
 import os
 import json
-import logging
 import io
 import urllib.request
 import urllib.error
@@ -14,7 +13,7 @@ from unittest.mock import patch, MagicMock
 from django.test import TestCase
 from django.contrib.auth.models import User
 from core.models import UserProfile, CourseResult, AdvisorChatMessage
-from core.services.ai_service import generate_ai_advice, call_chat_completion
+from core.services.ai_service import generate_ai_advice
 
 
 class GroqAdvisorIntegrationTests(TestCase):

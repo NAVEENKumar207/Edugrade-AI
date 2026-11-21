@@ -6,7 +6,7 @@ Editorial Consultancy Design (Anton, Newsreader, Vermillion, Navy).
 from reactpy import component, html, use_state
 from ui.components.icons import (
     icon_award, icon_trending_up, icon_book_open, icon_briefcase,
-    icon_sparkles, icon_check, icon_alert, icon_calculator, icon_bot
+    icon_check, icon_alert, icon_calculator, icon_bot
 )
 from ui.services.data_service import get_student_dashboard_data, get_arrears
 
@@ -265,7 +265,7 @@ def StudentDashboard(user, set_page):
                 ),
                 html.p(
                     {"style": {"color": "var(--text-secondary)", "fontSize": "0.95rem", "marginTop": "0.25rem"}},
-                    f"Welcome back, ",
+                    "Welcome back, ",
                     html.strong({"style": {"color": "var(--brand-navy)"}}, student["name"]),
                     f" • Roll No: {student['roll_number']} • {student['department']}"
                 )

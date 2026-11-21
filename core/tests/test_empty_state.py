@@ -9,8 +9,7 @@ from django.contrib.auth.models import User
 from rest_framework.test import APIClient
 from rest_framework import status
 from core.models import UserProfile, CompanyPlacementCriteria
-from core.services.ai_service import generate_ai_advice
-from core.services.academic_service import placement_readiness, plan_target_cgpa
+from core.services.academic_service import placement_readiness
 
 
 class EmptyStateEndpointTests(TestCase):

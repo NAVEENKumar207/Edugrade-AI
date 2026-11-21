@@ -8,7 +8,7 @@ django.setup()
 
 from django.test import Client
 from django.contrib.auth.models import User
-from core.models import UserProfile, SemesterRecord, CourseResult, CompanyPlacementCriteria, AdvisorChatMessage, AcademicAuditLog
+from core.models import UserProfile, SemesterRecord, CourseResult, AdvisorChatMessage, AcademicAuditLog
 
 def run_all_tests():
     uid = uuid.uuid4().hex[:8]

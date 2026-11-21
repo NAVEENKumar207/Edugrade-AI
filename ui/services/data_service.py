@@ -19,8 +19,8 @@ from core.models import (
     CourseResult, CompanyPlacementCriteria, AdvisorChatMessage, AcademicAuditLog
 )
 from core.services.academic_service import (
-    calculate_sgpa, calculate_cgpa, plan_target_cgpa, check_placement_eligibility,
-    record_course_result, recalculate_student_metrics, placement_readiness
+    calculate_cgpa, check_placement_eligibility,
+    record_course_result, placement_readiness
 )
 from core.services.ai_service import generate_ai_advice
 from core.services.security_service import (
@@ -108,7 +108,7 @@ def register_user(role, fullname, username, department, password, roll_number=''
                 user.last_name = parts[1]
             user.save()
 
-        profile = UserProfile.objects.create(
+        UserProfile.objects.create(
             user=user,
             role=role,
             roll_number=roll_number or ('FAC-' + username.upper() if is_staff else '7176' + username),
@@ -418,7 +418,6 @@ def get_admin_analytics_data():
     from core.api_views import AT_RISK_CGPA_THRESHOLD, AT_RISK_BACKLOG_THRESHOLD
 
     students_qs = UserProfile.objects.filter(role='student')
-    total_students = students_qs.count()
 
     # 1. Grade distribution
     grade_order = ['O', 'A+', 'A', 'B+', 'B', 'C', 'U', 'RA', 'SA', 'W']

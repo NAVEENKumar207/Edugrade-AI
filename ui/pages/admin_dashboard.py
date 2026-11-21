@@ -6,7 +6,7 @@ Editorial Consultancy Design (Anton, Newsreader, Vermillion, Navy).
 from reactpy import component, html, use_state
 from ui.components.icons import (
     icon_users, icon_award, icon_briefcase, icon_layers,
-    icon_shield_check, icon_alert, icon_check
+    icon_alert, icon_check
 )
 from ui.services.data_service import (
     get_faculty_overview_data, get_faculty_students_list, save_single_course_result,

@@ -8,7 +8,7 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 from rest_framework.test import APIClient
 from rest_framework import status
-from core.models import UserProfile, SemesterRecord, CourseResult, AcademicAuditLog
+from core.models import UserProfile, AcademicAuditLog
 from core.services.academic_service import record_course_result
 from ui.services.data_service import get_arrears
 

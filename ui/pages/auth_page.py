@@ -4,7 +4,7 @@ Enterprise Dark SaaS Aesthetic (Plus Jakarta Sans, Obsidian Slate, Electric Cyan
 """
 
 from reactpy import component, html, use_state
-from ui.components.icons import icon_sparkles, icon_alert, icon_shield_check, icon_users, icon_check
+from ui.components.icons import icon_sparkles, icon_alert
 from ui.components.theme_toggle import ThemeToggle
 from ui.services.data_service import authenticate_user, register_user
 
@@ -141,7 +141,6 @@ def LoginPage(set_page, set_user, current_role='student', theme='dark', toggle_t
                             "flex": "1",
                             "padding": "0.6rem 1rem",
                             "borderRadius": "var(--radius-sm)",
-                            "border": "none",
                             "cursor": "pointer",
                             "fontWeight": "700",
                             "fontSize": "0.85rem",
@@ -160,7 +159,6 @@ def LoginPage(set_page, set_user, current_role='student', theme='dark', toggle_t
                             "flex": "1",
                             "padding": "0.6rem 1rem",
                             "borderRadius": "var(--radius-sm)",
-                            "border": "none",
                             "cursor": "pointer",
                             "fontWeight": "700",
                             "fontSize": "0.85rem",

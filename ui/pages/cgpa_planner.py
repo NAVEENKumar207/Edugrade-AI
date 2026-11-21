@@ -4,7 +4,7 @@ Editorial Consultancy Design (Anton, Newsreader, Vermillion, Navy).
 """
 
 from reactpy import component, html, use_state
-from ui.components.icons import icon_sparkles, icon_check, icon_alert
+from ui.components.icons import icon_check, icon_alert
 from core.services.academic_service import plan_target_cgpa
 
 def _to_float(val, fallback=0.0):

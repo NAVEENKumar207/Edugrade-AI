@@ -3,8 +3,7 @@ Root ReactPy Application for EduGrade AI Platform.
 Manages global client-side routing, user session state, and component rendering.
 """
 
-from reactpy import component, html, use_state, use_effect
-from django.contrib.auth.models import User
+from reactpy import component, html, use_state
 from ui.pages.landing import LandingPage
 from ui.pages.auth_page import LoginPage, SignupPage
 from ui.pages.student_dashboard import StudentDashboard
