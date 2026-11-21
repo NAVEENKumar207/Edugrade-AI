@@ -26,3 +26,4 @@ def test_reactpy_render():
 
 if __name__ == '__main__':
     test_reactpy_render()
+    os._exit(0)

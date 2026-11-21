@@ -96,7 +96,7 @@ The **primary modern frontend** is the reactive Single-Page Application (SPA) po
 EduGrade AI starts with a clean database ready for institutional onboarding:
 
 ### 1. Initial Setup
-1. **Configure Environment**: Copy `.env.example` to `.env` and set `ADMIN_SIGNUP_KEY` (e.g. `ADMIN_SIGNUP_KEY=ADMIN2026`).
+1. **Configure Environment**: Copy `.env.example` to `.env` and set `ADMIN_SIGNUP_KEY` (e.g. `ADMIN_SIGNUP_KEY=your-admin-signup-key`).
 2. **Apply Migrations**: `python manage.py migrate`
 3. **Populate Placement Criteria**:
    ```bash

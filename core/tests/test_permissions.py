@@ -47,11 +47,15 @@ class ApiPermissionsTests(TestCase):
         """Anonymous requests to protected endpoints must return 401 or 403."""
         protected_endpoints = [
             '/api/students/dashboard/',
+            '/api/student/arrears/',
             '/api/academics/results/',
             '/api/placements/eligibility/',
             '/api/advisor/chat/',
             '/api/faculty/overview/',
             '/api/faculty/students/',
+            '/api/admin/grades/sample-csv/',
+            '/api/admin/analytics/',
+            '/api/transcript/pdf/',
         ]
         for url in protected_endpoints:
             res = self.client.get(url)
@@ -69,6 +73,9 @@ class ApiPermissionsTests(TestCase):
             ('/api/faculty/overview/', 'GET'),
             ('/api/faculty/students/', 'GET'),
             ('/api/faculty/results/upload/', 'POST'),
+            ('/api/admin/grades/sample-csv/', 'GET'),
+            ('/api/admin/grades/bulk-upload/', 'POST'),
+            ('/api/admin/analytics/', 'GET'),
         ]
         for url, method in admin_endpoints:
             if method == 'GET':
@@ -79,6 +86,24 @@ class ApiPermissionsTests(TestCase):
                 res.status_code,
                 status.HTTP_403_FORBIDDEN,
                 f"Student should receive 403 on {url}, got {res.status_code}"
+            )
+
+    def test_admin_can_access_admin_faculty_endpoints(self):
+        """Faculty/admin requests to admin endpoints succeed with 200 OK."""
+        self.client.force_authenticate(user=self.admin_user)
+
+        admin_get_endpoints = [
+            '/api/faculty/overview/',
+            '/api/faculty/students/',
+            '/api/admin/grades/sample-csv/',
+            '/api/admin/analytics/',
+        ]
+        for url in admin_get_endpoints:
+            res = self.client.get(url)
+            self.assertEqual(
+                res.status_code,
+                status.HTTP_200_OK,
+                f"Admin should receive 200 on {url}, got {res.status_code}"
             )
 
     def test_student_cannot_read_another_student_data(self):
