@@ -20,7 +20,8 @@ EduGrade AI/
 │   │   ├── ai_service.py                → Grounded AI Academic Advisor powered by Groq Cloud (llama-3.3-70b-versatile) & bilingual fallback
 │   │   ├── security_service.py          → Cache-backed login brute-force rate limiter (5 attempts / 5-min lockout)
 │   │   └── pdf_service.py               → ReportLab professional official academic transcript PDF generator
-│   ├── tests/                           → Comprehensive automated unit and integration test suite (102 test cases)
+│   ├── tests/                           → Comprehensive automated unit and integration test suite (103 test cases)
+│   │   ├── helpers.py                   → Reusable factory functions (create_student, create_admin, add_result)
 │   │   ├── test_academic_service.py     → Grade points, SGPA, CGPA, target planner, what-if simulator
 │   │   ├── test_models_integration.py   → Referential integrity, models, cascade deletions
 │   │   ├── test_permissions.py          → DRF API client authentication & role-based access control guards
@@ -42,6 +43,7 @@ EduGrade AI/
 │   ├── app.py                           → Root application component, routing, navigation & state management
 │   ├── components/
 │   │   ├── layout.py                    → Responsive layout with sidebar, topbar, role badges & signout
+│   │   ├── common.py                    → Reusable UI cards (EmptyStateCard, StatCard, AlertBanner)
 │   │   └── icons.py                     → Crisp SVG vector icons (Sparkles, Award, Trending, Bot, etc.)
 │   ├── services/
 │   │   └── data_service.py              → Secure ORM and academic calculation data bridge for ReactPy
@@ -135,7 +137,7 @@ cp .env.example .env
 | Variable | Default Value | Description |
 | :--- | :--- | :--- |
 | `SECRET_KEY` | *(django-insecure dev key)* | Cryptographic signing key for Django sessions and tokens |
-| `DEBUG` | `True` | Debug mode toggle |
+| `DEBUG` | `False` | Debug mode toggle (defaults to `False` if unset) |
 | `ALLOWED_HOSTS` | `localhost,127.0.0.1` | Comma-separated list of host/domain names |
 | `CORS_ALLOWED_ORIGINS` | `http://localhost:3000,...` | Comma-separated origins allowed for cross-origin requests |
 | `ADMIN_SIGNUP_KEY` | *(none / empty)* | Secret registration key required for creating faculty/admin accounts |
@@ -177,15 +179,23 @@ When faculty record a passing grade ($Grade \in \{O, A+, A, B+, B, C\}$) for a c
 3. The affected `SemesterRecord.sgpa`, overall `UserProfile.cgpa`, and placement eligibility are automatically recomputed.
 4. An immutable audit record is logged in `AcademicAuditLog` (`action='ARREAR_CLEARED'`).
 
-### 4. Placement Readiness Index (0–100 Scale)
+### 4. Target CGPA Planner
+Calculates the exact SGPA required across remaining semesters to achieve a target CGPA. Returns one of five deterministic statuses:
+- `already_achieved`: Current CGPA already meets or exceeds target CGPA.
+- `easily_achievable`: Required upcoming SGPA $\le 6.50$.
+- `feasible`: $6.50 <$ Required upcoming SGPA $\le 10.00$.
+- `impossible`: Required upcoming SGPA $> 10.00$ (cannot be mathematically achieved within maximum 10-point scale).
+- `invalid`: Non-positive target semesters or degree credits.
+
+### 5. Placement Readiness Index (0–100 Scale)
 A composite, explainable metric evaluating a student's employability:
-$$\text{Readiness} = \underbrace{\min\left(50, \max\left(0, \frac{\text{CGPA}}{10} \times 50\right)\right)}_{\text{Academic Performance (50 pts)}} + \underbrace{\max\left(0, 30 - 15 \times \text{Backlogs}\right)}_{\text{Backlog Penalty (30 pts)}} + \underbrace{\left(\frac{\text{Eligible Companies}}{\text{Total Companies}} \times 20\right)}_{\text{Market Alignment (20 pts)}}$$
+$$\text{Readiness} = \underbrace{\min\left(50, \max\left(0, \frac{\text{CGPA}}{10} \times 50\right)\right)}_{\text{Academic Performance (50 pts)}} + \underbrace{\max\left(0, 30 - 10 \times \text{Backlogs}\right)}_{\text{Backlog Penalty (30 pts)}} + \underbrace{\left(\frac{\text{Eligible Companies}}{\text{Total Companies}} \times 20\right)}_{\text{Market Alignment (20 pts)}}$$
 - **CGPA Component (50%)**: Linear scaling from 0 to 10 CGPA.
-- **Backlog Component (30%)**: 30 points if 0 backlogs, 15 points if 1 backlog, 0 points if 2+ backlogs.
+- **Backlog Component (30%)**: 30 points if 0 backlogs, 20 points if 1 backlog, 10 points if 2 backlogs, 0 points if 3+ backlogs.
 - **Company Eligibility (20%)**: Percentage of active recruiting companies where the student meets minimum CGPA and maximum backlog thresholds.
 - **Actionable Guidance**: Deterministic tips prioritizing clearing backlogs first, lifting CGPA above 7.0/8.0 next, or maintaining competitive advantage.
 
-### 5. At-Risk Student Criteria
+### 6. At-Risk Student Criteria
 Faculty dashboards flag students requiring academic intervention using configurable institutional thresholds:
 - `AT_RISK_CGPA_THRESHOLD = 6.0`: CGPA strictly below 6.00.
 - `AT_RISK_BACKLOG_THRESHOLD = 2`: 2 or more active/standing backlogs.
@@ -194,27 +204,30 @@ Faculty dashboards flag students requiring academic intervention using configura
 
 ## 📡 Complete REST API Specification
 
-All API endpoints are under `/api/` and enforce role-based authentication and student isolation:
+All modern API endpoints are registered in `core/urls.py` under `/api/` and enforce role-based authentication and student isolation:
 
 | Endpoint | Method | Auth Required | Role | Description |
 | :--- | :---: | :---: | :---: | :--- |
+| `/api/auth/me/` | `GET` | Yes | Student/Admin | Returns authenticated user profile and session role |
 | `/api/auth/login/` | `POST` | No | Public | Authenticates user; rate-limited (5 failed attempts locks for 5 min) |
-| `/api/auth/register/` | `POST` | No | Public | Registers student or faculty (requires `admin_key` for faculty) |
+| `/api/auth/signup/` | `POST` | No | Public | Registers student or faculty (requires `admin_key` for faculty) |
+| `/api/auth/logout/` | `POST` | Yes | Student/Admin | Invalidates active user session |
 | `/api/auth/change-password/` | `POST` | Yes | Student/Admin | Validates old password and updates to new password |
 | `/api/students/dashboard/` | `GET` | Yes | Student | Returns student metrics, CGPA, SGPA history, readiness score, and tips |
 | `/api/student/arrears/` | `GET` | Yes | Student | Returns breakdown of active and cleared arrears |
-| `/api/transcript/pdf/` | `GET` | Yes | Student/Admin | Streams generated PDF transcript (students restricted to own data) |
 | `/api/academics/results/` | `GET` | Yes | Student | Returns semester course results and grade points |
-| `/api/academics/planner/target-cgpa/` | `POST` | Yes | Student | Target CGPA simulator returning required upcoming SGPA and feasibility |
-| `/api/academics/planner/what-if/` | `POST` | Yes | Student | Simulates CGPA impact given hypothetically assigned course grades |
+| `/api/planner/cgpa/` | `POST` | No / Optional | Public/Student | Target CGPA simulator returning required upcoming SGPA and feasibility |
 | `/api/placements/eligibility/` | `GET` | Yes | Student | Evaluates eligibility across all corporate placement drives |
-| `/api/advisor/chat/` | `POST` | Yes | Student | Context-aware AI chat with weakest subject 4-week study plan fallback |
-| `/api/advisor/history/` | `DELETE` | Yes | Student | Deletes student's conversation history and creates an audit log |
-| `/api/admin/dashboard/` | `GET` | Yes | Admin/Faculty | Overview of student count, average CGPA, and department roster |
-| `/api/admin/analytics/` | `GET` | Yes | Admin/Faculty | Institutional grade distribution, department CGPA, and at-risk students |
-| `/api/admin/grades/entry/` | `POST` | Yes | Admin/Faculty | Enters single course grade with automatic arrear clearance handling |
+| `/api/advisor/chat/` | `GET`, `POST` | Yes | Student | Retrieves chat history (`GET`) or generates grounded AI advice (`POST`) |
+| `/api/advisor/history/` | `DELETE` | Yes | Student | Deletes student conversation history and creates an audit log |
+| `/api/faculty/overview/` | `GET` | Yes | Admin/Faculty | Department overview, total students, average CGPA, and metrics |
+| `/api/faculty/students/` | `GET` | Yes | Admin/Faculty | Searchable student directory with CGPA, credits, and backlogs |
+| `/api/faculty/results/upload/` | `POST` | Yes | Admin/Faculty | Ingests semester academic records and computes metrics atomically |
 | `/api/admin/grades/sample-csv/` | `GET` | Yes | Admin/Faculty | Downloads standard CSV grade entry template |
 | `/api/admin/grades/bulk-upload/` | `POST` | Yes | Admin/Faculty | Validates and ingests bulk grade CSV with detailed error report |
+| `/api/admin/analytics/` | `GET` | Yes | Admin/Faculty | Institutional grade distribution, department CGPA, and at-risk students |
+| `/api/transcript/pdf/` | `GET` | Yes | Student/Admin | Streams generated official academic PDF transcript |
+| `/api/health/` | `GET` | No | Public | Health check endpoint returning status 200 OK |
 
 ---
 
@@ -223,16 +236,19 @@ All API endpoints are under `/api/` and enforce role-based authentication and st
 EduGrade AI includes comprehensive automated testing:
 
 ```bash
-# 1. Run all 102 Django unit and integration tests
+# 1. Run all 103 Django unit and integration tests
 python manage.py test
 
-# 2. Run end-to-end route, API and permission verification
+# 2. Run test suite in reverse order
+python manage.py test --reverse
+
+# 3. Run end-to-end route, API and permission verification
 python test_routes.py
 
-# 3. Verify ReactPy host component mounting
+# 4. Verify ReactPy host component mounting
 python test_reactpy.py
 
-# 4. Check database referential integrity & migrations
+# 5. Check database referential integrity & migrations
 python manage.py check_database
 ```
 
@@ -240,9 +256,15 @@ python manage.py check_database
 
 ## 🚀 Running the Application
 
-1. **Start the ASGI server**:
-   ```bash
-   python manage.py runserver 127.0.0.1:8000
-   ```
-2. **Access the portal**:
-   Open **[http://127.0.0.1:8000/](http://127.0.0.1:8000/)** in any modern web browser.
+### Option A: Standard Django Development Server
+```bash
+python manage.py runserver 127.0.0.1:8000
+```
+
+### Option B: ASGI Production Server (Daphne)
+```bash
+daphne -b 127.0.0.1 -p 8000 edugrade.asgi:application
+```
+
+### Accessing the Portal
+Open **[http://127.0.0.1:8000/](http://127.0.0.1:8000/)** in any modern web browser.
