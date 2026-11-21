@@ -18,6 +18,16 @@ GRADE_POINT_MAP = {
     'W': 0.0,
 }
 
+FAILING_GRADES = {'U', 'RA', 'SA', 'W'}
+VALID_GRADES = set(GRADE_POINT_MAP.keys())
+GRADE_ORDER = ['O', 'A+', 'A', 'B+', 'B', 'C', 'U', 'RA', 'SA', 'W']
+
+# At-risk academic intervention institutional thresholds
+AT_RISK_CGPA_THRESHOLD = 6.0
+AT_RISK_BACKLOG_THRESHOLD = 2
+MIN_PASSING_GRADE_POINT = 5.0
+MAX_GRADE_POINT = 10.0
+
 def grade_to_point(grade_str: str) -> float:
     """Converts letter grade to numeric grade points."""
     clean = str(grade_str).strip().upper()
@@ -645,7 +655,6 @@ def process_bulk_grades_csv(action_user, csv_text: str):
             "status_code": 400
         }
 
-    VALID_GRADES = {'O', 'A+', 'A', 'B+', 'B', 'C', 'U', 'RA', 'SA', 'W'}
     saved = 0
     skipped = 0
     errors = []

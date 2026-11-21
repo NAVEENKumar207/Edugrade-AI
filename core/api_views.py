@@ -21,17 +21,21 @@ from .models import (
     CourseResult, CompanyPlacementCriteria, AdvisorChatMessage, AcademicAuditLog
 )
 from .services.academic_service import (
-    calculate_sgpa, calculate_cgpa, plan_target_cgpa, check_placement_eligibility,
-    placement_readiness
+    calculate_cgpa, plan_target_cgpa, check_placement_eligibility,
+    placement_readiness, record_course_result, recalculate_student_metrics,
+    AT_RISK_CGPA_THRESHOLD, AT_RISK_BACKLOG_THRESHOLD, GRADE_ORDER
 )
 from .services.ai_service import generate_ai_advice
 from .services.security_service import (
     is_account_locked, record_failed_login, reset_login_attempts, get_lockout_message
 )
 
-# At-risk academic intervention thresholds
-AT_RISK_CGPA_THRESHOLD = 6.0
-AT_RISK_BACKLOG_THRESHOLD = 2
+def require_admin(request, message="Faculty or admin access required."):
+    """Helper returning HTTP 403 Response if user is not faculty/admin, else None."""
+    profile = getattr(request.user, 'profile', None)
+    if not profile or not profile.is_admin():
+        return Response({'error': message}, status=status.HTTP_403_FORBIDDEN)
+    return None
 
 
 # ==========================================
@@ -503,9 +507,9 @@ def api_advisor_clear_history(request):
 @permission_classes([IsAuthenticated])
 def api_faculty_overview(request):
     """Returns department and institution-wide metrics for faculty/admin."""
-    profile = getattr(request.user, 'profile', None)
-    if not profile or not profile.is_admin():
-        return Response({'error': 'Unauthorized: Faculty access required'}, status=status.HTTP_403_FORBIDDEN)
+    err = require_admin(request, 'Unauthorized: Faculty access required')
+    if err:
+        return err
 
     students = UserProfile.objects.filter(role='student')
     total_students = students.count()
@@ -550,9 +554,9 @@ def api_faculty_overview(request):
 @permission_classes([IsAuthenticated])
 def api_faculty_students(request):
     """Lists student records with search and placement status filter."""
-    profile = getattr(request.user, 'profile', None)
-    if not profile or not profile.is_admin():
-        return Response({'error': 'Unauthorized: Faculty access required'}, status=status.HTTP_403_FORBIDDEN)
+    err = require_admin(request, 'Unauthorized: Faculty access required')
+    if err:
+        return err
 
     search = request.GET.get('search', '').strip()
     status_filter = request.GET.get('status', 'all')
@@ -603,9 +607,9 @@ def api_faculty_upload_results(request):
     Validates and imports student semester results in bulk.
     Guarantees atomic transaction and creates audit record.
     """
-    profile = getattr(request.user, 'profile', None)
-    if not profile or not profile.is_admin():
-        return Response({'error': 'Unauthorized: Faculty access required'}, status=status.HTTP_403_FORBIDDEN)
+    err = require_admin(request, 'Unauthorized: Faculty access required')
+    if err:
+        return err
 
     data = request.data
     records = data.get('records', [])
@@ -631,41 +635,20 @@ def api_faculty_upload_results(request):
                     errors.append(f"Row {idx+1}: Student with roll number '{roll}' does not exist.")
                     continue
 
-                # Calculate SGPA
-                calc = calculate_sgpa(courses)
-                sgpa = calc['sgpa']
-                credits_earned = int(calc['total_credits'])
-
-                sem_record, _ = SemesterRecord.objects.update_or_create(
-                    student=student_prof,
-                    semester_number=int(sem_num),
-                    defaults={'sgpa': sgpa, 'credits_earned': credits_earned, 'is_published': True}
-                )
-
                 for c in courses:
-                    CourseResult.objects.update_or_create(
-                        student=student_prof,
+                    record_course_result(
+                        action_user=request.user,
+                        student_profile=student_prof,
                         semester_number=int(sem_num),
                         course_code=c.get('code', 'GEN01'),
-                        defaults={
-                            'semester_record': sem_record,
-                            'course_name': c.get('name', 'Course Subject'),
-                            'credits': int(c.get('credits', 3)),
-                            'grade': c.get('grade', 'A'),
-                            'grade_point': float(c.get('grade_point', 8.0)),
-                            'is_published': True
-                        }
+                        course_name=c.get('name', 'Course Subject'),
+                        credits=int(c.get('credits', 3)),
+                        grade=c.get('grade', 'A'),
+                        grade_point=float(c.get('grade_point', 8.0)),
+                        recalculate=False
                     )
 
-                # Recompute student cumulative CGPA
-                all_sems = SemesterRecord.objects.filter(student=student_prof).values('sgpa', 'credits_earned')
-                cgpa_res = calculate_cgpa(list(all_sems))
-                student_prof.current_cgpa = cgpa_res['cgpa']
-                student_prof.credits_earned = int(cgpa_res['total_credits'])
-                student_prof.backlogs_count = calc['backlogs']
-                student_prof.is_placement_eligible = (cgpa_res['cgpa'] >= 7.0 and calc['backlogs'] == 0)
-                student_prof.save()
-
+                recalculate_student_metrics(student_prof)
                 success_count += 1
 
             # Log audit
@@ -688,9 +671,9 @@ def api_faculty_upload_results(request):
 @permission_classes([IsAuthenticated])
 def api_admin_grades_sample_csv(request):
     """Returns downloadable sample CSV template for bulk grade upload."""
-    profile = getattr(request.user, 'profile', None)
-    if not profile or not profile.is_admin():
-        return Response({'error': 'Faculty or admin access required.'}, status=status.HTTP_403_FORBIDDEN)
+    err = require_admin(request, 'Faculty or admin access required.')
+    if err:
+        return err
 
     from django.http import HttpResponse
     csv_content = (
@@ -712,9 +695,9 @@ def api_admin_grades_bulk_upload(request):
     Validates CSV extension, size <= 2MB, header columns, rows <= 1000,
     and individual field constraints.
     """
-    profile = getattr(request.user, 'profile', None)
-    if not profile or not profile.is_admin():
-        return Response({'error': 'Faculty or admin access required.'}, status=status.HTTP_403_FORBIDDEN)
+    err = require_admin(request, 'Faculty or admin access required.')
+    if err:
+        return err
 
     uploaded_file = request.FILES.get('file') or request.FILES.get('csv_file')
     if not uploaded_file:
@@ -813,9 +796,9 @@ def api_admin_analytics(request):
       - Aggregate metrics
     Optimized with aggregates and select_related.
     """
-    profile = getattr(request.user, 'profile', None)
-    if not profile or not profile.is_admin():
-        return Response({'error': 'Faculty or admin access required.'}, status=status.HTTP_403_FORBIDDEN)
+    err = require_admin(request, 'Faculty or admin access required.')
+    if err:
+        return err
 
     from django.db.models import Avg, Count, Q
 
@@ -832,8 +815,7 @@ def api_admin_analytics(request):
     eligibility_rate = round((eligible_count / total_students * 100), 1) if total_students > 0 else 0.0
 
     # 1. Grade Distribution
-    grade_order = ['O', 'A+', 'A', 'B+', 'B', 'C', 'U', 'RA', 'SA', 'W']
-    grade_counts = {g: 0 for g in grade_order}
+    grade_counts = {g: 0 for g in GRADE_ORDER}
     grade_data = CourseResult.objects.values('grade').annotate(count=Count('id'))
     for item in grade_data:
         g = str(item['grade']).strip().upper()

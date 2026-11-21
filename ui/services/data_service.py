@@ -20,7 +20,7 @@ from core.models import (
 )
 from core.services.academic_service import (
     calculate_cgpa, check_placement_eligibility,
-    record_course_result, placement_readiness
+    record_course_result, placement_readiness, GRADE_ORDER
 )
 from core.services.ai_service import generate_ai_advice
 from core.services.security_service import (
@@ -420,8 +420,7 @@ def get_admin_analytics_data():
     students_qs = UserProfile.objects.filter(role='student')
 
     # 1. Grade distribution
-    grade_order = ['O', 'A+', 'A', 'B+', 'B', 'C', 'U', 'RA', 'SA', 'W']
-    grade_counts = {g: 0 for g in grade_order}
+    grade_counts = {g: 0 for g in GRADE_ORDER}
     for item in CourseResult.objects.values('grade').annotate(count=Count('id')):
         g = str(item['grade']).strip().upper()
         if g in grade_counts:

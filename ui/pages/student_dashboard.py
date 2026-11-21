@@ -8,6 +8,7 @@ from ui.components.icons import (
     icon_award, icon_trending_up, icon_book_open, icon_briefcase,
     icon_check, icon_alert, icon_calculator, icon_bot
 )
+from ui.components.common import StatCard
 from ui.services.data_service import get_student_dashboard_data, get_arrears
 
 @component
@@ -286,32 +287,24 @@ def StudentDashboard(user, set_page):
         # KPI Stats Grid with Anton Numerals
         html.div(
             {"className": "stat-grid"},
-            html.div(
-                {"className": "stat-card"},
-                html.div(
-                    html.div({"className": "stat-label"}, "Cumulative CGPA"),
-                    html.div({"className": "stat-value", "style": {"color": "var(--brand-vermillion)"}}, f"{student['current_cgpa']:.2f}" if has_results else "N/A"),
-                    html.small({"style": {"color": "var(--text-muted)", "fontWeight": "600"}}, f"Target: {student['target_cgpa']:.2f}" if has_results else "No results published yet")
-                ),
-                html.div({"style": {"alignSelf": "flex-end"}}, icon_award(26, "var(--brand-vermillion)"))
+            StatCard(
+                label="Cumulative CGPA",
+                value=f"{student['current_cgpa']:.2f}" if has_results else "N/A",
+                subtitle=f"Target: {student['target_cgpa']:.2f}" if has_results else "No results published yet",
+                icon=icon_award(26, "var(--brand-vermillion)"),
+                value_color="var(--brand-vermillion)"
             ),
-            html.div(
-                {"className": "stat-card"},
-                html.div(
-                    html.div({"className": "stat-label"}, "Latest Semester SGPA"),
-                    html.div({"className": "stat-value", "style": {"color": "var(--brand-navy)"}}, f"{student['latest_sgpa']:.2f}" if has_results else "N/A"),
-                    html.small({"style": {"color": "var(--text-muted)", "fontWeight": "600"}}, f"Semester {len(semesters)} CBCS" if has_results else "No results published yet")
-                ),
-                html.div({"style": {"alignSelf": "flex-end"}}, icon_trending_up(26, "var(--brand-navy)"))
+            StatCard(
+                label="Latest Semester SGPA",
+                value=f"{student['latest_sgpa']:.2f}" if has_results else "N/A",
+                subtitle=f"Semester {len(semesters)} CBCS" if has_results else "No results published yet",
+                icon=icon_trending_up(26, "var(--brand-navy)")
             ),
-            html.div(
-                {"className": "stat-card"},
-                html.div(
-                    html.div({"className": "stat-label"}, "Credits Completed"),
-                    html.div({"className": "stat-value", "style": {"color": "var(--brand-navy)"}}, f"{student['credits_earned']}"),
-                    html.small({"style": {"color": "var(--text-muted)", "fontWeight": "600"}}, f"{int(student['credits_earned'] / (student['total_credits'] or 160) * 100)}% of 160 credits completed")
-                ),
-                html.div({"style": {"alignSelf": "flex-end"}}, icon_book_open(26, "#53B7CF"))
+            StatCard(
+                label="Credits Completed",
+                value=str(student['credits_earned']),
+                subtitle=f"{int(student['credits_earned'] / (student['total_credits'] or 160) * 100)}% of 160 credits completed",
+                icon=icon_book_open(26, "#53B7CF")
             ),
             html.div(
                 {"className": "stat-card"},

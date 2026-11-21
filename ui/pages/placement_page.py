@@ -5,6 +5,7 @@ Editorial Consultancy Design (Anton, Newsreader, Vermillion, Navy).
 
 from reactpy import component, html, use_state
 from ui.components.icons import icon_briefcase, icon_shield_check, icon_check, icon_alert
+from ui.components.common import StatCard, EmptyStateCard
 from ui.services.data_service import get_placement_matrix_data
 
 @component
@@ -189,32 +190,24 @@ def PlacementPage(user):
         # Top Summary KPIs
         html.div(
             {"className": "stat-grid", "style": {"marginBottom": "2rem"}},
-            html.div(
-                {"className": "stat-card"},
-                html.div(
-                    html.div({"className": "stat-label"}, "Total Companies Audited"),
-                    html.div({"className": "stat-value", "style": {"color": "var(--brand-navy)"}}, str(len(companies))),
-                    html.small({"style": {"color": "var(--text-muted)", "fontWeight": "600"}}, "Tier-1 Tech & MNC recruitments")
-                ),
-                html.div({"style": {"alignSelf": "flex-end"}}, icon_briefcase(26, "var(--brand-navy)"))
+            StatCard(
+                label="Total Companies Audited",
+                value=str(len(companies)),
+                subtitle="Tier-1 Tech & MNC recruitments",
+                icon=icon_briefcase(26, "var(--brand-navy)")
             ),
-            html.div(
-                {"className": "stat-card"},
-                html.div(
-                    html.div({"className": "stat-label"}, "Eligible Opportunities"),
-                    html.div({"className": "stat-value", "style": {"color": "var(--brand-vermillion)"}}, str(eligible_count)),
-                    html.small({"style": {"color": "var(--text-muted)", "fontWeight": "600"}}, f"Qualification rate: {int(eligible_count / (len(companies) or 1) * 100)}%")
-                ),
-                html.div({"style": {"alignSelf": "flex-end"}}, icon_check(26, "var(--brand-vermillion)"))
+            StatCard(
+                label="Eligible Opportunities",
+                value=str(eligible_count),
+                subtitle=f"Qualification rate: {int(eligible_count / (len(companies) or 1) * 100)}%",
+                icon=icon_check(26, "var(--brand-vermillion)"),
+                value_color="var(--brand-vermillion)"
             ),
-            html.div(
-                {"className": "stat-card"},
-                html.div(
-                    html.div({"className": "stat-label"}, "Top Package Reached"),
-                    html.div({"className": "stat-value", "style": {"color": "var(--brand-navy)"}}, f"{max([c['package_lpa'] for c in companies if c['is_eligible']] or [0]):.1f} LPA"),
-                    html.small({"style": {"color": "var(--text-muted)", "fontWeight": "600"}}, "Highest qualifying annual package")
-                ),
-                html.div({"style": {"alignSelf": "flex-end"}}, icon_shield_check(26, "#10B981"))
+            StatCard(
+                label="Top Package Reached",
+                value=f"{max([c['package_lpa'] for c in companies if c['is_eligible']] or [0]):.1f} LPA",
+                subtitle="Highest qualifying annual package",
+                icon=icon_shield_check(26, "#10B981")
             )
         ),
 
@@ -225,10 +218,9 @@ def PlacementPage(user):
         html.div(
             {"style": {"display": "grid", "gridTemplateColumns": "repeat(auto-fit, minmax(320px, 1fr))", "gap": "1.75rem"}},
             company_cards if company_cards else [
-                html.div(
-                    {"className": "card", "style": {"gridColumn": "1 / -1", "textAlign": "center", "padding": "3rem 1.5rem"}},
-                    html.h3({"style": {"fontFamily": "var(--font-serif)", "fontSize": "1.35rem", "color": "var(--brand-navy)", "marginBottom": "0.5rem"}}, "No companies have been added yet."),
-                    html.p({"style": {"color": "var(--text-secondary)", "fontSize": "0.95rem"}}, "Placement coordinators have not published corporate recruitment criteria yet.")
+                EmptyStateCard(
+                    title="No companies have been added yet.",
+                    description="Placement coordinators have not published corporate recruitment criteria yet."
                 )
             ]
         )

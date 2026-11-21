@@ -5,6 +5,7 @@ Editorial Consultancy Design (Anton, Newsreader, Vermillion, Navy).
 
 from reactpy import component, html, use_state
 from ui.components.icons import icon_award, icon_book_open, icon_shield_check, icon_check
+from ui.components.common import StatCard, EmptyStateCard
 from ui.services.data_service import get_semester_results_data
 
 @component
@@ -125,42 +126,33 @@ def ResultsPage(user):
         # Summary Cards
         html.div(
             {"className": "stat-grid", "style": {"marginBottom": "2rem"}},
-            html.div(
-                {"className": "stat-card"},
-                html.div(
-                    html.div({"className": "stat-label"}, "Cumulative CGPA"),
-                    html.div({"className": "stat-value", "style": {"color": "var(--brand-vermillion)"}}, f"{data['current_cgpa']:.2f}" if len(semesters) > 0 else "N/A"),
-                    html.small({"style": {"color": "var(--text-muted)", "fontWeight": "600"}}, "Credit-weighted official standing" if len(semesters) > 0 else "No results yet")
-                ),
-                html.div({"style": {"alignSelf": "flex-end"}}, icon_award(26, "var(--brand-vermillion)"))
+            StatCard(
+                label="Cumulative CGPA",
+                value=f"{data['current_cgpa']:.2f}" if len(semesters) > 0 else "N/A",
+                subtitle="Credit-weighted official standing" if len(semesters) > 0 else "No results yet",
+                icon=icon_award(26, "var(--brand-vermillion)"),
+                value_color="var(--brand-vermillion)"
             ),
-            html.div(
-                {"className": "stat-card"},
-                html.div(
-                    html.div({"className": "stat-label"}, "Total Credits Earned"),
-                    html.div({"className": "stat-value", "style": {"color": "var(--brand-navy)"}}, str(data["credits_earned"])),
-                    html.small({"style": {"color": "var(--text-muted)", "fontWeight": "600"}}, f"Out of {data['total_credits']} required credits")
-                ),
-                html.div({"style": {"alignSelf": "flex-end"}}, icon_book_open(26, "var(--brand-navy)"))
+            StatCard(
+                label="Total Credits Earned",
+                value=str(data["credits_earned"]),
+                subtitle=f"Out of {data['total_credits']} required credits",
+                icon=icon_book_open(26, "var(--brand-navy)")
             ),
-            html.div(
-                {"className": "stat-card"},
-                html.div(
-                    html.div({"className": "stat-label"}, "Completed Semesters"),
-                    html.div({"className": "stat-value", "style": {"color": "var(--brand-navy)"}}, str(len(semesters))),
-                    html.small({"style": {"color": "var(--text-muted)", "fontWeight": "600"}}, "Regulation 2026 CBCS Cycle")
-                ),
-                html.div({"style": {"alignSelf": "flex-end"}}, icon_shield_check(26, "#10B981"))
+            StatCard(
+                label="Completed Semesters",
+                value=str(len(semesters)),
+                subtitle="Regulation 2026 CBCS Cycle",
+                icon=icon_shield_check(26, "#10B981")
             )
         ),
         # Semester Cards List
         html.div(
             {"style": {"display": "flex", "flexDirection": "column"}},
             sem_cards if sem_cards else [
-                html.div(
-                    {"className": "card", "style": {"textAlign": "center", "padding": "3rem 1.5rem"}},
-                    html.h3({"style": {"fontFamily": "var(--font-serif)", "fontSize": "1.35rem", "color": "var(--brand-navy)", "marginBottom": "0.5rem"}}, "No Results Yet"),
-                    html.p({"style": {"color": "var(--text-secondary)", "fontSize": "0.95rem"}}, "No semester course results or grade transcripts have been published yet.")
+                EmptyStateCard(
+                    title="No Results Yet",
+                    description="No semester course results or grade transcripts have been published yet."
                 )
             ]
         )
