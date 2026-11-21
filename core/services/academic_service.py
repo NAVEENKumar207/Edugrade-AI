@@ -345,6 +345,7 @@ def check_placement_eligibility(student_profile, criteria_queryset) -> list:
 class PlacementReadinessResult(dict):
     """Result object that behaves both as an integer score and as a dict with breakdown & tip."""
     def __init__(self, score, cgpa_part, backlog_part, company_part, tip, eligible_count=0, total_companies=0):
+        """Initializes dictionary entries and object attributes for composite score representation."""
         super().__init__(
             score=score,
             cgpa_part=cgpa_part,
@@ -363,12 +364,15 @@ class PlacementReadinessResult(dict):
         self.total_companies = total_companies
 
     def __int__(self):
+        """Returns integer readiness score."""
         return self.score
 
     def __float__(self):
+        """Returns float readiness score."""
         return float(self.score)
 
     def __eq__(self, other):
+        """Compares score equality against numeric values or another result object."""
         if isinstance(other, (int, float)):
             return self.score == other
         return super().__eq__(other)
@@ -446,8 +450,6 @@ def placement_readiness(profile_or_cgpa, backlogs=None, eligible_count=None, tot
 # ==============================================================================
 # Shared Grade Recording & Recalculation Engine (Arrear Tracker & Single/Bulk Entry)
 # ==============================================================================
-
-FAILING_GRADES = {'U', 'RA', 'SA', 'W'}
 
 def is_failing_grade(grade_str: str) -> bool:
     """Returns True if the grade string represents a failed or standing arrear."""

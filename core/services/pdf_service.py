@@ -15,16 +15,19 @@ from reportlab.pdfgen import canvas
 
 
 class NumberedCanvas(canvas.Canvas):
-    """Adds 'Page X of Y' and official system footer to every page."""
+    """Two-pass ReportLab canvas that appends 'Page X of Y' and official system footer."""
     def __init__(self, *args, **kwargs):
+        """Initializes canvas and internal state tracker for multi-page decoration."""
         super().__init__(*args, **kwargs)
         self._saved_page_states = []
 
     def showPage(self):
+        """Saves current page state for deferred footer rendering on final pass."""
         self._saved_page_states.append(dict(self.__dict__))
         self._startPage()
 
     def save(self):
+        """Renders page numbers and footer decorations across all recorded pages."""
         num_pages = len(self._saved_page_states)
         for state in self._saved_page_states:
             self.__dict__.update(state)
@@ -33,6 +36,7 @@ class NumberedCanvas(canvas.Canvas):
         super().save()
 
     def draw_page_decorations(self, page_count):
+        """Draws official bottom divider rule, verification note, and page counter."""
         self.saveState()
         self.setFont("Helvetica", 8)
         self.setFillColor(colors.HexColor("#64748B"))
@@ -53,6 +57,8 @@ class NumberedCanvas(canvas.Canvas):
 def generate_transcript_pdf(student_profile, semester_filter=None):
     """
     Generates a PDF byte stream containing the student's official academic transcript.
+    Inputs: student_profile (UserProfile instance), semester_filter (optional int semester).
+    Returns: bytes representing the generated PDF document.
     """
     from core.models import SemesterRecord, CourseResult
 

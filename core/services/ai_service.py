@@ -109,7 +109,9 @@ def generate_ai_advice(student_profile, user_message: str) -> dict:
                 status_lbl = "Eligible" if comp['is_eligible'] else "Not Eligible"
                 company_eligibility_notes.append(f"{comp['company_name']}: {status_lbl}")
 
-    # Build privacy-conscious student data block (NO name, roll number, email, username, or password)
+    # Build student academic context block for AI advisor prompt.
+    # Data privacy: personal fields (name, roll number, email, username) are not sent to Groq/OpenAI.
+    # Note: the student's own chat text is sent as typed.
     if has_results:
         student_data_text = (
             f"Department: {dept}\n"

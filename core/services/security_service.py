@@ -11,9 +11,11 @@ MAX_ATTEMPTS = 5
 LOCK_SECONDS = 300
 
 def get_fail_key(username: str) -> str:
+    """Returns cache key string for tracking failed login attempts for a username."""
     return "login_fail_" + username.strip().lower()
 
 def get_lock_key(username: str) -> str:
+    """Returns cache key string for tracking active account lockouts for a username."""
     return "login_lock_" + username.strip().lower()
 
 def is_account_locked(username: str) -> tuple[bool, int]:
@@ -58,5 +60,5 @@ def reset_login_attempts(username: str):
     cache.delete(get_lock_key(clean))
 
 def get_lockout_message(remaining_minutes: int = 5) -> str:
-    """Standard rate limit error message."""
+    """Returns user-facing rate limit error message indicating remaining lockout minutes."""
     return f"Too many failed attempts. Try again in {remaining_minutes} minutes."
