@@ -258,12 +258,15 @@ def api_student_dashboard(request):
         'id', 'semester_number', 'sgpa', 'credits_earned', 'is_published'
     ))
 
-    # Recalculate true cumulative CGPA
+    # Recalculate true cumulative CGPA only if values changed
     if semesters:
         cgpa_calc = calculate_cgpa(semesters)
-        profile.current_cgpa = cgpa_calc['cgpa']
-        profile.credits_earned = int(cgpa_calc['total_credits'])
-        profile.save(update_fields=['current_cgpa', 'credits_earned'])
+        new_cgpa = cgpa_calc['cgpa']
+        new_credits = int(cgpa_calc['total_credits'])
+        if float(profile.current_cgpa) != float(new_cgpa) or profile.credits_earned != new_credits:
+            profile.current_cgpa = new_cgpa
+            profile.credits_earned = new_credits
+            profile.save(update_fields=['current_cgpa', 'credits_earned'])
 
     insights = list(SubjectInsight.objects.filter(student=profile).values(
         'id', 'subject_name', 'grade_point', 'status_label'
@@ -511,28 +514,32 @@ def api_faculty_overview(request):
     if err:
         return err
 
+    from django.db.models import Avg, Count, Q
+
     students = UserProfile.objects.filter(role='student')
-    total_students = students.count()
-
-    cgpas = [float(s.current_cgpa) for s in students if s.current_cgpa > 0]
-    avg_cgpa = round(sum(cgpas) / len(cgpas), 2) if cgpas else 0.0
-
-    eligible_count = students.filter(is_placement_eligible=True).count()
+    agg = students.aggregate(
+        total_students=Count('id'),
+        avg_cgpa=Avg('current_cgpa', filter=Q(current_cgpa__gt=0)),
+        eligible_count=Count('id', filter=Q(is_placement_eligible=True))
+    )
+    total_students = agg['total_students']
+    avg_cgpa = round(float(agg['avg_cgpa'] or 0.0), 2)
+    eligible_count = agg['eligible_count']
     eligibility_rate = round((eligible_count / total_students * 100), 1) if total_students > 0 else 0.0
 
-    # Department breakdown
-    dept_stats = []
-    departments = students.values_list('department', flat=True).distinct()
-    for dept in departments:
-        dept_students = students.filter(department=dept)
-        count = dept_students.count()
-        d_cgpas = [float(s.current_cgpa) for s in dept_students if s.current_cgpa > 0]
-        dept_avg = round(sum(d_cgpas) / len(d_cgpas), 2) if d_cgpas else 0.0
-        dept_stats.append({
-            'department': dept,
-            'student_count': count,
-            'avg_cgpa': dept_avg
-        })
+    dept_qs = students.values('department').annotate(
+        count=Count('id'),
+        avg_cgpa=Avg('current_cgpa', filter=Q(current_cgpa__gt=0))
+    ).order_by('department')
+
+    dept_stats = [
+        {
+            'department': d['department'],
+            'student_count': d['count'],
+            'avg_cgpa': round(float(d['avg_cgpa'] or 0.0), 2)
+        }
+        for d in dept_qs
+    ]
 
     recent_audits = AcademicAuditLog.objects.all()[:5].values(
         'action_type', 'description', 'timestamp'

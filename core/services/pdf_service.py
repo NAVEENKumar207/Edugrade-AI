@@ -185,15 +185,16 @@ def generate_transcript_pdf(student_profile, semester_filter=None):
         sem_qs = sem_qs.filter(semester_number=semester_filter)
 
     semesters = list(sem_qs)
+    all_courses = list(CourseResult.objects.filter(student=student_profile).order_by('course_code'))
+    courses_by_sem = {}
+    for c in all_courses:
+        courses_by_sem.setdefault(c.semester_number, []).append(c)
 
-    if not semesters and not CourseResult.objects.filter(student=student_profile).exists():
+    if not semesters and not all_courses:
         story.append(Paragraph("<b>No academic records available for this student.</b>", cell_style))
     else:
         for sem in semesters:
-            courses = CourseResult.objects.filter(
-                student=student_profile,
-                semester_number=sem.semester_number
-            ).order_by('course_code')
+            courses = courses_by_sem.get(sem.semester_number, [])
 
             sem_title = f"Semester {sem.semester_number} Course Results & Credits (SGPA: {float(sem.sgpa):.2f})"
             story.append(Paragraph(sem_title, section_heading))
