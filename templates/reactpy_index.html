@@ -1,0 +1,82 @@
+{% load reactpy %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>EduGrade AI — Academic Intelligence Platform</title>
+    <meta name="description" content="AI-powered academic performance tracker, CGPA/SGPA credit calculator, placement eligibility matrix, and academic advisor platform.">
+    
+    <!-- Google Fonts: Anton (Condensed Display), Newsreader (Editorial Serif), Plus Jakarta Sans (Clean Modern Sans) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""/>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Newsreader:ital,opsz,wght@0,6..72,300..700;1,6..72,300..700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+    
+    <!-- Design System Stylesheet -->
+    <link rel="stylesheet" href="/static/css/reactpy_styles.css"/>
+    <script>
+        // 1. Immediate Theme Bootstrap (prevents theme flash)
+        (function() {
+            try {
+                var saved = localStorage.getItem('edugrade_theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', saved);
+                document.documentElement.className = 'theme-' + saved;
+            } catch (e) {}
+        })();
+
+        // 2. Global Theme Switcher & Synchronizer
+        function setGlobalTheme(newTheme) {
+            document.documentElement.setAttribute('data-theme', newTheme);
+            document.documentElement.className = 'theme-' + newTheme;
+            if (document.body) {
+                document.body.setAttribute('data-theme', newTheme);
+                document.body.className = 'editorial-body theme-' + newTheme;
+            }
+            try {
+                localStorage.setItem('edugrade_theme', newTheme);
+            } catch (e) {}
+        }
+
+        // 3. Instant UI Toggle Interceptor (captures clicks before any framework latency)
+        document.addEventListener('click', function(e) {
+            var btn = e.target.closest('.theme-toggle-btn');
+            if (btn) {
+                var current = document.documentElement.getAttribute('data-theme') || 'dark';
+                var next = current === 'dark' ? 'light' : 'dark';
+                setGlobalTheme(next);
+            }
+        }, true);
+
+        // 4. Ensure initial body reflects saved theme
+        document.addEventListener('DOMContentLoaded', function() {
+            var saved = localStorage.getItem('edugrade_theme') || 'dark';
+            setGlobalTheme(saved);
+        });
+
+        // 5. Bulk CSV File Picker Auto-Reader
+        document.addEventListener('change', function(e) {
+            if (e.target && e.target.id === 'csv-file-picker') {
+                var file = e.target.files && e.target.files[0];
+                if (file) {
+                    var reader = new FileReader();
+                    reader.onload = function(evt) {
+                        var ta = document.getElementById('csv-raw-textarea');
+                        if (ta) {
+                            ta.value = evt.target.result;
+                            ta.dispatchEvent(new Event('input', { bubbles: true }));
+                            ta.dispatchEvent(new Event('change', { bubbles: true }));
+                        }
+                    };
+                    reader.readAsText(file);
+                }
+            }
+        });
+    </script>
+</head>
+<body class="editorial-body">
+    <div id="edugrade-root">
+        {% component "ui.app.EduGradeApp" %}
+    </div>
+</body>
+
+</html>

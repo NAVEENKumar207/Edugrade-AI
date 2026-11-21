@@ -1,0 +1,251 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Placement Eligibility & Drives | EduGrade AI</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body class="dashboard-page">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <a href="{% url 'dashboard' %}" class="logo" style="text-decoration: none;">
+            <span>Edu</span>Grade
+        </a>
+
+        <nav>
+            <a href="{% url 'dashboard' %}">
+                <span>⌂</span>
+                Dashboard
+            </a>
+            <a href="{% url 'upload' %}">
+                <span>⚡</span>
+                Calculate SGPA
+            </a>
+            <a href="{% url 'syllabus' %}">
+                <span>📄</span>
+                Syllabus
+            </a>
+            <a href="{% url 'results' %}">
+                <span>📊</span>
+                Results
+            </a>
+            <a href="{% url 'cgpa_planner' %}">
+                <span>🎯</span>
+                CGPA Planner
+            </a>
+            <a href="{% url 'placement' %}" class="active">
+                <span>💼</span>
+                Placement
+            </a>
+            <a href="{% url 'ai_advisor' %}">
+                <span>🤖</span>
+                AI Advisor
+            </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <a href="#">⚙ Settings</a>
+            <a href="{% url 'logout' %}">↪ Logout</a>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="dashboard-main">
+
+        <!-- TOPBAR -->
+        <header class="dashboard-header">
+            <div>
+                <h1>Placement Eligibility & Company Matrix 💼</h1>
+                <p>Check how your current academic profile matches top corporate recruitment criteria.</p>
+            </div>
+
+            <div class="profile">
+                <div class="profile-avatar">
+                    {{ user.username|make_list|first|upper }}
+                </div>
+                <div>
+                    <strong>{{ user.get_full_name|default:user.username }}</strong>
+                    <small>{{ profile.department }} • Semester {{ profile.current_semester }}</small>
+                </div>
+            </div>
+        </header>
+
+        <!-- STAT CARDS -->
+        <section class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-top">
+                    <span>Eligible Company Drives</span>
+                    <div class="stat-icon">💼</div>
+                </div>
+                <h2 class="eligible">
+                    {% if profile.current_cgpa >= 8.0 %}12 Drives{% else %}4 Drives{% endif %}
+                </h2>
+                <p class="positive">Profile matches current criteria</p>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-top">
+                    <span>Highest Matched Package</span>
+                    <div class="stat-icon">💰</div>
+                </div>
+                <h2>
+                    {% if profile.current_cgpa >= 8.5 %}32 LPA{% elif profile.current_cgpa >= 8.0 %}28 LPA{% else %}9 LPA{% endif %}
+                </h2>
+                <p>Based on current CGPA</p>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-top">
+                    <span>Standing Arrears</span>
+                    <div class="stat-icon">✓</div>
+                </div>
+                <h2 class="eligible">0 Arrears</h2>
+                <p>Academic Record Clean</p>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-top">
+                    <span>Profile Status</span>
+                    <div class="stat-icon">🎓</div>
+                </div>
+                <h2 class="eligible">
+                    {% if profile.current_cgpa >= 8.5 %}Super Dream{% elif profile.current_cgpa >= 8.0 %}Dream{% else %}Core{% endif %}
+                </h2>
+                <p>Eligibility Tier</p>
+            </div>
+        </section>
+
+        <!-- COMPANY ELIGIBILITY MATRIX -->
+        <section class="dashboard-card" style="margin-top: 25px;">
+            <div class="card-header">
+                <div>
+                    <h2>Campus Recruitment Drives & Cutoff Matrix</h2>
+                    <p>Live matching based on your CGPA of <strong id="my-cgpa-display">{{ profile.current_cgpa }}</strong></p>
+                </div>
+                <select onchange="filterCompanies(this.value)">
+                    <option value="all">All Packages</option>
+                    <option value="dream">Dream (> 10 LPA)</option>
+                    <option value="tier1">Tier 1 (6 - 10 LPA)</option>
+                </select>
+            </div>
+
+            <div class="company-grid">
+                <!-- Microsoft -->
+                <div class="company-card" data-pkg="28">
+                    <div class="company-header">
+                        <div>
+                            <span class="company-title">Microsoft</span>
+                            <small style="display: block; color: var(--muted);">Software Engineer (SDE 1)</small>
+                        </div>
+                        <span class="company-pkg">28 LPA</span>
+                    </div>
+                    <div class="company-criteria">
+                        <div><strong>CGPA Cutoff:</strong> Min 8.00 (Your: {{ profile.current_cgpa }} {% if profile.current_cgpa >= 8.0 %}✓{% else %}⚠️{% endif %})</div>
+                        <div><strong>Backlogs:</strong> 0 Standing Arrears ✓</div>
+                        <div><strong>Eligible Branches:</strong> CSE, IT, AIDS ✓</div>
+                    </div>
+                    <span class="badge-tag {% if profile.current_cgpa >= 8.0 %}badge-success{% else %}badge-warning{% endif %}">
+                        {% if profile.current_cgpa >= 8.0 %}✓ Eligible to Apply{% else %}⚠️ Need 8.00 CGPA{% endif %}
+                    </span>
+                </div>
+
+                <!-- Amazon -->
+                <div class="company-card" data-pkg="24">
+                    <div class="company-header">
+                        <div>
+                            <span class="company-title">Amazon</span>
+                            <small style="display: block; color: var(--muted);">SDE Intern + Full Time</small>
+                        </div>
+                        <span class="company-pkg">24 LPA</span>
+                    </div>
+                    <div class="company-criteria">
+                        <div><strong>CGPA Cutoff:</strong> Min 8.00 (Your: {{ profile.current_cgpa }} {% if profile.current_cgpa >= 8.0 %}✓{% else %}⚠️{% endif %})</div>
+                        <div><strong>Backlogs:</strong> 0 Standing Arrears ✓</div>
+                        <div><strong>Eligible Branches:</strong> All Circuit Branches ✓</div>
+                    </div>
+                    <span class="badge-tag {% if profile.current_cgpa >= 8.0 %}badge-success{% else %}badge-warning{% endif %}">
+                        {% if profile.current_cgpa >= 8.0 %}✓ Eligible to Apply{% else %}⚠️ Need 8.00 CGPA{% endif %}
+                    </span>
+                </div>
+
+                <!-- Google -->
+                <div class="company-card" data-pkg="32">
+                    <div class="company-header">
+                        <div>
+                            <span class="company-title">Google</span>
+                            <small style="display: block; color: var(--muted);">Software Development Engineer</small>
+                        </div>
+                        <span class="company-pkg">32 LPA</span>
+                    </div>
+                    <div class="company-criteria">
+                        <div><strong>CGPA Cutoff:</strong> Min 8.50 (Your: {{ profile.current_cgpa }} {% if profile.current_cgpa >= 8.5 %}✓{% else %}⚠️{% endif %})</div>
+                        <div><strong>Backlogs:</strong> 0 Standing Arrears ✓</div>
+                        <div><strong>Gap Needed:</strong> {% if profile.current_cgpa < 8.5 %}Target higher SGPA in remaining semesters{% else %}Met Criteria{% endif %}</div>
+                    </div>
+                    <span class="badge-tag {% if profile.current_cgpa >= 8.5 %}badge-success{% else %}badge-warning{% endif %}">
+                        {% if profile.current_cgpa >= 8.5 %}✓ Eligible to Apply{% else %}⚠️ Need 8.50 CGPA{% endif %}
+                    </span>
+                </div>
+
+                <!-- Zoho -->
+                <div class="company-card" data-pkg="9">
+                    <div class="company-header">
+                        <div>
+                            <span class="company-title">Zoho Corporation</span>
+                            <small style="display: block; color: var(--muted);">Member Technical Staff (MTS)</small>
+                        </div>
+                        <span class="company-pkg">9 LPA</span>
+                    </div>
+                    <div class="company-criteria">
+                        <div><strong>CGPA Cutoff:</strong> Min 7.00 (Your: {{ profile.current_cgpa }} ✓)</div>
+                        <div><strong>Backlogs:</strong> Up to 1 allowed ✓</div>
+                        <div><strong>Eligible Branches:</strong> Open to All ✓</div>
+                    </div>
+                    <span class="badge-tag badge-success">✓ Eligible to Apply</span>
+                </div>
+
+                <!-- Infosys SP -->
+                <div class="company-card" data-pkg="9.5">
+                    <div class="company-header">
+                        <div>
+                            <span class="company-title">Infosys</span>
+                            <small style="display: block; color: var(--muted);">Specialist Programmer (SP)</small>
+                        </div>
+                        <span class="company-pkg">9.5 LPA</span>
+                    </div>
+                    <div class="company-criteria">
+                        <div><strong>CGPA Cutoff:</strong> Min 7.50 (Your: {{ profile.current_cgpa }} ✓)</div>
+                        <div><strong>Backlogs:</strong> 0 Standing Arrears ✓</div>
+                        <div><strong>Eligible Branches:</strong> CSE, IT, ECE ✓</div>
+                    </div>
+                    <span class="badge-tag badge-success">✓ Eligible to Apply</span>
+                </div>
+
+                <!-- TCS Digital -->
+                <div class="company-card" data-pkg="7.5">
+                    <div class="company-header">
+                        <div>
+                            <span class="company-title">TCS</span>
+                            <small style="display: block; color: var(--muted);">Digital Cadre Engineer</small>
+                        </div>
+                        <span class="company-pkg">7.5 LPA</span>
+                    </div>
+                    <div class="company-criteria">
+                        <div><strong>CGPA Cutoff:</strong> Min 7.00 (Your: {{ profile.current_cgpa }} ✓)</div>
+                        <div><strong>Backlogs:</strong> 0 Standing Arrears ✓</div>
+                        <div><strong>Eligible Branches:</strong> All Engineering ✓</div>
+                    </div>
+                    <span class="badge-tag badge-success">✓ Eligible to Apply</span>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="{% static 'js/script.js' %}"></script>
+</body>
+</html>

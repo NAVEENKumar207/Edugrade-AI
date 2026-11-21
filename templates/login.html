@@ -1,0 +1,152 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Login | EduGrade AI</title>
+
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <script>
+        (function() {
+            var saved = localStorage.getItem('edugrade_theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', saved);
+        })();
+    </script>
+</head>
+
+<body class="auth-page">
+
+    <div style="position: absolute; top: 1.5rem; right: 1.5rem; z-index: 100;">
+        <button type="button" class="legacy-theme-toggle" id="theme-toggle" aria-label="Toggle Theme">
+            <span class="theme-icon">☀️</span> <span class="theme-text">Light Mode</span>
+        </button>
+    </div>
+
+    <div class="auth-container">
+
+
+        <div class="auth-brand">
+
+            <a href="{% url 'home' %}" class="logo">
+                <span>Edu</span>Grade AI
+            </a>
+
+            <h1>
+                Welcome back.
+            </h1>
+
+            <p>
+                Access student insights or manage college academic performance with intelligent AI analytics.
+            </p>
+
+        </div>
+
+
+        <div class="auth-card">
+
+            <!-- Role Selector Toggle -->
+            <div class="role-toggle">
+                <button type="button" class="role-tab active" data-role="student">
+                    🎓 Student Login
+                </button>
+                <button type="button" class="role-tab" data-role="admin">
+                    🛡️ Admin / Faculty
+                </button>
+            </div>
+
+            <h2 id="auth-role-title">Sign in</h2>
+
+            <p class="auth-subtitle" id="auth-role-subtitle">
+                Enter your student details to access your dashboard.
+            </p>
+
+            {% if messages %}
+                <div style="margin-bottom: 15px;">
+                    {% for message in messages %}
+                        <div style="padding: 10px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 8px; {% if message.tags == 'error' %}background: #fee2e2; color: #dc2626;{% else %}background: #dcfce7; color: #16a34a;{% endif %}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <form action="{% url 'login' %}" method="POST" data-form-type="login">
+                {% csrf_token %}
+
+                <input type="hidden" name="role" id="selected-role" value="student">
+
+                <label>Email Address / Username / ID</label>
+
+                <input
+                    type="text"
+                    name="username"
+                    id="identifier-input"
+                    placeholder="student@example.com or Roll No"
+                    required
+                >
+
+
+                <label>Password</label>
+
+                <input
+                    type="password"
+                    name="password"
+                    placeholder="Enter your password"
+                    required
+                >
+
+
+                <div class="form-options">
+
+                    <label class="checkbox">
+
+                        <input type="checkbox" name="remember">
+
+                        Remember me
+
+                    </label>
+
+                    <a href="#">
+                        Forgot password?
+                    </a>
+
+                </div>
+
+
+                <button type="submit" class="auth-button">
+                    Sign In →
+                </button>
+
+            </form>
+
+            <div class="divider">
+                <span>OR</span>
+            </div>
+
+
+            <p class="signup-text">
+
+                Don't have an account?
+
+                <a href="{% url 'signup' %}">
+                    Create one
+                </a>
+
+            </p>
+
+
+            <a href="{% url 'home' %}" class="back-home">
+                ← Back to home
+            </a>
+
+        </div>
+
+    </div>
+
+    <script src="{% static 'js/script.js' %}"></script>
+</body>
+</html>

@@ -1,0 +1,167 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Academic Results & Transcripts | EduGrade AI</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body class="dashboard-page">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <a href="{% url 'dashboard' %}" class="logo" style="text-decoration: none;">
+            <span>Edu</span>Grade
+        </a>
+
+        <nav>
+            <a href="{% url 'dashboard' %}">
+                <span>⌂</span>
+                Dashboard
+            </a>
+            <a href="{% url 'upload' %}">
+                <span>⚡</span>
+                Calculate SGPA
+            </a>
+            <a href="{% url 'syllabus' %}">
+                <span>📄</span>
+                Syllabus
+            </a>
+            <a href="{% url 'results' %}" class="active">
+                <span>📊</span>
+                Results
+            </a>
+            <a href="{% url 'cgpa_planner' %}">
+                <span>🎯</span>
+                CGPA Planner
+            </a>
+            <a href="{% url 'placement' %}">
+                <span>💼</span>
+                Placement
+            </a>
+            <a href="{% url 'ai_advisor' %}">
+                <span>🤖</span>
+                AI Advisor
+            </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <a href="#">⚙ Settings</a>
+            <a href="{% url 'logout' %}">↪ Logout</a>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="dashboard-main">
+
+        <!-- TOPBAR -->
+        <header class="dashboard-header">
+            <div>
+                <h1>Semester Transcripts & Grade Sheets 📊</h1>
+                <p>Verified academic record history for your profile.</p>
+            </div>
+
+            <div class="profile">
+                <div class="profile-avatar">
+                    {{ user.username|make_list|first|upper }}
+                </div>
+                <div>
+                    <strong>{{ user.get_full_name|default:user.username }}</strong>
+                    <small>{{ profile.department }} • Semester {{ profile.current_semester }}</small>
+                </div>
+            </div>
+        </header>
+
+        <!-- STAT CARDS -->
+        <section class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-top">
+                    <span>Cumulative CGPA</span>
+                    <div class="stat-icon">🎓</div>
+                </div>
+                <h2>{{ profile.current_cgpa }}</h2>
+                <p class="positive">Official Academic Standing</p>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-top">
+                    <span>Semesters Recorded</span>
+                    <div class="stat-icon">📈</div>
+                </div>
+                <h2>{{ semesters.count }} of 8</h2>
+                <p>Verified records available</p>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-top">
+                    <span>Total Arrears / Backlogs</span>
+                    <div class="stat-icon">✓</div>
+                </div>
+                <h2 class="eligible">0</h2>
+                <p>100% Pass Percentage</p>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-top">
+                    <span>Credits Earned</span>
+                    <div class="stat-icon">💼</div>
+                </div>
+                <h2>{{ profile.credits_earned }} / {{ profile.total_credits }}</h2>
+                <p>On track for graduation</p>
+            </div>
+        </section>
+
+        <!-- SEMESTER RESULTS TABLE -->
+        <section class="dashboard-card" style="margin-top: 25px;">
+            <div class="card-header">
+                <div>
+                    <h2>Semester Grade Record History</h2>
+                    <p>Verified transcripts from your academic journey</p>
+                </div>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <a href="/api/transcript/pdf/" download class="primary-button" style="padding: 8px 16px; font-size: 13px; text-decoration: none; background: #0f172a; border-color: #0f172a;">
+                        📄 Download Transcript (PDF)
+                    </a>
+                    <a href="{% url 'upload' %}" class="primary-button" style="padding: 8px 16px; font-size: 13px; text-decoration: none;">
+                        + Calculate New Semester
+                    </a>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>Semester</th>
+                            <th>Credits Earned</th>
+                            <th>Semester SGPA</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sem in semesters %}
+                        <tr>
+                            <td><strong>Semester {{ sem.semester_number }}</strong></td>
+                            <td>{{ sem.credits_earned }} Credits</td>
+                            <td><strong style="color: var(--primary);">{{ sem.sgpa }}</strong></td>
+                            <td><span class="badge-tag badge-success">Passed</span></td>
+                            <td><a href="{% url 'upload' %}" style="color: var(--primary); text-decoration: none; font-weight: 600;">Edit Grades</a></td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 20px;">No semester records found. Please upload your results.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script src="{% static 'js/script.js' %}"></script>
+</body>
+</html>

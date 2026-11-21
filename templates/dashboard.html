@@ -1,0 +1,291 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | EduGrade AI</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <script>
+        (function() {
+            var saved = localStorage.getItem('edugrade_theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', saved);
+        })();
+    </script>
+</head>
+
+<body class="dashboard-page">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <a href="{% url 'dashboard' %}" class="logo" style="text-decoration: none;">
+            <span>Edu</span>Grade
+        </a>
+
+        <nav>
+            <a href="{% url 'dashboard' %}" class="active">
+                <span>⌂</span>
+                Dashboard
+            </a>
+            <a href="{% url 'upload' %}">
+                <span>⚡</span>
+                Calculate SGPA
+            </a>
+            <a href="{% url 'syllabus' %}">
+                <span>📄</span>
+                Syllabus
+            </a>
+            <a href="{% url 'results' %}">
+                <span>📊</span>
+                Results
+            </a>
+            <a href="{% url 'cgpa_planner' %}">
+                <span>🎯</span>
+                CGPA Planner
+            </a>
+            <a href="{% url 'placement' %}">
+                <span>💼</span>
+                Placement
+            </a>
+            <a href="{% url 'ai_advisor' %}">
+                <span>🤖</span>
+                AI Advisor
+            </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <button type="button" class="legacy-theme-toggle" id="theme-toggle" style="width: 100%; margin-bottom: 0.5rem; justify-content: center;" aria-label="Toggle Theme">
+                <span class="theme-icon">☀️</span> <span class="theme-text">Light Mode</span>
+            </button>
+            <a href="#">⚙ Settings</a>
+            <a href="{% url 'logout' %}">↪ Logout</a>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="dashboard-main">
+
+        <!-- TOPBAR -->
+        <header class="dashboard-header">
+            <div>
+                <h1>Good morning, {{ profile.user.first_name|default:profile.user.username }} 👋</h1>
+                <p>Here's your academic overview.</p>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <button type="button" class="legacy-theme-toggle" id="theme-toggle-top" aria-label="Toggle Theme">
+                    <span class="theme-icon">☀️</span> <span class="theme-text">Light Mode</span>
+                </button>
+                <div class="profile">
+                    <div class="profile-avatar">
+                        {{ profile.user.username|make_list|first|upper }}
+                    </div>
+                    <div>
+                        <strong>{{ profile.user.get_full_name|default:profile.user.username }}</strong>
+                        <small>{{ profile.department }} • Semester {{ profile.current_semester }}</small>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- STAT CARDS -->
+        <section class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-top">
+                    <span>Current CGPA</span>
+                    <div class="stat-icon">🎓</div>
+                </div>
+                <h2>{{ profile.current_cgpa }}</h2>
+                <p class="positive">Academic Performance</p>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-top">
+                    <span>Latest SGPA</span>
+                    <div class="stat-icon">📈</div>
+                </div>
+                <h2>{% if semesters %}{{ semesters.last.sgpa }}{% else %}--{% endif %}</h2>
+                <p class="positive">Semester Trend</p>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-top">
+                    <span>Credits Earned</span>
+                    <div class="stat-icon">✓</div>
+                </div>
+                <h2>{{ profile.credits_earned }}</h2>
+                <p>of {{ profile.total_credits }} total credits</p>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-top">
+                    <span>Placement Status</span>
+                    <div class="stat-icon">💼</div>
+                </div>
+                <h2 class="{% if profile.is_placement_eligible %}eligible{% else %}not-eligible{% endif %}">
+                    {% if profile.is_placement_eligible %}Eligible{% else %}Not Eligible{% endif %}
+                </h2>
+                <p>Verified based on CGPA</p>
+            </div>
+        </section>
+
+        <!-- MAIN GRID -->
+        <section class="dashboard-grid">
+            <!-- PERFORMANCE CHART -->
+            <div class="dashboard-card performance-card">
+                <div class="card-header">
+                    <div>
+                        <h2>Academic Performance</h2>
+                        <p>Your semester-wise SGPA trend</p>
+                    </div>
+                    <select>
+                        <option>All Semesters</option>
+                        <option>Last 3 Semesters</option>
+                    </select>
+                </div>
+
+                <div class="big-chart">
+                    <div class="y-axis">
+                        <span>10</span><span>8</span><span>6</span><span>4</span><span>2</span>
+                    </div>
+                    <div class="bars">
+                        {% for sem in semesters %}
+                        <div class="bar-wrapper">
+                            <div class="bar bar{{ forloop.counter }}">
+                                <span>{{ sem.sgpa }}</span>
+                            </div>
+                            <small>S{{ sem.semester_number }}</small>
+                        </div>
+                        {% empty %}
+                        <p style="text-align: center; width: 100%; padding: 20px;">No semester records found.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI INSIGHT -->
+            <div class="dashboard-card ai-card">
+                <div class="ai-header">
+                    <div class="ai-icon">✨</div>
+                    <div>
+                        <h2>AI Insight</h2>
+                        <span>Updated today</span>
+                    </div>
+                </div>
+                <div class="insight-content">
+                    <h3>Academic Trend Analysis</h3>
+                    <p>
+                        {% if profile.current_cgpa > 8.0 %}
+                        You're maintaining a strong academic record. Focus on maintaining consistency
+                        in your core engineering subjects to secure top placements.
+                        {% else %}
+                        You have room for improvement. Focusing on your weakest subjects could
+                        significantly boost your CGPA in the next semester.
+                        {% endif %}
+                    </p>
+                </div>
+                <div class="insight-box">
+                    <strong>💡 Recommendation</strong>
+                    <p>Review your performance in the most recent semester and identify subjects that need more focus.</p>
+                </div>
+                <a href="{% url 'ai_advisor' %}" class="outline-button" style="display: block; text-align: center; text-decoration: none;">
+                    Ask AI Advisor →
+                </a>
+            </div>
+        </section>
+
+        <!-- BOTTOM GRID -->
+        <section class="bottom-grid">
+            <!-- TARGET CGPA -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <div>
+                        <h2>Target CGPA</h2>
+                        <p>Your current goal</p>
+                    </div>
+                    <span class="target-value">{{ profile.target_cgpa }}</span>
+                </div>
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: {% widthratio profile.current_cgpa profile.target_cgpa 100 %}%"></div>
+                    </div>
+                    <div class="progress-text">
+                        <span>{{ profile.current_cgpa }} current</span>
+                        <span>{{ profile.target_cgpa }} target</span>
+                    </div>
+                </div>
+                <p class="target-message">
+                    Maintain consistency to reach your target of {{ profile.target_cgpa }}.
+                </p>
+                <a href="{% url 'cgpa_planner' %}" class="outline-button" style="display: block; text-align: center; text-decoration: none;">
+                    Open CGPA Planner →
+                </a>
+            </div>
+
+            <!-- ARREARS TRACKER -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <div>
+                        <h2>Academic Arrears Tracker</h2>
+                        <p>Standing and cleared backlogs</p>
+                    </div>
+                </div>
+                {% if not arrears.active and not arrears.cleared %}
+                    <p style="text-align: center; padding: 20px; color: #10B981; font-weight: 600;">✓ No arrears - great work!</p>
+                {% else %}
+                    {% if arrears.active %}
+                        <h4 style="color: #EF4444; font-size: 0.9rem; margin-bottom: 8px;">Active Arrears</h4>
+                        {% for a in arrears.active %}
+                            <div class="subject-row" style="margin-bottom: 6px;">
+                                <div>
+                                    <span class="subject-name">{{ a.course_code }} - {{ a.course_name }}</span>
+                                    <small class="needs-work">Sem {{ a.semester }}</small>
+                                </div>
+                                <strong style="color: #EF4444;">{{ a.grade }}</strong>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    {% if arrears.cleared %}
+                        <h4 style="color: #10B981; font-size: 0.9rem; margin-top: 12px; margin-bottom: 8px;">Cleared Arrears</h4>
+                        {% for c in arrears.cleared %}
+                            <div class="subject-row" style="margin-bottom: 6px;">
+                                <div>
+                                    <span class="subject-name">{{ c.course_code }} - {{ c.course_name }}</span>
+                                    <small style="color: #64748B;">Cleared {{ c.cleared_on }}</small>
+                                </div>
+                                <strong style="color: #10B981;">{{ c.previous_grade }} → {{ c.current_grade }}</strong>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endif %}
+            </div>
+
+            <!-- STRONG / WEAK -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <div>
+                        <h2>Subject Insights</h2>
+                        <p>Based on your performance</p>
+                    </div>
+                </div>
+                {% for insight in insights %}
+                <div class="subject-row">
+                    <div>
+                        <span class="subject-name">{{ insight.subject_name }}</span>
+                        <small class="{% if insight.status_label == 'Needs attention' %}needs-work{% endif %}">
+                            {{ insight.status_label }}
+                        </small>
+                    </div>
+                    <strong>{{ insight.grade_point }}</strong>
+                </div>
+                {% empty %}
+                <p style="text-align: center; padding: 20px;">No subject insights available.</p>
+                {% endfor %}
+            </div>
+        </section>
+    </main>
+
+    <script src="{% static 'js/script.js' %}"></script>
+</body>
+</html>

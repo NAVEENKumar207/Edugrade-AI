@@ -1,0 +1,455 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Academic Upload & SGPA/CGPA Calculation | EduGrade AI</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body class="dashboard-page">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <a href="{% url 'dashboard' %}" class="logo" style="text-decoration: none;">
+            <span>Edu</span>Grade
+        </a>
+
+        <nav>
+            <a href="{% url 'dashboard' %}">
+                <span>⌂</span>
+                Dashboard
+            </a>
+            <a href="{% url 'upload' %}" class="active">
+                <span>⚡</span>
+                Calculate SGPA
+            </a>
+            <a href="{% url 'syllabus' %}">
+                <span>📄</span>
+                Syllabus
+            </a>
+            <a href="{% url 'results' %}">
+                <span>📊</span>
+                Results
+            </a>
+            <a href="{% url 'cgpa_planner' %}">
+                <span>🎯</span>
+                CGPA Planner
+            </a>
+            <a href="{% url 'placement' %}">
+                <span>💼</span>
+                Placement
+            </a>
+            <a href="{% url 'ai_advisor' %}">
+                <span>🤖</span>
+                AI Advisor
+            </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <a href="#">⚙ Settings</a>
+            <a href="{% url 'logout' %}">↪ Logout</a>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="dashboard-main">
+
+        <!-- TOPBAR -->
+        <header class="dashboard-header">
+            <div>
+                <h1>Academic Data & Calculation Flow ⚡</h1>
+                <p>College Details → Syllabus Upload → Result Extraction → Live SGPA & CGPA.</p>
+            </div>
+
+            <div class="profile">
+                <div class="profile-avatar">
+                    {{ user.username|make_list|first|upper }}
+                </div>
+                <div>
+                    <strong>{{ user.get_full_name|default:user.username }}</strong>
+                    <small>{{ user.profile.department }} • Semester {{ user.profile.current_semester }}</small>
+                </div>
+            </div>
+        </header>
+
+        <!-- MULTI-STEP WIZARD -->
+        <div class="wizard-container">
+            <!-- STEP INDICATORS -->
+            <div class="wizard-steps">
+                <div class="step-item active" id="step-ind-1">
+                    <div class="step-circle">1</div>
+                    <span>College Details</span>
+                </div>
+                <div class="step-item" id="step-ind-2">
+                    <div class="step-circle">2</div>
+                    <span>Upload Documents</span>
+                </div>
+                <div class="step-item" id="step-ind-3">
+                    <div class="step-circle">3</div>
+                    <span>Subject Grades</span>
+                </div>
+                <div class="step-item" id="step-ind-4">
+                    <div class="step-circle">4</div>
+                    <span>SGPA & CGPA Result</span>
+                </div>
+            </div>
+
+            <!-- STEP 1: COLLEGE & REGULATION DETAILS -->
+            <div class="wizard-step-content active" id="wizard-step-1">
+                <div class="card-header" style="margin-bottom: 20px;">
+                    <div>
+                        <h2>Step 1: University & Academic Profile</h2>
+                        <p>Specify your university system so AI applies accurate credit weightages.</p>
+                    </div>
+                </div>
+
+                <form id="form-step-1" onsubmit="event.preventDefault(); goToStep(2);">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 18px;">
+                        <div>
+                            <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px;">University / Institution Name</label>
+                            <input type="text" value="Anna University / Autonomous Affiliated" style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px;" required>
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px;">Regulation / Curriculum Scheme</label>
+                            <select style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px;">
+                                <option value="R2021">Regulation 2021 (CBCS Scheme)</option>
+                                <option value="R2017">Regulation 2017</option>
+                                <option value="AUTONOMOUS">Autonomous College Custom Regulation</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; margin-bottom: 25px;">
+                        <div>
+                            <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px;">Department / Stream</label>
+                            <select style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px;">
+                                <option selected>{{ user.profile.department }}</option>
+                                <option>Information Technology</option>
+                                <option>AI & Data Science</option>
+                                <option>Electronics & Communication</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px;">Semester To Calculate</label>
+                            <select id="calc-semester-select" style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px;">
+                                <option value="5" selected>Semester 5 (Current)</option>
+                                <option value="6">Semester 6</option>
+                                <option value="4">Semester 4</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px;">Previous Cumulative CGPA</label>
+                            <input type="number" step="0.01" value="{{ user.profile.current_cgpa }}" id="prev-cgpa-input" style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px;">
+                        </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: flex-end;">
+                        <button type="submit" class="primary-button" style="cursor: pointer; border: none;">
+                            Proceed to Document Upload →
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- STEP 2: SMART DOCUMENT UPLOAD -->
+            <div class="wizard-step-content" id="wizard-step-2">
+                <div class="card-header" style="margin-bottom: 10px;">
+                    <div>
+                        <h2>Step 2: Smart Document Upload (AI OCR & Parser)</h2>
+                        <p>Upload your semester syllabus or results sheet. EduGrade AI will extract your subjects automatically.</p>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div>
+                        <h3 style="font-size: 14px; margin-bottom: 8px; color: var(--dark);">📄 1. Semester Syllabus Document</h3>
+                        <div class="dropzone" id="syllabus-dropzone" onclick="simulateFileUpload('syllabus')">
+                            <div class="dropzone-icon">📄</div>
+                            <h4>Drag & Drop Syllabus PDF</h4>
+                            <p>or click to browse files (PDF, DOCX, TXT)</p>
+                            <div class="file-preview" id="syllabus-preview" style="display: none;">
+                                <span>✓ Syllabus_Extracted_Success.pdf</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 style="font-size: 14px; margin-bottom: 8px; color: var(--dark);">📊 2. Semester Results / Grade Card</h3>
+                        <div class="dropzone" id="result-dropzone" onclick="simulateFileUpload('result')">
+                            <div class="dropzone-icon">📊</div>
+                            <h4>Drag & Drop Result Sheet / PDF</h4>
+                            <p>or click to browse grade card (PDF, JPG, PNG)</p>
+                            <div class="file-preview" id="result-preview" style="display: none;">
+                                <span>✓ Result_Scanned_Success.pdf</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div style="background: #f7f6ff; border-radius: 9px; padding: 15px; margin: 20px 0; font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 20px;">✨</span>
+                    <div>
+                        <strong style="color: var(--primary);">AI Automatic Extraction Enabled:</strong>
+                        Clicking either box above will automatically detect subjects, course credits, and letter grades.
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <button type="button" class="secondary-button" onclick="goToStep(1)">
+                        ← Back
+                    </button>
+                    <button type="button" class="primary-button" onclick="goToStep(3)">
+                        Extract & Verify Grades →
+                    </button>
+                </div>
+            </div>
+
+            <!-- STEP 3: SUBJECT GRADES & CREDITS TABLE -->
+            <div class="wizard-step-content" id="wizard-step-3">
+                <div class="card-header" style="margin-bottom: 20px;">
+                    <div>
+                        <h2>Step 3: Verify Subjects & Letter Grades</h2>
+                        <p>Confirm the detected credits and letter grades for your semester.</p>
+                    </div>
+                    <button type="button" class="admin-btn" onclick="addNewSubjectRow()">
+                        + Add Custom Subject
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table class="custom-table" id="subject-grades-table">
+                        <thead>
+                            <tr>
+                                <th>Subject Code</th>
+                                <th>Subject Title</th>
+                                <th>Credits (C)</th>
+                                <th>Grade Received</th>
+                                <th>Grade Point (GP)</th>
+                                <th>Credit Points (C × GP)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="grades-tbody">
+                            <!-- Dynamically filled course entries -->
+                            <tr data-credits="4">
+                                <td><strong>CS3501</strong></td>
+                                <td>Compiler Design & LLVM</td>
+                                <td>4</td>
+                                <td>
+                                    <select class="grade-select" onchange="calculateLiveSGPA()">
+                                        <option value="10">O (Outstanding - 10)</option>
+                                        <option value="9" selected>A+ (Excellent - 9)</option>
+                                        <option value="8">A (Very Good - 8)</option>
+                                        <option value="7">B+ (Good - 7)</option>
+                                        <option value="6">B (Above Average - 6)</option>
+                                        <option value="0">RA (Re-Appear - 0)</option>
+                                    </select>
+                                </td>
+                                <td class="gp-display">9</td>
+                                <td class="cp-display"><strong>36</strong></td>
+                            </tr>
+                            <tr data-credits="3">
+                                <td><strong>CS3591</strong></td>
+                                <td>Computer Networks</td>
+                                <td>3</td>
+                                <td>
+                                    <select class="grade-select" onchange="calculateLiveSGPA()">
+                                        <option value="10">O (Outstanding - 10)</option>
+                                        <option value="9">A+ (Excellent - 9)</option>
+                                        <option value="8" selected>A (Very Good - 8)</option>
+                                        <option value="7">B+ (Good - 7)</option>
+                                        <option value="6">B (Above Average - 6)</option>
+                                        <option value="0">RA (Re-Appear - 0)</option>
+                                    </select>
+                                </td>
+                                <td class="gp-display">8</td>
+                                <td class="cp-display"><strong>24</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 25px;">
+                    <button type="button" class="secondary-button" onclick="goToStep(2)">
+                        ← Back
+                    </button>
+                    <button type="button" class="primary-button" onclick="finalizeCalculation()">
+                        Calculate SGPA & Update CGPA →
+                    </button>
+                </div>
+            </div>
+
+            <!-- STEP 4: FINAL RESULTS & ACTIONABLE INSIGHTS -->
+            <div class="wizard-step-content" id="wizard-step-4">
+                <div class="calculation-hero">
+                    <div>
+                        <h3>🎉 Semester Calculation Complete</h3>
+                        <div class="score-display" id="final-sgpa-badge">--</div>
+                        <p>Total Credits Calculated: <strong id="final-credits">--</strong> • No Standing Arrears</p>
+                    </div>
+                    <div style="text-align: right; background: rgba(255,255,255,0.15); padding: 18px 24px; border-radius: 12px;">
+                        <small style="opacity: 0.9;">Updated Overall CGPA</small>
+                        <h2 style="font-size: 36px; margin: 4px 0;" id="final-cgpa-badge">--</h2>
+                        <span class="badge-tag badge-success">Academic Growth Recorded</span>
+                    </div>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-top">
+                            <span>Target CGPA Status</span>
+                            <div class="stat-icon">🎯</div>
+                        </div>
+                        <h2 id="target-cgpa-display">{{ user.profile.target_cgpa }}</h2>
+                        <p class="positive">Updated roadmap generated</p>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-top">
+                            <span>Placement Eligibility</span>
+                            <div class="stat-icon">💼</div>
+                        </div>
+                        <h2 id="placement-status" class="eligible">Eligible</h2>
+                        <p>Eligibility criteria verified</p>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-top">
+                            <span>Strength Area</span>
+                            <div class="stat-icon">💡</div>
+                        </div>
+                        <h2 id="strength-area">Top-Scored Subject</h2>
+                        <p class="positive">High performance recorded</p>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-top">
+                            <span>Focus Recommended</span>
+                            <div class="stat-icon">⚠️</div>
+                        </div>
+                        <h2 id="focus-area"> Lowest-Scored Subject</h2>
+                        <p>Can gain CGPA by grade upgrade</p>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 15px; margin-top: 25px;">
+                    <a href="{% url 'dashboard' %}" class="primary-button" style="text-align: center;">
+                        Return to Main Dashboard →
+                    </a>
+                    <a href="{% url 'placement' %}" class="secondary-button">
+                        Check Placement Eligibility →
+                    </a>
+                    <a href="{% url 'ai_advisor' %}" class="secondary-button">
+                        Consult AI Academic Advisor →
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="{% static 'js/script.js' %}"></script>
+    <script>
+        function goToStep(stepNumber) {
+            document.querySelectorAll('.wizard-step-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.step-item').forEach(el => el.classList.remove('active'));
+            const targetStep = document.getElementById('wizard-step-' + stepNumber);
+            const targetInd = document.getElementById('step-ind-' + stepNumber);
+            if (targetStep) targetStep.classList.add('active');
+            if (targetInd) targetInd.classList.add('active');
+            for (let i = 1; i < stepNumber; i++) {
+                const ind = document.getElementById('step-ind-' + i);
+                if (ind) ind.classList.add('completed');
+            }
+            if (stepNumber === 3) calculateLiveSGPA();
+        }
+
+        function simulateFileUpload(type) {
+            const prev = document.getElementById(type + '-preview');
+            if (prev) prev.style.display = 'flex';
+            alert('✨ AI Parser: Successfully extracted data from ' + type + '!');
+        }
+
+        function calculateLiveSGPA() {
+            const rows = document.querySelectorAll('#grades-tbody tr');
+            let totalCredits = 0;
+            let totalCreditPoints = 0;
+            rows.forEach(row => {
+                const credits = parseFloat(row.getAttribute('data-credits') || 3);
+                const select = row.querySelector('.grade-select');
+                const gp = parseFloat(select.value);
+                const cp = credits * gp;
+                const gpElem = row.querySelector('.gp-display');
+                const cpElem = row.querySelector('.cp-display');
+                if (gpElem) gpElem.textContent = gp;
+                if (cpElem) cpElem.innerHTML = '<strong>' + cp + '</strong>';
+                totalCredits += credits;
+                totalCreditPoints += cp;
+            });
+            const sgpa = (totalCreditPoints / totalCredits).toFixed(2);
+            return { sgpa, totalCredits };
+        }
+
+        async function finalizeCalculation() {
+            const { sgpa, totalCredits } = calculateLiveSGPA();
+            const semester = document.getElementById('calc-semester-select').value;
+
+            // Extract subjects
+            const subjects = [];
+            document.querySelectorAll('#grades-tbody tr').forEach(row => {
+                subjects.push({
+                    name: row.cells[1].textContent,
+                    credits: row.getAttribute('data-credits'),
+                    grade_point: row.querySelector('.grade-select').value
+                });
+            });
+
+            try {
+                const response = await fetch("{% url 'api_save_results' %}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({
+                        semester: semester,
+                        subjects: subjects
+                    })
+                });
+
+                const data = await response.json();
+                if (data.status === 'success') {
+                    document.getElementById('final-sgpa-badge').textContent = sgpa;
+                    document.getElementById('final-cgpa-badge').textContent = data.cgpa;
+                    document.getElementById('final-credits').textContent = totalCredits;
+                    goToStep(4);
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch (e) {
+                alert('An error occurred while saving results.');
+            }
+        }
+
+        function addNewSubjectRow() {
+            const subCode = prompt('Enter Subject Code:', 'CS3503');
+            const subName = prompt('Enter Subject Name:', 'Cloud Computing & DevOps');
+            const credits = prompt('Enter Subject Credits (e.g. 3 or 4):', '3');
+            if (subCode && subName && credits) {
+                const tbody = document.getElementById('grades-tbody');
+                const tr = document.createElement('tr');
+                tr.setAttribute('data-credits', credits);
+                tr.innerHTML = `
+                    <td><strong>${subCode}</strong></td>
+                    <td>${subName}</td>
+                    <td>${credits}</td>
+                    <td>
+                        <select class="grade-select" onchange="calculateLiveSGPA()">
+                            <option value="10">O (Outstanding - 10)</option>
+                            <option value="9" selected>A+ (Excellent - 9)</option>
+                            <option value="8">A (Very Good - 8)</option>
+                            <option value="7">B+ (Good - 7)</option>
+                            <option value="6">B (Above Average - 6)</option>
+                            <option value="0">RA (Re-Appear - 0)</option>
+                        </select>
+                    </td>
+                    <td class="gp-display">9</td>
+                    <td class="cp-display"><strong>${credits * 9}</strong></td>
+                `;
+                tbody.appendChild(tr);
+                calculateLiveSGPA();
+            }
+        }
+    </script>
+</body>
+</html>

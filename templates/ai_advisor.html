@@ -1,0 +1,165 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Academic Advisor | EduGrade AI</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body class="dashboard-page">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <a href="{% url 'dashboard' %}" class="logo" style="text-decoration: none;">
+            <span>Edu</span>Grade
+        </a>
+
+        <nav>
+            <a href="{% url 'dashboard' %}">
+                <span>⌂</span>
+                Dashboard
+            </a>
+            <a href="{% url 'upload' %}">
+                <span>⚡</span>
+                Calculate SGPA
+            </a>
+            <a href="{% url 'syllabus' %}">
+                <span>📄</span>
+                Syllabus
+            </a>
+            <a href="{% url 'results' %}">
+                <span>📊</span>
+                Results
+            </a>
+            <a href="{% url 'cgpa_planner' %}">
+                <span>🎯</span>
+                CGPA Planner
+            </a>
+            <a href="{% url 'placement' %}">
+                <span>💼</span>
+                Placement
+            </a>
+            <a href="{% url 'ai_advisor' %}" class="active">
+                <span>🤖</span>
+                AI Advisor
+            </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <a href="#">⚙ Settings</a>
+            <a href="{% url 'logout' %}">↪ Logout</a>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="dashboard-main">
+
+        <!-- TOPBAR -->
+        <header class="dashboard-header">
+            <div>
+                <h1>AI Academic Advisor 🤖</h1>
+                <p>Interactive artificial intelligence specialized in student performance optimization and career readiness.</p>
+            </div>
+
+            <div class="profile">
+                <div class="profile-avatar">
+                    {{ user.username|make_list|first|upper }}
+                </div>
+                <div>
+                    <strong>{{ user.get_full_name|default:user.username }}</strong>
+                    <small>{{ user.profile.department }} • Semester {{ user.profile.current_semester }}</small>
+                </div>
+            </div>
+        </header>
+
+        <!-- AI CHAT CONTAINER -->
+        <div class="chat-container">
+            <div class="chat-messages" id="chat-messages-box">
+                <div class="chat-bubble ai">
+                    <strong>🤖 EduGrade AI Advisor:</strong><br>
+                    Hello {{ user.first_name|default:user.username }}! I have analyzed your complete academic record.
+                    Your current CGPA is <strong>{{ user.profile.current_cgpa }}</strong>.
+                    <br><br>
+                    How can I assist your academic planning today?
+                </div>
+                <div class="chat-bubble ai">
+                    <strong>💡 Quick Prompts you can ask:</strong>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px;">
+                        <button type="button" class="badge-tag badge-primary" style="border: 1px solid var(--primary); cursor: pointer; background: white;" onclick="sendQuickPrompt('How do I reach 9.0 CGPA by graduation?')">
+                            🎯 How do I reach 9.0 CGPA?
+                        </button>
+                        <button type="button" class="badge-tag badge-primary" style="border: 1px solid var(--primary); cursor: pointer; background: white;" onclick="sendQuickPrompt('Which subjects need immediate recovery?')">
+                            ⚠️ Which subjects need recovery?
+                        </button>
+                        <button type="button" class="badge-tag badge-primary" style="border: 1px solid var(--primary); cursor: pointer; background: white;" onclick="sendQuickPrompt('Am I eligible for Microsoft and Google campus drives?')">
+                            💼 Check Top Tier Placement Readiness
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chat-input-box">
+                <input type="text" id="user-chat-input" placeholder="Ask AI Advisor about your grades, syllabus, or placement roadmap..." onkeypress="if(event.key==='Enter') sendChatMessage()">
+                <button type="button" onclick="sendChatMessage()">Send Message →</button>
+            </div>
+        </div>
+    </main>
+
+    <script src="{% static 'js/script.js' %}"></script>
+    <script>
+        function sendQuickPrompt(text) {
+            document.getElementById('user-chat-input').value = text;
+            sendChatMessage();
+        }
+
+        async function sendChatMessage() {
+            const input = document.getElementById('user-chat-input');
+            const message = input.value.trim();
+            if (!message) return;
+
+            const box = document.getElementById('chat-messages-box');
+
+            // Add user message
+            const userBubble = document.createElement('div');
+            userBubble.className = 'chat-bubble user';
+            userBubble.textContent = message;
+            box.appendChild(userBubble);
+            input.value = '';
+            box.scrollTop = box.scrollHeight;
+
+            // Add loading indicator
+            const loadingBubble = document.createElement('div');
+            loadingBubble.className = 'chat-bubble ai';
+            loadingBubble.innerHTML = '<em>AI is thinking...</em>';
+            box.appendChild(loadingBubble);
+            box.scrollTop = box.scrollHeight;
+
+            try {
+                const response = await fetch("{% url 'chat_ai' %}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({ message: message })
+                });
+
+                const data = await response.json();
+                let sourceLabel = '';
+                if (data.source) {
+                    const lbl = (data.source === 'groq') ? 'Powered by Groq' : 'Built-in advisor';
+                    sourceLabel = `<br><small style="opacity: 0.6; font-size: 0.72rem; font-style: italic;">${lbl}</small>`;
+                }
+                const replyText = data.reply || data.response || 'I am here to guide your academic journey.';
+                loadingBubble.innerHTML = replyText + sourceLabel;
+            } catch (e) {
+                loadingBubble.innerHTML = 'Sorry, I am unable to connect to the AI engine at the moment.';
+            }
+            box.scrollTop = box.scrollHeight;
+        }
+    </script>
+</body>
+</html>
