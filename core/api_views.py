@@ -852,15 +852,23 @@ def api_admin_analytics(request):
         Q(current_cgpa__lt=AT_RISK_CGPA_THRESHOLD) | Q(backlogs_count__gte=AT_RISK_BACKLOG_THRESHOLD)
     ).select_related('user').order_by('current_cgpa')
 
+    at_risk_list = list(at_risk_qs)
+    all_semesters = list(SemesterRecord.objects.filter(
+        student__in=at_risk_list, is_published=True
+    ).order_by('semester_number'))
+    semesters_by_student = {}
+    for sem in all_semesters:
+        semesters_by_student.setdefault(sem.student_id, []).append(sem)
+
     at_risk_students = []
-    for s in at_risk_qs:
+    for s in at_risk_list:
         reasons = []
         if float(s.current_cgpa) < AT_RISK_CGPA_THRESHOLD:
             reasons.append(f"CGPA {float(s.current_cgpa):.2f} < {AT_RISK_CGPA_THRESHOLD}")
         if s.backlogs_count >= AT_RISK_BACKLOG_THRESHOLD:
             reasons.append(f"{s.backlogs_count} Active Arrears (>= {AT_RISK_BACKLOG_THRESHOLD})")
 
-        risk_data = evaluate_student_risk(s)
+        risk_data = evaluate_student_risk(s, prefetched_semesters=semesters_by_student.get(s.id, []))
 
         at_risk_students.append({
             'id': s.id,
@@ -1015,7 +1023,7 @@ def api_skills(request):
 
     evaluations = []
     for comp in companies:
-        match_res = company_skill_match(profile, comp)
+        match_res = company_skill_match(profile, comp, scores=scores)
         fit_res = evaluate_placement_fit(profile, comp, match_res)
         evaluations.append(fit_res)
 
@@ -1229,8 +1237,11 @@ def api_journey(request):
         return Response({'error': 'Student access required.'}, status=status.HTTP_403_FORBIDDEN)
 
     from core.services.journey_service import get_journey, get_badges
-    journey = get_journey(profile)
-    badges = get_badges(profile)
+    from core.models import SemesterRecord, CourseResult
+    sem_records = list(SemesterRecord.objects.filter(student=profile, is_published=True).order_by('semester_number'))
+    courses = list(CourseResult.objects.filter(student=profile, is_published=True))
+    journey = get_journey(profile, sem_records=sem_records, courses=courses)
+    badges = get_badges(profile, sem_records=sem_records, courses=courses)
 
     return Response({
         'journey': journey,

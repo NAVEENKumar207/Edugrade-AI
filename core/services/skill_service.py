@@ -101,7 +101,7 @@ def skill_scores(student_profile) -> dict:
 
     return results
 
-def company_skill_match(student_profile, company) -> dict:
+def company_skill_match(student_profile, company, scores=None) -> dict:
     """
     Compares student's acquired skill scores against corporate required skills.
     Identifies match percentage, weak skills (<60), and uncovered skills (no course evidence).
@@ -109,7 +109,8 @@ def company_skill_match(student_profile, company) -> dict:
     raw_req = company.required_skills or ""
     req_list = [s.strip() for s in raw_req.replace(';', ',').split(',') if s.strip()]
 
-    scores = skill_scores(student_profile)
+    if scores is None:
+        scores = skill_scores(student_profile)
     scores_lookup = {k.lower(): v for k, v in scores.items()}
 
     # Skill name aliases for common technical terms

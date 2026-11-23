@@ -63,7 +63,7 @@ def compute_sgpa_slope(sgpas: list) -> float:
         return 0.0
     return sum((xs[i] - mean_x) * (pts[i] - mean_y) for i in range(n)) / denom
 
-def get_journey(student_profile) -> list:
+def get_journey(student_profile, sem_records=None, courses=None) -> list:
     """
     Builds chronological academic journey timeline for a student.
     Returns list of dicts with semester metrics, trend change, best/hardest courses,
@@ -72,16 +72,20 @@ def get_journey(student_profile) -> list:
     if not student_profile:
         return []
 
-    sem_records = list(SemesterRecord.objects.filter(
-        student=student_profile,
-        is_published=True
-    ).order_by('semester_number'))
+    if sem_records is None:
+        sem_records = list(SemesterRecord.objects.filter(
+            student=student_profile,
+            is_published=True
+        ).order_by('semester_number'))
 
     if not sem_records:
         return []
 
+    if courses is None:
+        courses = list(CourseResult.objects.filter(student=student_profile, is_published=True))
+
     courses_by_sem = {}
-    for c in CourseResult.objects.filter(student=student_profile, is_published=True):
+    for c in courses:
         courses_by_sem.setdefault(c.semester_number, []).append(c)
 
     journey = []
@@ -157,7 +161,7 @@ def get_journey(student_profile) -> list:
 
     return journey
 
-def get_badges(student_profile) -> dict:
+def get_badges(student_profile, sem_records=None, courses=None) -> dict:
     """
     Evaluates institutional career milestone badges for a student.
     Returns dictionary with earned, locked, and all badges with rules and descriptions.
@@ -165,25 +169,28 @@ def get_badges(student_profile) -> dict:
     if not student_profile:
         return {"earned_badges": [], "locked_badges": [], "all_badges": []}
 
-    sem_records = list(SemesterRecord.objects.filter(
-        student=student_profile,
-        is_published=True
-    ).order_by('semester_number'))
+    if sem_records is None:
+        sem_records = list(SemesterRecord.objects.filter(
+            student=student_profile,
+            is_published=True
+        ).order_by('semester_number'))
     sem_count = len(sem_records)
 
     cgpa = float(student_profile.current_cgpa) if student_profile.current_cgpa is not None else 0.0
     backlogs = int(student_profile.backlogs_count) if student_profile.backlogs_count is not None else 0
 
+    if courses is None:
+        courses = list(CourseResult.objects.filter(student=student_profile, is_published=True))
+
     courses_by_sem = {}
-    for c in CourseResult.objects.filter(student=student_profile, is_published=True):
+    for c in courses:
         courses_by_sem.setdefault(c.semester_number, []).append(c)
 
     # 1. Zero Arrears: backlogs == 0 and at least 1 semester
     b1_earned = (backlogs == 0 and sem_count >= 1)
 
     # 2. Comeback: cleared at least 1 arrear
-    has_cleared = CourseResult.objects.filter(student=student_profile, arrear_cleared=True).exists()
-    b2_earned = has_cleared
+    b2_earned = any(c.arrear_cleared for c in courses)
 
     # 3. Rising Star: SGPA up in 2 consecutive semesters
     b3_earned = False
@@ -286,7 +293,7 @@ def get_badges(student_profile) -> dict:
         "all_badges": definitions
     }
 
-def evaluate_student_risk(student_profile) -> dict:
+def evaluate_student_risk(student_profile, prefetched_semesters=None) -> dict:
     """
     Evaluates student academic trajectory for early warning intervention.
     Calculates predicted next SGPA, trend, risk level (high, medium, low), and plain-sentence reasons.
@@ -294,10 +301,13 @@ def evaluate_student_risk(student_profile) -> dict:
     cgpa = float(student_profile.current_cgpa) if student_profile.current_cgpa is not None else 0.0
     backlogs = int(student_profile.backlogs_count) if student_profile.backlogs_count is not None else 0
 
-    semesters = list(SemesterRecord.objects.filter(
-        student=student_profile,
-        is_published=True
-    ).order_by('semester_number'))
+    if prefetched_semesters is not None:
+        semesters = list(prefetched_semesters)
+    else:
+        semesters = list(SemesterRecord.objects.filter(
+            student=student_profile,
+            is_published=True
+        ).order_by('semester_number'))
     sgpas = [float(s.sgpa) for s in semesters]
 
     predicted_next_sgpa = predict_next_sgpa(sgpas)
