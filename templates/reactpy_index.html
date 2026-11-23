@@ -232,6 +232,68 @@
                 }
             }
         });
+
+        // 6. Web Speech API Voice Recognition & Synthesis Bridge
+        var currentSpeechLang = 'ta-IN';
+        window.setVoiceLang = function(lang) {
+            currentSpeechLang = lang;
+            var lbl = document.getElementById('voice-lang-label');
+            if (lbl) lbl.textContent = lang === 'ta-IN' ? 'தமிழ் (ta-IN)' : 'English (en-IN)';
+        };
+
+        window.startVoiceInput = function() {
+            var SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRec) {
+                return;
+            }
+            try {
+                var recognizer = new SpeechRec();
+                recognizer.lang = currentSpeechLang;
+                recognizer.interimResults = false;
+                recognizer.maxAlternatives = 1;
+
+                var micBtn = document.getElementById('voice-mic-btn');
+                if (micBtn) micBtn.classList.add('animate-pulse', 'text-light-primary');
+
+                recognizer.onresult = function(event) {
+                    if (event.results && event.results[0] && event.results[0][0]) {
+                        var text = event.results[0][0].transcript;
+                        var inp = document.getElementById('ai-advisor-input');
+                        if (inp) {
+                            inp.value = text;
+                            inp.dispatchEvent(new Event('input', { bubbles: true }));
+                            inp.dispatchEvent(new Event('change', { bubbles: true }));
+                        }
+                    }
+                };
+                recognizer.onend = function() {
+                    if (micBtn) micBtn.classList.remove('animate-pulse', 'text-light-primary');
+                };
+                recognizer.onerror = function() {
+                    if (micBtn) micBtn.classList.remove('animate-pulse', 'text-light-primary');
+                };
+                recognizer.start();
+            } catch (err) {
+                console.log("Voice recognition error:", err);
+            }
+        };
+
+        window.readLatestReplyAloud = function() {
+            if (!window.speechSynthesis) {
+                return;
+            }
+            try {
+                var msgs = document.querySelectorAll('.ai-reply-text');
+                if (!msgs || msgs.length === 0) return;
+                var lastMsg = msgs[msgs.length - 1].innerText;
+                window.speechSynthesis.cancel();
+                var utterance = new SpeechSynthesisUtterance(lastMsg);
+                utterance.lang = currentSpeechLang;
+                window.speechSynthesis.speak(utterance);
+            } catch (err) {
+                console.log("Voice synthesis error:", err);
+            }
+        };
     </script>
 </head>
 <body class="bg-light-surface text-light-on-surface dark:bg-dark-surface dark:text-dark-on-surface font-body antialiased">

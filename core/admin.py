@@ -1,7 +1,8 @@
 from django.contrib import admin
 from .models import (
     UserProfile, SemesterRecord, SubjectInsight,
-    CourseResult, CompanyPlacementCriteria, AdvisorChatMessage, AcademicAuditLog
+    CourseResult, CompanyPlacementCriteria, AdvisorChatMessage, AcademicAuditLog,
+    CourseSkillMap, TranscriptIssue
 )
 
 @admin.register(UserProfile)
@@ -47,3 +48,19 @@ class AdvisorChatMessageAdmin(admin.ModelAdmin):
 class AcademicAuditLogAdmin(admin.ModelAdmin):
     list_display = ('action_type', 'action_by', 'timestamp', 'description')
     list_filter = ('action_type', 'timestamp')
+
+@admin.register(CourseSkillMap)
+class CourseSkillMapAdmin(admin.ModelAdmin):
+    list_display = ('course_code', 'skill')
+    list_filter = ('skill',)
+    search_fields = ('course_code', 'skill')
+
+@admin.register(TranscriptIssue)
+class TranscriptIssueAdmin(admin.ModelAdmin):
+    list_display = ('token_short', 'student', 'issued_at', 'is_revoked')
+    list_filter = ('is_revoked', 'issued_at')
+    search_fields = ('token', 'student__user__username', 'student__roll_number')
+
+    def token_short(self, obj):
+        return f"{obj.token[:8]}..."
+

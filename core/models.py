@@ -1,5 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import User
+import uuid
+
+def generate_transcript_token():
+    return uuid.uuid4().hex
 
 class UserProfile(models.Model):
     ROLE_CHOICES = (
@@ -107,3 +111,35 @@ class AcademicAuditLog(models.Model):
 
     def __str__(self):
         return f"[{self.timestamp}] {self.action_type}: {self.description[:40]}"
+
+
+class CourseSkillMap(models.Model):
+    """Maps course codes to industry career skills for skill gap analysis."""
+    course_code = models.CharField(max_length=50)
+    skill = models.CharField(max_length=100)
+
+    class Meta:
+        unique_together = ('course_code', 'skill')
+        ordering = ['course_code', 'skill']
+
+    def __str__(self):
+        return f"{self.course_code} -> {self.skill}"
+
+
+class TranscriptIssue(models.Model):
+    """Cryptographically signed verifiable academic transcript snapshot."""
+    token = models.CharField(max_length=64, unique=True, default=generate_transcript_token)
+    student = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='transcript_issues')
+    issued_at = models.DateTimeField(auto_now_add=True)
+    snapshot = models.JSONField()
+    snapshot_hash = models.CharField(max_length=64)
+    signature = models.CharField(max_length=64)
+    is_revoked = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['-issued_at']
+
+    def __str__(self):
+        status_lbl = "REVOKED" if self.is_revoked else "VALID"
+        return f"Transcript {self.token[:8]}... - {self.student.user.username} ({status_lbl})"
+

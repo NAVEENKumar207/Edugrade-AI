@@ -5,13 +5,18 @@ Matches New Ui/student_dashboard/code.html.
 """
 
 from reactpy import component, html, use_state
-from ui.services.data_service import get_student_dashboard_data, get_placement_matrix_data, get_arrears
+from ui.services.data_service import (
+    get_student_dashboard_data, get_placement_matrix_data, get_arrears,
+    get_next_moves, get_journey_and_badges
+)
 
 @component
 def StudentDashboard(user, set_page):
     data, set_data = use_state(lambda: get_student_dashboard_data(user))
     placement_data, set_placement_data = use_state(lambda: get_placement_matrix_data(user))
     arrears_data, set_arrears_data = use_state(lambda: get_arrears(user))
+    moves_data, set_moves_data = use_state(lambda: get_next_moves(user, assumed_grade="B"))
+    journey_data, set_journey_data = use_state(lambda: get_journey_and_badges(user))
 
     if not data:
         data = get_student_dashboard_data(user)
@@ -19,6 +24,13 @@ def StudentDashboard(user, set_page):
         placement_data = get_placement_matrix_data(user)
     if not arrears_data:
         arrears_data = get_arrears(user)
+    if not moves_data:
+        moves_data = get_next_moves(user, assumed_grade="B")
+    if not journey_data:
+        journey_data = get_journey_and_badges(user)
+
+    top_move_sentence = moves_data[0].get("sentence", "") if moves_data and len(moves_data) > 0 else ""
+    earned_badges = journey_data.get("badges", {}).get("earned_badges", [])[:3]
 
     student = data.get("student", {})
     semesters = data.get("semesters", [])
@@ -146,6 +158,55 @@ def StudentDashboard(user, set_page):
                     html.span("ASK AI ADVISOR")
                 )
             )
+        ),
+
+        # Next Best Move Quick Line
+        (
+            html.div(
+                {
+                    "class_name": "p-3 px-4 rounded-radius-md bg-light-surface-container-low border border-light-outline-variant flex items-center justify-between gap-2 cursor-pointer hover:border-light-primary transition-colors",
+                    "on_click": lambda e: set_page("future_lab")
+                },
+                html.div(
+                    {"class_name": "flex items-center gap-2 overflow-hidden"},
+                    html.span({"class_name": "material-symbols-outlined text-light-primary text-[20px] shrink-0"}, "trending_up"),
+                    html.span({"class_name": "text-label-sm font-mono text-light-primary font-bold uppercase shrink-0"}, "Your Next Best Move:"),
+                    html.span({"class_name": "text-body-sm text-light-on-surface truncate font-medium"}, top_move_sentence)
+                ),
+                html.span({"class_name": "text-label-xs font-mono text-light-primary shrink-0 flex items-center gap-1 font-bold"}, "OPEN FUTURE LAB →")
+            )
+            if top_move_sentence else None
+        ),
+
+        # Top 3 Earned Badges Row
+        (
+            html.div(
+                {"class_name": "card p-3 px-4 border border-light-outline-variant bg-light-surface-container-lowest flex flex-col md:flex-row md:items-center justify-between gap-gutter-md rounded-radius-md"},
+                html.div(
+                    {"class_name": "flex items-center gap-2"},
+                    html.span({"class_name": "material-symbols-outlined text-light-primary text-[20px]"}, "military_tech"),
+                    html.strong({"class_name": "text-label-sm font-mono uppercase text-light-on-surface"}, "Earned Badges:"),
+                ),
+                html.div(
+                    {"class_name": "flex items-center gap-2 flex-wrap"},
+                    [
+                        html.span(
+                            {"key": b["id"], "class_name": f"badge font-mono text-label-xs {b.get('badge_class', 'badge-primary')}"},
+                            f"🏆 {b['name']}"
+                        )
+                        for b in earned_badges
+                    ]
+                ),
+                html.button(
+                    {
+                        "type": "button",
+                        "on_click": lambda e: set_page("journey"),
+                        "class_name": "text-label-xs font-mono text-light-primary font-bold hover:underline cursor-pointer"
+                    },
+                    "View Journey Timeline →"
+                )
+            )
+            if earned_badges else None
         ),
 
         # 4-KPI Bento Row

@@ -20,35 +20,35 @@ def LandingPage(set_page, set_auth_role=None, theme="dark", toggle_theme=None):
 
     role_data = {
         "student": {
-            "tags": ["NO SPREADSHEETS", "AUTO-AUDIT SGPA", "FLAG ARREARS", "EN / தமிழ் AI"],
-            "title": "Breakdown of your degree progression",
-            "value": str(stats.get("avg_cgpa", "8.64")),
-            "sub": f"{stats.get('total_credits', 136)} / 160 Credits",
-            "left": "11 / 14 DRIVES ELIGIBLE",
-            "right": "0 ARREARS"
+            "tags": ["DIGITAL TWIN", "NEXT BEST MOVE", "MARKS TARGET", "EN / தமிழ் AI"],
+            "title": "Your Academic Digital Twin",
+            "value": f"{stats.get('grades_count', 0)}",
+            "sub": "Course Records Evaluated",
+            "left": "MONTE CARLO TRAJECTORY",
+            "right": "TAMIL + ENG ADVISOR"
         },
         "faculty": {
-            "tags": ["1,240 COHORT", "ATOMIC ENTRY", "AUDIT TRAIL", "82.4% ELIGIBLE"],
-            "title": "Department cohort standing snapshot",
-            "value": "8.18",
-            "sub": f"{stats.get('total_students', 1240):,} Active Students",
-            "left": "ATOMIC LEDGER SYNCED",
-            "right": "CBCS 2026"
+            "tags": ["DRIVE MANAGER", "EARLY WARNING", "AUDIT TRAIL", "QR TRANSCRIPTS"],
+            "title": "Institutional Oversight & Early Warning",
+            "value": f"{stats.get('students_count', 0)}",
+            "sub": "Enrolled Candidates",
+            "left": "LEAST-SQUARES PREDICTION",
+            "right": "ATOMIC AUDIT"
         },
         "placement": {
-            "tags": ["14 DRIVES TRACKED", "CUTOFF AUDIT", "BACKLOG FILTER", "TIER-1 READY"],
-            "title": "Corporate drive eligibility matrix",
-            "value": f"{stats.get('placement_eligible_percent', 82.4)}%",
-            "sub": "Cohort Qualified",
-            "left": "ZOHO • MICROSOFT • GOOGLE",
-            "right": "LIVE CUTOFFS"
+            "tags": ["SKILL MAPPING", "BORDERLINE COHORTS", "CSV EXPORT", "GAP ANALYSIS"],
+            "title": "Corporate Drive Intelligence",
+            "value": f"{stats.get('recruiters_count', 0)}",
+            "sub": "Corporate Recruitment Drives",
+            "left": "TIER-1 CUTOFF AUDIT",
+            "right": "SKILL FIT MATCH"
         },
         "mentor": {
-            "tags": ["GROUNDED AI", "EN & தமிழ்", "REMEDIATION PLAN", "TARGET SGPA"],
-            "title": "Bilingual academic advisor telemetry",
-            "value": "9.10",
-            "sub": "Required Sem VII SGPA",
-            "left": "CS3601 • MA3351 FOCUS",
+            "tags": ["GROUNDED AI", "EN & தமிழ்", "VOICE INPUT", "STUDY PLANS"],
+            "title": "Bilingual Voice Academic Mentor",
+            "value": "24/7",
+            "sub": "Automated Remediation",
+            "left": "WEB SPEECH API",
             "right": "TAMIL + ENG"
         }
     }
@@ -137,12 +137,12 @@ def LandingPage(set_page, set_auth_role=None, theme="dark", toggle_theme=None):
                         # Headline
                         html.h1(
                             {"className": "font-headline text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-light-on-surface uppercase leading-none"},
-                            "Academic Excellence Is Not Random. It Is Simulated."
+                            "Your Academic Digital Twin — See Your Future, Not Just Your Past."
                         ),
                         # Subtext
                         html.p(
                             {"className": "font-mono text-mono-sm md:text-body-lg text-light-on-surface-variant uppercase max-w-2xl leading-relaxed"},
-                            "EduGrade AI models semester grades, predicts target CGPAs, audits placement cutoffs, and delivers bilingual EN/தமிழ் remediation plans."
+                            "A probabilistic academic intelligence platform forecasting degree outcomes with Monte Carlo simulations, ranking career unlock moves, and verifying transcripts with HMAC-SHA256 cryptography."
                         ),
                         # CTAs
                         html.div(
@@ -329,19 +329,61 @@ def LandingPage(set_page, set_auth_role=None, theme="dark", toggle_theme=None):
                         {"className": "lg:col-span-7 grid grid-cols-1 sm:grid-cols-2"},
                         html.div(
                             {"className": "sm:col-span-2 p-8 border-b border-light-outline-variant flex flex-col justify-between gap-2 bg-light-surface"},
-                            html.span({"className": "font-headline text-4xl font-bold text-light-on-surface tabular-nums uppercase"}, "160 Credits"),
-                            html.span({"className": "font-mono text-mono-sm text-light-on-surface-variant uppercase"}, "Tracked across 8 semesters on official 10-point scale")
+                            html.span({"className": "font-headline text-4xl font-bold text-light-on-surface tabular-nums uppercase"}, str(stats.get('students_count', 0))),
+                            html.span({"className": "font-mono text-mono-sm text-light-on-surface-variant uppercase"}, "Students enrolled in institutional database")
                         ),
                         html.div(
                             {"className": "p-8 bg-light-primary-container text-light-on-primary-container flex flex-col justify-between gap-2"},
-                            html.span({"className": "font-headline text-4xl font-bold tabular-nums"}, f"{stats.get('placement_eligible_percent', 82.4)}%"),
-                            html.span({"className": "font-mono text-mono-sm uppercase"}, "Cohort placement eligibility audited")
+                            html.span({"className": "font-headline text-4xl font-bold tabular-nums"}, str(stats.get('recruiters_count', 0))),
+                            html.span({"className": "font-mono text-mono-sm uppercase"}, "Corporate Placement Partner Drives")
                         ),
                         html.div(
                             {"className": "p-8 bg-light-surface border-t sm:border-t-0 sm:border-l border-light-outline-variant flex flex-col justify-between gap-2"},
-                            html.span({"className": "font-headline text-4xl font-bold text-light-on-surface tabular-nums"}, "100%"),
-                            html.span({"className": "font-mono text-mono-sm text-light-on-surface-variant uppercase"}, "Atomic audit logging on every grade entry")
+                            html.span({"className": "font-headline text-4xl font-bold text-light-on-surface tabular-nums"}, str(stats.get('grades_count', 0))),
+                            html.span({"className": "font-mono text-mono-sm text-light-on-surface-variant uppercase"}, "Published course examination records")
                         )
+                    )
+                )
+            ),
+
+            # 4b. 9 Unique Digital Twin & Career Readiness Features
+            html.section(
+                {"id": "capabilities", "className": "border-b border-light-outline-variant py-14 px-6 bg-light-surface-container-low"},
+                html.div(
+                    {"className": "max-w-[1440px] mx-auto flex flex-col gap-10"},
+                    html.div(
+                        {"className": "flex flex-col gap-2"},
+                        html.span({"className": "text-label-sm font-mono text-light-primary uppercase font-bold tracking-wider"}, "Platform Capabilities"),
+                        html.h2({"className": "font-headline text-2xl md:text-3xl font-bold text-light-on-surface uppercase tracking-tight"}, "9 Unique Capabilities Powering Your Academic Digital Twin")
+                    ),
+                    html.div(
+                        {"className": "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"},
+                        [
+                            html.article(
+                                {"key": f["title"], "className": "bg-light-surface border border-light-outline-variant p-6 flex flex-col justify-between gap-4 rounded-radius-md hover:border-light-primary transition-colors"},
+                                html.div(
+                                    {"className": "flex flex-col gap-2"},
+                                    html.div(
+                                        {"className": "flex items-center gap-2 text-light-primary"},
+                                        html.span({"className": "material-symbols-outlined text-[22px]"}, f["icon"]),
+                                        html.span({"className": "text-label-xs font-mono font-bold uppercase"}, f["num"])
+                                    ),
+                                    html.h3({"className": "font-headline text-title-md font-bold text-light-on-surface uppercase"}, f["title"]),
+                                    html.p({"className": "font-body text-body-sm text-light-on-surface-variant leading-relaxed"}, f["desc"])
+                                )
+                            )
+                            for f in [
+                                {"num": "01", "icon": "menu_book", "title": "Regulation Config", "desc": "Institutional regulation rules (core/regulation.py) defining internal marks, end-semester paper weights, passing minimums, and letter grade thresholds."},
+                                {"num": "02", "icon": "model_training", "title": "Future Lab Simulator", "desc": "Probabilistic Monte Carlo digital twin forecasting your graduation CGPA and placement eligibility from your historical grade patterns."},
+                                {"num": "03", "icon": "trending_up", "title": "Next Best Move", "desc": "Impact ranking analyzing your active arrears to identify which subject to clear first for the maximum CGPA boost and corporate recruiter unlocks."},
+                                {"num": "04", "icon": "calculate", "title": "Marks Target Calculator", "desc": "Instant dual-mode examination target calculator determining exactly what paper marks you need to score your desired grade."},
+                                {"num": "05", "icon": "psychology", "title": "Skill Map & Placement Fit", "desc": "Course-to-skill alignment comparing your academic mastery against corporate recruitment requirements with clear fit labels (Ready, Almost, Not yet)."},
+                                {"num": "06", "icon": "business_center", "title": "Faculty Drive Manager", "desc": "Candidate cohort intelligence for placement officers with optimized constant-query speed, borderline candidate tracking, and CSV export."},
+                                {"num": "07", "icon": "verified", "title": "QR-Verified Transcripts", "desc": "Tamper-proof ReportLab academic transcripts embedding an autonomous cryptographic HMAC-SHA256 snapshot verification QR code."},
+                                {"num": "08", "icon": "route", "title": "Journey & Milestone Badges", "desc": "Chronological semester progression timeline tracking SGPA changes and gamified achievement badges (Zero Arrears, Comeback, Distinction)."},
+                                {"num": "09", "icon": "mic", "title": "Tamil & English Voice Mode", "desc": "Grounded bilingual academic advising with speech recognition and read-aloud playback right in the browser."},
+                            ]
+                        ]
                     )
                 )
             )

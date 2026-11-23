@@ -28,6 +28,18 @@ urlpatterns = [
     path('api/admin/analytics/', api_views.api_admin_analytics, name='api_admin_analytics'),
     path('api/health/', api_views.api_health, name='api_health'),
 
+    # Digital Twin, Career Readiness, Skills, Verification & Analytics
+    path('api/twin/simulate/', api_views.api_twin_simulate, name='api_twin_simulate'),
+    path('api/twin/next-moves/', api_views.api_twin_next_moves, name='api_twin_next_moves'),
+    path('api/tools/marks-target/', api_views.api_marks_target, name='api_marks_target'),
+    path('api/skills/', api_views.api_skills, name='api_skills'),
+    path('api/admin/drives/', api_views.api_admin_drives_list, name='api_admin_drives_list'),
+    path('api/admin/drives/<int:company_id>/', api_views.api_admin_drive_detail, name='api_admin_drive_detail'),
+    path('api/admin/drives/<int:company_id>/export/', api_views.api_admin_drive_export, name='api_admin_drive_export'),
+    path('verify/<str:token>/', views.verify_transcript_view, name='verify_transcript_view'),
+    path('api/verify/<str:token>/', api_views.api_verify_transcript, name='api_verify_transcript'),
+    path('api/journey/', api_views.api_journey, name='api_journey'),
+
     # Backward-compatible endpoints
     path('api/chat-ai/', views.chat_ai, name='chat_ai'),
     path('api/calculate-cgpa/', views.api_calculate_cgpa, name='api_calculate_cgpa'),

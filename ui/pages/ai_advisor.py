@@ -102,7 +102,7 @@ def AiAdvisorPage(user):
             rendered_messages.append(
                 html.div(
                     {"key": str(idx), "class_name": "self-start max-w-2xl bg-light-surface-container-low border border-light-outline-variant p-gutter-md flex flex-col gap-gutter-sm"},
-                    html.p({"class_name": "font-body text-body-md text-light-on-surface whitespace-pre-wrap"}, text),
+                    html.p({"class_name": "font-body text-body-md text-light-on-surface whitespace-pre-wrap ai-reply-text"}, text),
                     source_badge
                 )
             )
@@ -203,11 +203,65 @@ def AiAdvisorPage(user):
                         ]
                     ),
 
-                    # Input form
+                    # Input form with Tamil/English Voice Mode
                     html.div(
-                        {"class_name": "flex items-center gap-gutter-sm mt-1"},
+                        {"class_name": "flex items-center gap-2 mb-1 flex-wrap"},
+                        html.div(
+                            {"class_name": "flex items-center gap-1 border border-light-outline-variant rounded-radius-sm p-0.5 bg-light-surface-container-low"},
+                            html.button(
+                                {
+                                    "type": "button",
+                                    "on_click": lambda e: None,
+                                    "onclick": "window.setVoiceLang('ta-IN')",
+                                    "class_name": "px-2 py-0.5 font-mono text-[11px] font-bold text-light-on-surface hover:text-light-primary cursor-pointer"
+                                },
+                                "தமிழ்"
+                            ),
+                            html.span({"class_name": "text-light-outline-variant"}, "|"),
+                            html.button(
+                                {
+                                    "type": "button",
+                                    "on_click": lambda e: None,
+                                    "onclick": "window.setVoiceLang('en-IN')",
+                                    "class_name": "px-2 py-0.5 font-mono text-[11px] font-bold text-light-on-surface hover:text-light-primary cursor-pointer"
+                                },
+                                "English"
+                            )
+                        ),
+                        html.button(
+                            {
+                                "id": "voice-mic-btn",
+                                "type": "button",
+                                "on_click": lambda e: None,
+                                "onclick": "window.startVoiceInput()",
+                                "title": "Speak query using microphone",
+                                "class_name": "inline-flex items-center gap-1 px-2.5 py-1 border border-light-outline-variant bg-light-surface-container-low font-mono text-label-xs text-light-on-surface hover:border-light-primary transition-colors cursor-pointer"
+                            },
+                            html.span({"class_name": "material-symbols-outlined text-[15px]"}, "mic"),
+                            html.span("Voice Input")
+                        ),
+                        html.button(
+                            {
+                                "id": "voice-speak-btn",
+                                "type": "button",
+                                "on_click": lambda e: None,
+                                "onclick": "window.readLatestReplyAloud()",
+                                "title": "Read latest advisor reply aloud",
+                                "class_name": "inline-flex items-center gap-1 px-2.5 py-1 border border-light-outline-variant bg-light-surface-container-low font-mono text-label-xs text-light-on-surface hover:border-light-primary transition-colors cursor-pointer"
+                            },
+                            html.span({"class_name": "material-symbols-outlined text-[15px]"}, "volume_up"),
+                            html.span("Read Aloud")
+                        ),
+                        html.span(
+                            {"id": "voice-lang-label", "class_name": "text-[10px] font-mono text-light-on-surface-variant ml-auto"},
+                            "தமிழ் (ta-IN)"
+                        )
+                    ),
+                    html.div(
+                        {"class_name": "flex items-center gap-gutter-sm"},
                         html.input(
                             {
+                                "id": "ai-advisor-input",
                                 "type": "text",
                                 "placeholder": "Ask about CGPA targets, weak subjects, or placement prep (EN / தமிழ்)...",
                                 "value": input_text,
@@ -227,6 +281,10 @@ def AiAdvisorPage(user):
                             html.span("Send"),
                             html.span({"class_name": "material-symbols-outlined text-[18px]"}, "send")
                         )
+                    ),
+                    html.div(
+                        {"class_name": "text-[10px] font-mono text-light-on-surface-variant mt-0.5"},
+                        "Voice uses your browser's speech service."
                     )
                 )
             ),

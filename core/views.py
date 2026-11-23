@@ -355,3 +355,12 @@ def api_save_results(request):
 
     return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
 
+
+def verify_transcript_view(request, token):
+    """Public verification page displaying cryptographically validated transcript snapshot."""
+    from core.services.transcript_service import verify_transcript_token
+    ctx = verify_transcript_token(token)
+    stat = 200 if ctx.get('is_valid') else 404
+    return render(request, 'verify.html', ctx, status=stat)
+
+

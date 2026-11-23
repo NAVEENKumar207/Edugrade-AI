@@ -4,7 +4,16 @@ Provides deterministic, credit-weighted academic calculations, CGPA simulation,
 placement eligibility assessment, and performance analytics.
 """
 
-from core.regulation import marks_to_grade
+import math
+from core.regulation import (
+    INTERNAL_MAX,
+    EXTERNAL_PAPER_MAX,
+    EXTERNAL_WEIGHT,
+    MIN_EXTERNAL_PERCENT,
+    MIN_TOTAL_TO_PASS,
+    GRADE_BOUNDARIES,
+    marks_to_grade,
+)
 
 # Standard 10-Point Grade Scale Mapping
 GRADE_POINT_MAP = {
@@ -291,6 +300,95 @@ def plan_target_cgpa(current_cgpa: float, completed_credits: float, target_cgpa:
         'status': status,
         'message': message,
         'scenarios': scenarios
+    }
+
+def required_marks(internal: float, target_grade: str) -> dict:
+    """
+    Calculates the minimum external paper marks needed to achieve target_grade.
+    internal: internal marks out of INTERNAL_MAX (0-40).
+    target_grade: 'O', 'A+', 'A', 'B+', 'B', 'C', or 'pass'.
+    """
+    try:
+        internal_val = float(internal)
+    except (TypeError, ValueError):
+        raise ValueError(f"Internal marks must be a valid number between 0 and {INTERNAL_MAX}.")
+    
+    if internal_val < 0.0 or internal_val > INTERNAL_MAX:
+        raise ValueError(f"Internal marks must be between 0 and {INTERNAL_MAX}.")
+
+    clean_target = str(target_grade).strip().upper()
+    valid_targets = ['O', 'A+', 'A', 'B+', 'B', 'C', 'PASS']
+    if clean_target not in valid_targets:
+        raise ValueError(f"Target grade must be one of: {', '.join(valid_targets)}.")
+
+    if clean_target == 'PASS':
+        needed_total = float(MIN_TOTAL_TO_PASS)
+    else:
+        needed_total = float(GRADE_BOUNDARIES[clean_target])
+
+    required_paper = (needed_total - internal_val) / EXTERNAL_WEIGHT
+    required_paper = max(required_paper, float(MIN_EXTERNAL_PERCENT))
+
+    if required_paper > EXTERNAL_PAPER_MAX:
+        max_possible_total = round(internal_val + (EXTERNAL_PAPER_MAX * EXTERNAL_WEIGHT), 1)
+        best_grade = marks_to_grade(max_possible_total)
+        return {
+            "status": "impossible",
+            "required_paper": None,
+            "resulting_total": max_possible_total,
+            "grade": best_grade,
+            "best_grade": best_grade,
+            "message": f"Target grade {clean_target} is impossible with internal score of {internal_val}. Best reachable grade with maximum paper marks ({EXTERNAL_PAPER_MAX}) is {best_grade} ({max_possible_total}/100)."
+        }
+    else:
+        paper_score = int(math.ceil(required_paper))
+        resulting_total = round(internal_val + (paper_score * EXTERNAL_WEIGHT), 1)
+        res_grade = marks_to_grade(resulting_total)
+        return {
+            "status": "possible",
+            "required_paper": paper_score,
+            "resulting_total": resulting_total,
+            "grade": res_grade,
+            "message": f"You need at least {paper_score}/{EXTERNAL_PAPER_MAX} in the end-semester paper to achieve {res_grade} (resulting total: {resulting_total}/100)."
+        }
+
+def evaluate_expected_marks(internal: float, paper_marks: float) -> dict:
+    """
+    Evaluates final total and grade given internal marks and expected external paper marks.
+    Enforces minimum external passing percent threshold.
+    """
+    try:
+        internal_val = float(internal)
+        paper_val = float(paper_marks)
+    except (TypeError, ValueError):
+        raise ValueError("Marks must be valid numbers.")
+
+    if internal_val < 0.0 or internal_val > INTERNAL_MAX:
+        raise ValueError(f"Internal marks must be between 0 and {INTERNAL_MAX}.")
+    if paper_val < 0.0 or paper_val > EXTERNAL_PAPER_MAX:
+        raise ValueError(f"External paper marks must be between 0 and {EXTERNAL_PAPER_MAX}.")
+
+    total = round(internal_val + (paper_val * EXTERNAL_WEIGHT), 1)
+    
+    if paper_val < MIN_EXTERNAL_PERCENT:
+        grade = "U"
+        passed_external = False
+        message = (
+            f"Result is U (arrear) because external paper score ({paper_val:.1f}/{EXTERNAL_PAPER_MAX}) "
+            f"is below the minimum passing threshold of {MIN_EXTERNAL_PERCENT}%, even though total is {total}."
+        )
+    else:
+        grade = marks_to_grade(total)
+        passed_external = True
+        message = f"Expected result: Grade {grade} with total marks of {total}/100."
+
+    return {
+        "internal": internal_val,
+        "paper_marks": paper_val,
+        "total": total,
+        "grade": grade,
+        "passed_external": passed_external,
+        "message": message
     }
 
 def check_placement_eligibility(student_profile, criteria_queryset) -> list:

@@ -447,6 +447,7 @@ def get_admin_analytics_data():
         })
 
     # 3. At-risk students
+    from core.services.journey_service import evaluate_student_risk
     at_risk_qs = students_qs.filter(
         Q(current_cgpa__lt=AT_RISK_CGPA_THRESHOLD) | Q(backlogs_count__gte=AT_RISK_BACKLOG_THRESHOLD)
     ).select_related('user').order_by('current_cgpa')
@@ -459,6 +460,8 @@ def get_admin_analytics_data():
         if s.backlogs_count >= AT_RISK_BACKLOG_THRESHOLD:
             reasons.append(f"{s.backlogs_count} Active Arrears (>= {AT_RISK_BACKLOG_THRESHOLD})")
 
+        risk_data = evaluate_student_risk(s)
+
         at_risk_students.append({
             'id': s.id,
             'name': f"{s.user.first_name} {s.user.last_name}".strip() or s.user.username,
@@ -467,7 +470,11 @@ def get_admin_analytics_data():
             'current_semester': s.current_semester,
             'current_cgpa': float(s.current_cgpa),
             'backlogs_count': s.backlogs_count,
-            'reason': " & ".join(reasons) if reasons else "Academic review needed"
+            'reason': " & ".join(reasons) if reasons else "Academic review needed",
+            'predicted_next_sgpa': risk_data['predicted_next_sgpa'],
+            'trend': risk_data['trend'],
+            'risk_level': risk_data['risk_level'],
+            'reasons': risk_data['reasons'],
         })
 
     return {
@@ -490,6 +497,196 @@ def get_landing_stats():
         'grades_count': grades_count,
         'recruiters_count': recruiters_count,
     }
+
+
+# ==========================================
+# DIGITAL TWIN & CAREER READINESS BRIDGES
+# ==========================================
+
+def get_student_profile(user):
+    """Retrieves student UserProfile instance for authenticated user."""
+    if not user or not user.is_authenticated:
+        return None
+    return UserProfile.objects.filter(user=user, role='student').first()
+
+def run_digital_twin_simulation(user, target_cgpa, effort="same", seed=None):
+    """Executes Monte Carlo academic simulation for current student."""
+    profile = get_student_profile(user)
+    if not profile:
+        return {"enough_data": False, "message": "Student profile not found."}
+    from core.services.twin_service import simulate_future
+    return simulate_future(profile, target_cgpa=float(target_cgpa), effort=effort, seed=seed)
+
+def get_next_moves(user, assumed_grade="B"):
+    """Fetches ranked Next Best Move list for active arrears."""
+    profile = get_student_profile(user)
+    if not profile:
+        return []
+    from core.services.twin_service import rank_next_moves
+    try:
+        return rank_next_moves(profile, assumed_grade=assumed_grade)
+    except Exception:
+        return []
+
+def calculate_marks_target_bridge(internal, target_grade=None, paper_marks=None, mode="target"):
+    """Calculates marks target required paper score or evaluates expected grade."""
+    from core.services.academic_service import required_marks, evaluate_expected_marks
+    if paper_marks is not None or mode == 'expected':
+        return evaluate_expected_marks(internal, paper_marks)
+    return required_marks(internal, target_grade)
+
+def get_skills_and_fit(user):
+    """Returns acquired skill scores and corporate fit analysis for student."""
+    profile = get_student_profile(user)
+    if not profile:
+        return {'skills': {}, 'companies': []}
+    from core.services.skill_service import skill_scores, company_skill_match, evaluate_placement_fit
+    scores = skill_scores(profile)
+    companies = list(CompanyPlacementCriteria.objects.filter(is_active=True).order_by('-package_lpa'))
+    evaluations = []
+    for comp in companies:
+        m = company_skill_match(profile, comp)
+        fit = evaluate_placement_fit(profile, comp, m)
+        evaluations.append(fit)
+    return {'skills': scores, 'companies': evaluations}
+
+def get_journey_and_badges(user):
+    """Returns chronological journey timeline and earned milestone badges."""
+    profile = get_student_profile(user)
+    if not profile:
+        return {'journey': [], 'badges': {'earned_badges': [], 'locked_badges': [], 'all_badges': []}}
+    from core.services.journey_service import get_journey, get_badges
+    return {
+        'journey': get_journey(profile),
+        'badges': get_badges(profile)
+    }
+
+def get_admin_drives_data(company_id=None, department=None):
+    """Returns corporate placement drives list or single drive details for faculty."""
+    companies_qs = CompanyPlacementCriteria.objects.all().order_by('-package_lpa')
+    companies = list(companies_qs)
+
+    if not companies:
+        return {'companies': [], 'selected_company': None, 'eligible_students': [], 'almost_eligible_students': []}
+
+    selected = None
+    if company_id:
+        selected = next((c for c in companies if c.id == int(company_id)), None)
+    if not selected and companies:
+        selected = companies[0]
+
+    # Pre-fetch candidate cohorts for the selected company
+    students_qs = UserProfile.objects.filter(role='student').select_related('user').order_by('-current_cgpa')
+    if department:
+        students_qs = students_qs.filter(department=department)
+    students = list(students_qs)
+
+    from core.models import CourseResult, CourseSkillMap
+    all_courses = list(CourseResult.objects.filter(student__in=students, is_published=True).order_by('semester_number', 'id'))
+    courses_by_student = {}
+    for c in all_courses:
+        courses_by_student.setdefault(c.student_id, []).append(c)
+
+    db_mappings = list(CourseSkillMap.objects.all())
+    mappings_by_code = {}
+    for m in db_mappings:
+        mappings_by_code.setdefault(m.course_code.upper(), []).append(m.skill)
+
+    min_cgpa = float(selected.min_cgpa)
+    max_backlogs = selected.max_backlogs
+    raw_req = selected.required_skills or ""
+    req_list = [s.strip() for s in raw_req.replace(';', ',').split(',') if s.strip()]
+
+    aliases = {
+        "sql": "dbms", "database": "dbms", "algorithms": "dsa", "data structures": "dsa",
+        "operating systems": "os", "networking": "networks", "machine learning": "ai/ml",
+        "mathematics": "maths"
+    }
+    from core.services.skill_service import _match_keywords_for_title
+
+    eligible_list = []
+    almost_list = []
+
+    for s in students:
+        cgpa = float(s.current_cgpa or 0.0)
+        backlogs = int(s.backlogs_count or 0)
+        name = f"{s.user.first_name} {s.user.last_name}".strip() or s.user.username
+
+        c_list = courses_by_student.get(s.id, [])
+        latest_c = {}
+        for c in c_list:
+            latest_c[c.course_code.upper()] = c
+
+        skill_buckets = {}
+        for c in latest_c.values():
+            skills = mappings_by_code.get(c.course_code.upper())
+            if not skills:
+                skills = _match_keywords_for_title(c.course_name)
+            for sk in skills:
+                skill_buckets.setdefault(sk, []).append(c)
+
+        s_scores = {}
+        for sk, clist in skill_buckets.items():
+            tot_cr = sum(float(c.credits) for c in clist)
+            tot_pt = sum(float(c.credits) * float(c.grade_point) for c in clist)
+            s_scores[sk.lower()] = round(((tot_pt / tot_cr) / 10.0) * 100.0, 1) if tot_cr > 0 else 0.0
+
+        cov = []
+        for req in req_list:
+            k = aliases.get(req.lower(), req.lower())
+            if k in s_scores:
+                cov.append(s_scores[k])
+        skill_match = round(sum(cov) / len(cov), 1) if cov else 0.0
+
+        cgpa_short = round(min_cgpa - cgpa, 2)
+        backlogs_over = backlogs - max_backlogs
+
+        student_info = {
+            'id': s.id,
+            'name': name,
+            'roll_number': s.roll_number,
+            'department': s.department,
+            'current_cgpa': cgpa,
+            'backlogs_count': backlogs,
+            'skill_match': skill_match,
+        }
+
+        if cgpa >= min_cgpa and backlogs <= max_backlogs:
+            student_info['status'] = 'Eligible'
+            eligible_list.append(student_info)
+        elif cgpa_short <= 0.50 and backlogs_over <= 1:
+            gaps = []
+            if cgpa_short > 0:
+                gaps.append(f"needs +{cgpa_short:.2f} CGPA")
+            if backlogs_over > 0:
+                gaps.append(f"clear {backlogs_over} arrear")
+            student_info['status'] = 'Almost Eligible'
+            student_info['gap_text'] = ", ".join(gaps) if gaps else "Near eligibility threshold"
+            almost_list.append(student_info)
+
+    return {
+        'companies': [
+            {'id': c.id, 'company_name': c.company_name, 'role_title': c.role_title, 'min_cgpa': float(c.min_cgpa), 'max_backlogs': c.max_backlogs, 'package_lpa': float(c.package_lpa)}
+            for c in companies
+        ],
+        'selected_company': {
+            'id': selected.id,
+            'company_name': selected.company_name,
+            'role_title': selected.role_title,
+            'min_cgpa': min_cgpa,
+            'max_backlogs': max_backlogs,
+            'package_lpa': float(selected.package_lpa),
+            'required_skills': selected.required_skills
+        },
+        'counts': {
+            'eligible': len(eligible_list),
+            'almost_eligible': len(almost_list),
+            'total': len(students)
+        },
+        'eligible_students': eligible_list,
+        'almost_eligible_students': almost_list
+    }
+
 
 
 

@@ -14,6 +14,9 @@ from ui.pages.ai_advisor import AiAdvisorPage
 from ui.pages.admin_dashboard import AdminDashboard
 from ui.pages.regulations_page import RegulationsPage
 from ui.pages.profile_page import ProfilePage
+from ui.pages.future_lab import FutureLab
+from ui.pages.journey_page import JourneyPage
+from ui.pages.drive_manager import DriveManager
 from ui.components.layout import AppLayout
 
 @component
@@ -101,6 +104,12 @@ def EduGradeApp():
     # Page routing logic
     if current_page in ["admin_dashboard", "admin", "cohort"]:
         page_content = AdminDashboard(user=current_user)
+    elif current_page in ["drives", "drive_manager"]:
+        page_content = DriveManager(user=current_user)
+    elif current_page in ["future_lab", "futurelab", "twin"]:
+        page_content = FutureLab(user=current_user, set_page=set_current_page)
+    elif current_page in ["journey", "my_journey"]:
+        page_content = JourneyPage(user=current_user)
     elif current_page == "results":
         page_content = ResultsPage(user=current_user)
     elif current_page == "planner":

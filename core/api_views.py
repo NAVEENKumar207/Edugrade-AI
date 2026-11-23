@@ -847,6 +847,7 @@ def api_admin_analytics(request):
         })
 
     # 3. At-risk students
+    from core.services.journey_service import evaluate_student_risk
     at_risk_qs = students_qs.filter(
         Q(current_cgpa__lt=AT_RISK_CGPA_THRESHOLD) | Q(backlogs_count__gte=AT_RISK_BACKLOG_THRESHOLD)
     ).select_related('user').order_by('current_cgpa')
@@ -859,6 +860,8 @@ def api_admin_analytics(request):
         if s.backlogs_count >= AT_RISK_BACKLOG_THRESHOLD:
             reasons.append(f"{s.backlogs_count} Active Arrears (>= {AT_RISK_BACKLOG_THRESHOLD})")
 
+        risk_data = evaluate_student_risk(s)
+
         at_risk_students.append({
             'id': s.id,
             'name': f"{s.user.first_name} {s.user.last_name}".strip() or s.user.username,
@@ -867,7 +870,11 @@ def api_admin_analytics(request):
             'current_semester': s.current_semester,
             'current_cgpa': float(s.current_cgpa),
             'backlogs_count': s.backlogs_count,
-            'reason': " & ".join(reasons) if reasons else "Academic review needed"
+            'reason': " & ".join(reasons) if reasons else "Academic review needed",
+            'predicted_next_sgpa': risk_data['predicted_next_sgpa'],
+            'trend': risk_data['trend'],
+            'risk_level': risk_data['risk_level'],
+            'reasons': risk_data['reasons'],
         })
 
     return Response({
@@ -886,6 +893,350 @@ def api_admin_analytics(request):
         'department_stats': dept_stats,
         'at_risk_students': at_risk_students
     })
+
+# ==========================================
+# DIGITAL TWIN & CAREER READINESS APIS
+# ==========================================
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def api_twin_simulate(request):
+    """
+    Monte Carlo academic future trajectory simulation.
+    Requires student role and validates target CGPA (0.00-10.00) and effort ('lower', 'same', 'higher').
+    """
+    profile = getattr(request.user, 'profile', None)
+    if not profile or profile.role != 'student':
+        return Response({'error': 'Student access required.'}, status=status.HTTP_403_FORBIDDEN)
+
+    req_student_id = request.data.get('student_id')
+    if req_student_id is not None and int(req_student_id) != profile.id:
+        return Response({'error': 'You can only simulate your own academic profile.'}, status=status.HTTP_403_FORBIDDEN)
+
+    target_cgpa = request.data.get('target_cgpa')
+    effort = str(request.data.get('effort', 'same')).strip().lower()
+
+    if target_cgpa is None:
+        return Response({'error': 'target_cgpa is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        target_val = float(target_cgpa)
+        if target_val < 0.0 or target_val > 10.0:
+            return Response({'error': 'Target CGPA must be between 0.00 and 10.00.'}, status=status.HTTP_400_BAD_REQUEST)
+    except (TypeError, ValueError):
+        return Response({'error': 'Target CGPA must be a valid number.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    if effort not in ['lower', 'same', 'higher']:
+        return Response({'error': 'Effort must be one of: lower, same, higher.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    seed = request.data.get('seed')
+    if seed is not None:
+        try:
+            seed = int(seed)
+        except (ValueError, TypeError):
+            seed = None
+
+    from core.services.twin_service import simulate_future
+    result = simulate_future(profile, target_cgpa=target_val, effort=effort, seed=seed)
+    return Response(result, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def api_twin_next_moves(request):
+    """
+    Ranks arrear clearing impact on CGPA and placement company eligibility without altering stored records.
+    """
+    profile = getattr(request.user, 'profile', None)
+    if not profile or profile.role != 'student':
+        return Response({'error': 'Student access required.'}, status=status.HTTP_403_FORBIDDEN)
+
+    grade = request.query_params.get('grade', 'B').strip().upper()
+    if grade not in ['C', 'B', 'A']:
+        return Response({'error': 'Assumed grade must be one of: C, B, A.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    from core.services.twin_service import rank_next_moves
+    try:
+        moves = rank_next_moves(profile, assumed_grade=grade)
+        return Response({'moves': moves, 'assumed_grade': grade}, status=status.HTTP_200_OK)
+    except ValueError as e:
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def api_marks_target(request):
+    """
+    Calculates marks target paper requirements or evaluates expected grade based on institutional regulation.
+    Available to any authenticated user.
+    """
+    from core.services.academic_service import required_marks, evaluate_expected_marks
+
+    internal = request.data.get('internal')
+    if internal is None:
+        internal = request.data.get('internal_marks')
+    if internal is None:
+        return Response({'error': 'internal marks is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    paper_marks = request.data.get('paper_marks')
+    target_grade = request.data.get('target_grade')
+    mode = request.data.get('mode')
+
+    try:
+        if paper_marks is not None or mode == 'expected':
+            if paper_marks is None:
+                return Response({'error': 'paper_marks is required in expected mode.'}, status=status.HTTP_400_BAD_REQUEST)
+            res = evaluate_expected_marks(internal, paper_marks)
+            return Response(res, status=status.HTTP_200_OK)
+        else:
+            if not target_grade:
+                return Response({'error': 'target_grade is required in target mode.'}, status=status.HTTP_400_BAD_REQUEST)
+            res = required_marks(internal, target_grade)
+            return Response(res, status=status.HTTP_200_OK)
+    except ValueError as e:
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def api_skills(request):
+    """
+    Returns the student's credit-weighted skill scores and company fit assessment.
+    """
+    profile = getattr(request.user, 'profile', None)
+    if not profile or profile.role != 'student':
+        return Response({'error': 'Student access required.'}, status=status.HTTP_403_FORBIDDEN)
+
+    from core.services.skill_service import skill_scores, company_skill_match, evaluate_placement_fit
+    from core.models import CompanyPlacementCriteria
+
+    scores = skill_scores(profile)
+    companies = list(CompanyPlacementCriteria.objects.filter(is_active=True).order_by('-package_lpa'))
+
+    evaluations = []
+    for comp in companies:
+        match_res = company_skill_match(profile, comp)
+        fit_res = evaluate_placement_fit(profile, comp, match_res)
+        evaluations.append(fit_res)
+
+    return Response({
+        'skills': scores,
+        'companies': evaluations
+    }, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def api_admin_drives_list(request):
+    """Lists all corporate recruitment drives with criteria (faculty/admin only)."""
+    err = require_admin(request)
+    if err:
+        return err
+
+    from core.models import CompanyPlacementCriteria
+    companies = list(CompanyPlacementCriteria.objects.all().order_by('-package_lpa').values(
+        'id', 'company_name', 'role_title', 'min_cgpa', 'max_backlogs', 'package_lpa', 'required_skills', 'is_active'
+    ))
+    return Response({
+        'companies': companies,
+        'drives': companies
+    }, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def api_admin_drive_detail(request, company_id):
+    """
+    Returns eligible and almost-eligible candidate cohorts for a specific placement drive.
+    Uses batch queries to maintain constant query count regardless of student population.
+    """
+    err = require_admin(request)
+    if err:
+        return err
+
+    from core.models import CompanyPlacementCriteria, UserProfile, CourseResult, CourseSkillMap
+    company = CompanyPlacementCriteria.objects.filter(id=company_id).first()
+    if not company:
+        return Response({'error': 'Company placement drive not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+    dept_filter = request.query_params.get('department')
+    students_qs = UserProfile.objects.filter(role='student').select_related('user').order_by('-current_cgpa')
+    if dept_filter:
+        students_qs = students_qs.filter(department=dept_filter)
+
+    students = list(students_qs)
+    min_cgpa = float(company.min_cgpa)
+    max_backlogs = company.max_backlogs
+
+    # Query count optimization: prefetch all student courses and skill maps in 2 queries
+    all_courses = list(CourseResult.objects.filter(student__in=students, is_published=True).order_by('semester_number', 'id'))
+    courses_by_student = {}
+    for c in all_courses:
+        courses_by_student.setdefault(c.student_id, []).append(c)
+
+    db_mappings = list(CourseSkillMap.objects.all())
+    mappings_by_code = {}
+    for m in db_mappings:
+        mappings_by_code.setdefault(m.course_code.upper(), []).append(m.skill)
+
+    raw_req = company.required_skills or ""
+    req_list = [s.strip() for s in raw_req.replace(';', ',').split(',') if s.strip()]
+
+    eligible_list = []
+    almost_list = []
+
+    aliases = {
+        "sql": "dbms", "database": "dbms", "algorithms": "dsa", "data structures": "dsa",
+        "operating systems": "os", "networking": "networks", "machine learning": "ai/ml",
+        "mathematics": "maths"
+    }
+
+    from core.services.skill_service import _match_keywords_for_title
+
+    for s in students:
+        cgpa = float(s.current_cgpa or 0.0)
+        backlogs = int(s.backlogs_count or 0)
+        name = f"{s.user.first_name} {s.user.last_name}".strip() or s.user.username
+
+        # In-memory skill calculation per student
+        c_list = courses_by_student.get(s.id, [])
+        latest_c = {}
+        for c in c_list:
+            latest_c[c.course_code.upper()] = c
+
+        skill_buckets = {}
+        for c in latest_c.values():
+            skills = mappings_by_code.get(c.course_code.upper())
+            if not skills:
+                skills = _match_keywords_for_title(c.course_name)
+            for sk in skills:
+                skill_buckets.setdefault(sk, []).append(c)
+
+        s_scores = {}
+        for sk, clist in skill_buckets.items():
+            tot_cr = sum(float(c.credits) for c in clist)
+            tot_pt = sum(float(c.credits) * float(c.grade_point) for c in clist)
+            s_scores[sk.lower()] = round(((tot_pt / tot_cr) / 10.0) * 100.0, 1) if tot_cr > 0 else 0.0
+
+        cov = []
+        for req in req_list:
+            k = aliases.get(req.lower(), req.lower())
+            if k in s_scores:
+                cov.append(s_scores[k])
+        skill_match = round(sum(cov) / len(cov), 1) if cov else 0.0
+
+        student_info = {
+            'id': s.id,
+            'name': name,
+            'roll_number': s.roll_number,
+            'department': s.department,
+            'current_cgpa': cgpa,
+            'backlogs_count': backlogs,
+            'skill_match': skill_match,
+        }
+
+        cgpa_short = round(min_cgpa - cgpa, 2)
+        backlogs_over = backlogs - max_backlogs
+
+        if cgpa >= min_cgpa and backlogs <= max_backlogs:
+            student_info['status'] = 'Eligible'
+            eligible_list.append(student_info)
+        elif cgpa_short <= 0.50 and backlogs_over <= 1:
+            gaps = []
+            if cgpa_short > 0:
+                gaps.append(f"needs +{cgpa_short:.2f} CGPA")
+            if backlogs_over > 0:
+                gaps.append(f"clear {backlogs_over} arrear")
+            student_info['status'] = 'Almost Eligible'
+            student_info['gap_text'] = ", ".join(gaps) if gaps else "Near eligibility threshold"
+            almost_list.append(student_info)
+
+    return Response({
+        'company': {
+            'id': company.id,
+            'company_name': company.company_name,
+            'role_title': company.role_title,
+            'min_cgpa': min_cgpa,
+            'max_backlogs': max_backlogs,
+            'package_lpa': float(company.package_lpa),
+            'required_skills': company.required_skills
+        },
+        'counts': {
+            'eligible': len(eligible_list),
+            'almost_eligible': len(almost_list),
+            'total_reviewed': len(students)
+        },
+        'eligible_students': eligible_list,
+        'almost_eligible_students': almost_list
+    }, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def api_admin_drive_export(request, company_id):
+    """Exports eligible and almost-eligible drive candidates to CSV format."""
+    err = require_admin(request)
+    if err:
+        return err
+
+    from core.models import CompanyPlacementCriteria
+    import csv
+    from django.http import HttpResponse
+
+    company = CompanyPlacementCriteria.objects.filter(id=company_id).first()
+    if not company:
+        return Response({'error': 'Company placement drive not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+    detail_res = api_admin_drive_detail(request._request, company_id)
+    if detail_res.status_code != 200:
+        return detail_res
+    res_data = detail_res.data
+    eligible = res_data.get('eligible_students', [])
+    almost = res_data.get('almost_eligible_students', [])
+
+    http_resp = HttpResponse(content_type='text/csv')
+    clean_name = "".join(c for c in company.company_name if c.isalnum() or c in (' ', '_', '-')).strip()
+    http_resp['Content-Disposition'] = f'attachment; filename="{clean_name}_drive_candidates.csv"'
+
+    writer = csv.writer(http_resp)
+    writer.writerow(['Status', 'Roll Number', 'Name', 'Department', 'CGPA', 'Backlogs', 'Skill Match (%)', 'Gap / Notes'])
+
+    for s in eligible:
+        writer.writerow(['Eligible', s.get('roll_number', ''), s.get('name', ''), s.get('department', ''), s.get('current_cgpa', ''), s.get('backlogs_count', ''), s.get('skill_match', ''), 'Meets all criteria'])
+
+    for s in almost:
+        writer.writerow(['Almost Eligible', s.get('roll_number', ''), s.get('name', ''), s.get('department', ''), s.get('current_cgpa', ''), s.get('backlogs_count', ''), s.get('skill_match', ''), s.get('gap_text', '')])
+
+    return http_resp
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def api_verify_transcript(request, token):
+    """Public verification endpoint returning cryptographically validated transcript snapshot."""
+    from core.services.transcript_service import verify_transcript_token
+    ctx = verify_transcript_token(token)
+    stat = status.HTTP_200_OK if ctx.get('is_valid') else status.HTTP_404_NOT_FOUND
+    return Response(ctx, status=stat)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def api_journey(request):
+    """Returns chronological academic journey timeline and earned/locked badges."""
+    profile = getattr(request.user, 'profile', None)
+    if not profile or profile.role != 'student':
+        return Response({'error': 'Student access required.'}, status=status.HTTP_403_FORBIDDEN)
+
+    from core.services.journey_service import get_journey, get_badges
+    journey = get_journey(profile)
+    badges = get_badges(profile)
+
+    return Response({
+        'journey': journey,
+        'badges': badges
+    }, status=status.HTTP_200_OK)
+
 
 @api_view(['GET'])
 @permission_classes([AllowAny])

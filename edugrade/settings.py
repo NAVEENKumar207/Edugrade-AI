@@ -26,6 +26,10 @@ GROQ_MODEL = os.getenv('GROQ_MODEL', 'llama-3.3-70b-versatile')
 GROQ_TIMEOUT_SECONDS = int(os.getenv('GROQ_TIMEOUT_SECONDS', '15'))
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY', '')
 
+# Transcript Digital Signature & Verification
+TRANSCRIPT_SIGNING_KEY = os.getenv('TRANSCRIPT_SIGNING_KEY') or SECRET_KEY
+SITE_URL = os.getenv('SITE_URL', 'http://127.0.0.1:8000').rstrip('/')
+
 # In-memory cache for login attempt limiting and performance
 CACHES = {
     'default': {

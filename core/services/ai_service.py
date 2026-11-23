@@ -109,6 +109,15 @@ def generate_ai_advice(student_profile, user_message: str) -> dict:
                 status_lbl = "Eligible" if comp['is_eligible'] else "Not Eligible"
                 company_eligibility_notes.append(f"{comp['company_name']}: {status_lbl}")
 
+        top_next_move_sentence = ""
+        try:
+            from core.services.twin_service import rank_next_moves
+            moves = rank_next_moves(student_profile, assumed_grade="B")
+            if moves and len(moves) > 0:
+                top_next_move_sentence = moves[0].get("sentence", "")
+        except Exception:
+            top_next_move_sentence = ""
+
     # Build student academic context block for AI advisor prompt.
     # Data privacy: personal fields (name, roll number, email, username) are not sent to Groq/OpenAI.
     # Note: the student's own chat text is sent as typed.
@@ -121,6 +130,7 @@ def generate_ai_advice(student_profile, user_message: str) -> dict:
             f"Total Credits Earned: {int(completed_cr)}\n"
             f"Active Backlogs: {backlogs}\n"
             f"Weakest Courses: {', '.join(weakest_courses) if weakest_courses else 'None'}\n"
+            f"Top Next Move: {top_next_move_sentence if top_next_move_sentence else 'None'}\n"
             f"Recruiter Eligibility: {', '.join(company_eligibility_notes) if company_eligibility_notes else 'Pending verification'}"
         )
     else:
@@ -274,9 +284,10 @@ def generate_ai_advice(student_profile, user_message: str) -> dict:
 
     if is_tamil:
         if 'cgpa' in msg_lower or 'mark' in msg_lower or 'மதிப்பெண்' in msg_lower:
+            next_line = f" அடுத்த சிறந்த நடவடிக்கை: {top_next_move_sentence}" if top_next_move_sentence else ""
             reply = (
                 f"வணக்கம்! உங்கள் தற்போதைய CGPA {cgpa:.2f} ஆகும். இலக்கு CGPA {target_cgpa:.2f} அடைய "
-                f"{plan['message']} அடுத்த செமஸ்டர்களில் கடின உழைப்புடன் படியுங்கள்.{weak_msg}"
+                f"{plan['message']} அடுத்த செமஸ்டர்களில் கடின உழைப்புடன் படியுங்கள்.{weak_msg}{next_line}"
             )
         elif 'placement' in msg_lower or 'வேலை' in msg_lower:
             reply = (
@@ -300,11 +311,12 @@ def generate_ai_advice(student_profile, user_message: str) -> dict:
             f"3. **Weekly Routine**: Mon-Wed: Core fundamentals; Thu-Fri: Lab & Coding assignments; Sat: Review & mock tests."
         )
     elif 'cgpa' in msg_lower or 'grade' in msg_lower or 'target' in msg_lower:
+        next_move_line = f"\n• Recommended Next Move: {top_next_move_sentence}" if top_next_move_sentence else ""
         reply = (
             f"Academic Performance Analysis:\n\n"
             f"• Current CGPA: **{cgpa:.2f}**\n"
             f"• Target Goal: **{target_cgpa:.2f}**\n"
-            f"• Assessment: {plan['message']}\n"
+            f"• Assessment: {plan['message']}{next_move_line}\n"
             f"{weak_msg}\n\n"
             f"To achieve this, maintain consistent test performance and aim for at least 8.5+ SGPA in all remaining courses."
         )

@@ -1,0 +1,105 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transcript Verification | EduGrade AI</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/reactpy_styles.css' %}">
+    <script>
+        (function() {
+            var saved = localStorage.getItem('edugrade_theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', saved);
+        })();
+    </script>
+</head>
+<body class="auth-page" style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem 1rem;">
+    <div style="max-width: 600px; width: 100%; margin: 0 auto;">
+        <!-- Header -->
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <div style="display: inline-flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                <span style="font-weight: 800; font-size: 1.5rem; letter-spacing: -0.03em; color: var(--color-on-surface);">EduGrade AI</span>
+            </div>
+            <p style="font-size: 0.85rem; color: var(--color-on-surface-variant); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">
+                Autonomous Academic Intelligence • Cryptographic Verification
+            </p>
+        </div>
+
+        <!-- Verification Card -->
+        <div class="card" style="padding: 2rem; border: 1px solid var(--color-outline-variant); border-radius: var(--radius-lg); background: var(--color-surface);">
+            {% if is_valid %}
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem;">
+                    <span class="badge badge-emerald" style="font-size: 0.9rem; padding: 0.4rem 0.8rem; font-weight: 700; letter-spacing: 0.04em;">
+                        ✓ VALID OFFICIAL TRANSCRIPT
+                    </span>
+                    <span style="font-size: 0.8rem; color: var(--color-on-surface-variant);">HMAC-SHA256 Verified</span>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 1.5rem;">
+                    <div style="border-bottom: 1px solid var(--color-outline-variant); padding-bottom: 0.5rem;">
+                        <span style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-on-surface-variant); display: block;">Student Name</span>
+                        <strong style="font-size: 1.05rem; color: var(--color-on-surface);">{{ masked_name }}</strong>
+                    </div>
+                    <div style="border-bottom: 1px solid var(--color-outline-variant); padding-bottom: 0.5rem;">
+                        <span style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-on-surface-variant); display: block;">Roll Number</span>
+                        <strong style="font-size: 1.05rem; color: var(--color-on-surface); font-family: monospace;">{{ masked_roll }}</strong>
+                    </div>
+                    <div style="border-bottom: 1px solid var(--color-outline-variant); padding-bottom: 0.5rem;">
+                        <span style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-on-surface-variant); display: block;">Department</span>
+                        <strong style="font-size: 0.95rem; color: var(--color-on-surface);">{{ department }}</strong>
+                    </div>
+                    <div style="border-bottom: 1px solid var(--color-outline-variant); padding-bottom: 0.5rem;">
+                        <span style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-on-surface-variant); display: block;">Cumulative CGPA</span>
+                        <strong style="font-size: 1.05rem; color: var(--color-primary);">{{ cgpa|floatformat:2 }} / 10.00</strong>
+                    </div>
+                    <div style="border-bottom: 1px solid var(--color-outline-variant); padding-bottom: 0.5rem;">
+                        <span style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-on-surface-variant); display: block;">Credits Earned</span>
+                        <strong style="font-size: 0.95rem; color: var(--color-on-surface);">{{ credits_earned }} Credits</strong>
+                    </div>
+                    <div style="border-bottom: 1px solid var(--color-outline-variant); padding-bottom: 0.5rem;">
+                        <span style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-on-surface-variant); display: block;">Active Backlogs</span>
+                        <strong style="font-size: 0.95rem; color: {% if backlogs == 0 %}var(--color-emerald){% else %}var(--color-danger){% endif %};">
+                            {{ backlogs }} Backlogs
+                        </strong>
+                    </div>
+                </div>
+
+                <div style="background: var(--color-surface-variant); border-radius: var(--radius-md); padding: 0.85rem 1rem; margin-bottom: 1.25rem;">
+                    <div style="font-size: 0.75rem; color: var(--color-on-surface-variant); margin-bottom: 0.25rem;">
+                        Issue Date: <strong>{{ issue_date }}</strong> • Semesters Recorded: <strong>{{ semester_count }}</strong>
+                    </div>
+                    <div style="font-size: 0.7rem; color: var(--color-on-surface-variant); word-break: break-all; font-family: monospace;">
+                        Token: {{ token }}
+                    </div>
+                </div>
+
+                <div style="font-size: 0.75rem; color: var(--color-on-surface-variant); line-height: 1.4;">
+                    ℹ️ <em>{{ note }}</em>
+                </div>
+            {% else %}
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem;">
+                    <span class="badge badge-danger" style="font-size: 0.9rem; padding: 0.4rem 0.8rem; font-weight: 700; letter-spacing: 0.04em;">
+                        ✕ NOT VALID
+                    </span>
+                    <span style="font-size: 0.8rem; color: var(--color-danger); font-weight: 600;">Verification Failed</span>
+                </div>
+
+                <p style="font-size: 0.9rem; color: var(--color-on-surface); margin-bottom: 1.5rem; line-height: 1.5;">
+                    The requested transcript record could not be verified. Reason: <strong>{{ reason }}</strong>
+                </p>
+
+                <div style="font-size: 0.8rem; color: var(--color-on-surface-variant); line-height: 1.4; border-top: 1px solid var(--color-outline-variant); padding-top: 1rem;">
+                    If you believe this record is genuine, please request a newly re-issued official transcript directly from the institutional controller of examinations.
+                </div>
+            {% endif %}
+        </div>
+
+        <div style="text-align: center; margin-top: 1.5rem;">
+            <a href="/" style="font-size: 0.8rem; color: var(--color-primary); text-decoration: none; font-weight: 600;">
+                ← Return to EduGrade AI
+            </a>
+        </div>
+    </div>
+</body>
+</html>

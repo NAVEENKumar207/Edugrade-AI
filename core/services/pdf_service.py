@@ -4,6 +4,7 @@ Produces professional, editorial-styled official academic transcripts using Repo
 """
 
 import io
+from django.conf import settings
 from django.utils import timezone
 from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
@@ -12,6 +13,9 @@ from reportlab.platypus import (
 )
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.pdfgen import canvas
+from reportlab.graphics.barcode.qr import QrCodeWidget
+from reportlab.graphics.shapes import Drawing
+from core.services.transcript_service import issue_or_reuse_transcript
 
 
 class NumberedCanvas(canvas.Canvas):
@@ -69,7 +73,8 @@ def generate_transcript_pdf(student_profile, semester_filter=None):
         leftMargin=40,
         rightMargin=40,
         topMargin=40,
-        bottomMargin=55
+        bottomMargin=55,
+        pageCompression=0
     )
 
     styles = getSampleStyleSheet()
@@ -268,6 +273,58 @@ def generate_transcript_pdf(student_profile, semester_filter=None):
         ('RIGHTPADDING', (0, 0), (-1, -1), 8),
     ]))
     story.append(summary_table)
+
+    # 5. Cryptographic QR Verification Block
+    transcript_issue = issue_or_reuse_transcript(student_profile)
+    site_url = getattr(settings, 'SITE_URL', 'http://127.0.0.1:8000').rstrip('/')
+    verify_url = f"{site_url}/verify/{transcript_issue.token}"
+
+    qr_widget = QrCodeWidget(verify_url)
+    b = qr_widget.getBounds()
+    qw = max(1.0, b[2] - b[0])
+    qh = max(1.0, b[3] - b[1])
+    qr_dim = 65
+    qr_drawing = Drawing(qr_dim, qr_dim, transform=[qr_dim/qw, 0, 0, qr_dim/qh, 0, 0])
+    qr_drawing.add(qr_widget)
+
+    qr_label_style = ParagraphStyle(
+        'QrLabel',
+        parent=cell_style,
+        fontSize=7.5,
+        leading=9.5,
+        textColor=colors.HexColor("#475569")
+    )
+    qr_token_style = ParagraphStyle(
+        'QrToken',
+        parent=cell_bold,
+        fontName='Courier-Bold',
+        fontSize=7.5,
+        leading=9.5,
+        textColor=navy
+    )
+
+    qr_row = [
+        [
+            qr_drawing,
+            [
+                Paragraph("<b>Scan to verify this transcript</b>", cell_bold),
+                Spacer(1, 2),
+                Paragraph(f"Public Verification Token: {transcript_issue.token}", qr_token_style),
+                Paragraph(f"URL: {verify_url}", qr_label_style),
+                Paragraph("HMAC-SHA256 Cryptographic Snapshot Verification • Autonomous Academic Record", qr_label_style),
+            ]
+        ]
+    ]
+    qr_table = Table(qr_row, colWidths=[75, 457])
+    qr_table.setStyle(TableStyle([
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('LEFTPADDING', (0, 0), (-1, -1), 4),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 4),
+        ('TOPPADDING', (0, 0), (-1, -1), 6),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+    ]))
+    story.append(Spacer(1, 6))
+    story.append(qr_table)
 
     # Build document
     doc.build(story, canvasmaker=NumberedCanvas)

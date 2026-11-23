@@ -266,6 +266,95 @@ def AdminDashboard(user):
             )
         ),
 
+        # Early Warning & At-Risk Academic Intervention Section
+        html.section(
+            {"class_name": "bg-light-surface-container-lowest border border-light-outline-variant p-gutter-lg flex flex-col gap-gutter-md"},
+            html.div(
+                {"class_name": "flex flex-wrap items-center justify-between gap-gutter-sm border-b border-light-outline-variant pb-gutter-xs"},
+                html.div(
+                    {"class_name": "flex items-center gap-2"},
+                    html.span({"class_name": "material-symbols-outlined text-light-danger text-[22px]"}, "warning"),
+                    html.h2({"class_name": "font-headline text-title-lg text-light-on-surface uppercase"}, f"Early Warning & At-Risk Intervention ({len(analytics.get('at_risk_students', []))})")
+                ),
+                html.span({"class_name": "text-label-xs font-mono text-light-on-surface-variant font-bold"}, "Predictive Least-Squares SGPA Trend & Intervention Triggers")
+            ),
+            (
+                html.div(
+                    {"class_name": "p-6 text-center text-light-on-surface-variant font-mono text-body-sm"},
+                    "No students currently meet the institutional at-risk criteria (CGPA < 6.0 or Backlogs ≥ 2)."
+                )
+                if not analytics.get("at_risk_students") else
+                html.div(
+                    {"class_name": "overflow-x-auto"},
+                    html.table(
+                        {"class_name": "w-full text-left border-collapse text-body-sm font-mono"},
+                        html.thead(
+                            html.tr(
+                                {"class_name": "border-b border-light-outline-variant text-light-on-surface-variant text-label-xs bg-light-surface-container-low"},
+                                html.th({"class_name": "py-2.5 px-3"}, "Risk Level"),
+                                html.th({"class_name": "py-2.5 px-3"}, "Roll No"),
+                                html.th({"class_name": "py-2.5 px-3"}, "Candidate"),
+                                html.th({"class_name": "py-2.5 px-3"}, "Dept"),
+                                html.th({"class_name": "py-2.5 px-3 text-right"}, "CGPA"),
+                                html.th({"class_name": "py-2.5 px-3 text-right"}, "Arrears"),
+                                html.th({"class_name": "py-2.5 px-3 text-center"}, "Trend"),
+                                html.th({"class_name": "py-2.5 px-3 text-right"}, "Predicted Next SGPA"),
+                                html.th({"class_name": "py-2.5 px-3"}, "Identified Triggers & Reasons"),
+                            )
+                        ),
+                        html.tbody(
+                            {"class_name": "divide-y divide-light-outline-variant font-body text-body-xs"},
+                            [
+                                html.tr(
+                                    {
+                                        "key": str(s.get("id", idx)),
+                                        "class_name": "hover:bg-light-surface-container-low transition-colors"
+                                    },
+                                    html.td(
+                                        {"class_name": "py-2.5 px-3"},
+                                        html.span(
+                                            {
+                                                "class_name": (
+                                                    "badge font-mono text-label-xs font-bold uppercase "
+                                                    + ("badge-danger" if s.get("risk_level") == "high" else "badge-amber" if s.get("risk_level") == "medium" else "badge-emerald")
+                                                )
+                                            },
+                                            (s.get("risk_level") or "high").upper()
+                                        )
+                                    ),
+                                    html.td({"class_name": "py-2.5 px-3 font-mono font-bold"}, s.get("roll_number") or "N/A"),
+                                    html.td({"class_name": "py-2.5 px-3 font-sans font-medium text-light-on-surface"}, s.get("name", "")),
+                                    html.td({"class_name": "py-2.5 px-3 text-light-on-surface-variant font-sans"}, s.get("department", "")),
+                                    html.td({"class_name": "py-2.5 px-3 text-right font-mono font-bold text-light-danger"}, f"{float(s.get('current_cgpa', 0.0)):.2f}"),
+                                    html.td({"class_name": "py-2.5 px-3 text-right font-mono font-bold text-light-danger"}, str(s.get("backlogs_count", 0))),
+                                    html.td(
+                                        {"class_name": "py-2.5 px-3 text-center font-mono font-bold"},
+                                        html.span(
+                                            {
+                                                "class_name": (
+                                                    "text-light-emerald" if s.get("trend") == "improving" else "text-light-danger" if s.get("trend") == "declining" else "text-light-on-surface-variant"
+                                                )
+                                            },
+                                            "↗ Improving" if s.get("trend") == "improving" else "↘ Declining" if s.get("trend") == "declining" else "→ Steady"
+                                        )
+                                    ),
+                                    html.td(
+                                        {"class_name": "py-2.5 px-3 text-right font-mono font-bold text-light-primary"},
+                                        f"{s['predicted_next_sgpa']:.2f}" if s.get("predicted_next_sgpa") is not None else "N/A (needs ≥2 sems)"
+                                    ),
+                                    html.td(
+                                        {"class_name": "py-2.5 px-3 font-sans text-light-on-surface-variant text-[11px]"},
+                                        " • ".join(s.get("reasons", [s.get("reason", "")]))
+                                    ),
+                                )
+                                for idx, s in enumerate(analytics.get("at_risk_students", []))
+                            ]
+                        )
+                    )
+                )
+            )
+        ),
+
         # Directory & Audit Log Main Row
         html.div(
             {"class_name": "grid grid-cols-1 xl:grid-cols-12 gap-gutter-lg items-start"},
