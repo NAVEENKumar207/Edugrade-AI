@@ -174,8 +174,8 @@ def AdminDashboard(user):
         html.div(
             {"class_name": "flex flex-wrap items-center justify-between gap-gutter-md pb-gutter-md border-b border-light-outline-variant"},
             html.div(
-                html.h1({"class_name": "font-headline text-headline-md text-light-on-surface uppercase tracking-tight"}, "Faculty & Institutional Oversight"),
-                html.p({"class_name": "font-mono text-mono-sm text-light-on-surface-variant uppercase"}, "Cohort Academic Performance • Atomic Ingestion • Verification Trail")
+                html.h1({"class_name": "font-headline text-headline-md text-light-on-surface uppercase tracking-tight"}, "Faculty Oversight"),
+                html.p({"class_name": "font-mono text-mono-sm text-light-on-surface-variant uppercase"}, "Cohort performance and audit trail.")
             ),
             html.div(
                 {"class_name": "flex items-center gap-gutter-sm flex-wrap"},
@@ -186,7 +186,7 @@ def AdminDashboard(user):
                         "class_name": "inline-flex items-center gap-2 px-gutter-md py-2 border border-light-secondary text-light-secondary font-mono text-mono-sm uppercase hover:bg-light-secondary hover:text-light-on-secondary transition-colors duration-state-change whitespace-nowrap cursor-pointer font-bold"
                     },
                     html.span({"class_name": "material-symbols-outlined text-[18px]"}, "upload_file"),
-                    html.span("Bulk CSV Ingest")
+                    html.span("Upload CSV")
                 ),
                 html.button(
                     {
@@ -195,7 +195,7 @@ def AdminDashboard(user):
                         "class_name": "inline-flex items-center gap-2 px-gutter-md py-2 bg-light-primary text-light-on-primary font-mono text-mono-sm uppercase hover:bg-light-primary-container hover:text-light-on-primary-container transition-colors duration-state-change whitespace-nowrap cursor-pointer font-bold"
                     },
                     html.span({"class_name": "material-symbols-outlined text-[18px]"}, "add"),
-                    html.span("Enter Student Grade")
+                    html.span("Enter Grade")
                 )
             )
         ),

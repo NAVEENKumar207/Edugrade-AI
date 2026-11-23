@@ -121,8 +121,8 @@ def CgpaPlanner(user):
         html.div(
             {"class_name": "flex flex-wrap items-center justify-between gap-gutter-md pb-gutter-md border-b border-light-outline-variant"},
             html.div(
-                html.h1({"class_name": "font-headline text-headline-md text-light-on-surface uppercase tracking-tight"}, "CGPA Planner & Simulator"),
-                html.p({"class_name": "font-mono text-mono-sm text-light-on-surface-variant uppercase"}, "Predictive Milestone Modeling • Remaining Credits Feasibility Engine")
+                html.h1({"class_name": "font-headline text-headline-md text-light-on-surface uppercase tracking-tight"}, "CGPA Planner"),
+                html.p({"class_name": "font-mono text-mono-sm text-light-on-surface-variant uppercase"}, "Estimates future outcomes based on academic history.")
             ),
             html.div(
                 {"class_name": "flex items-center gap-gutter-sm"},
@@ -143,8 +143,8 @@ def CgpaPlanner(user):
                 {"class_name": "xl:col-span-5 bg-light-surface-container-lowest border border-light-outline-variant p-gutter-lg flex flex-col gap-gutter-md"},
                 html.header(
                     {"class_name": "border-b border-light-outline-variant pb-gutter-sm"},
-                    html.h2({"class_name": "font-headline text-title-lg text-light-on-surface uppercase"}, "Simulation Parameters"),
-                    html.p({"class_name": "font-body text-body-sm text-light-on-surface-variant"}, "Adjust values or slide target CGPA to model mathematical feasibility")
+                    html.h2({"class_name": "font-headline text-title-lg text-light-on-surface uppercase"}, "Parameters"),
+                    html.p({"class_name": "font-body text-body-sm text-light-on-surface-variant"}, "Adjust values to model feasibility.")
                 ),
 
                 html.form(

@@ -27,25 +27,25 @@ def AppLayout(user, current_page, set_page, logout_action, children, theme="ligh
         nav_items = [
             {"id": "admin_dashboard", "label": "Cohort Directory", "icon": "groups"},
             {"id": "drives", "label": "Placement Drives", "icon": "business_center"},
-            {"id": "regulations", "label": "CBCS Framework", "icon": "menu_book"},
-            {"id": "profile", "label": "Faculty Profile", "icon": "person"},
+            {"id": "regulations", "label": "Regulations", "icon": "menu_book"},
+            {"id": "profile", "label": "Profile", "icon": "person"},
         ]
-        page_title = "Faculty & Institutional Oversight"
-        page_subtitle = f"{dept.upper()} • COHORT METRICS & AUDIT TRAIL"
+        page_title = "Faculty Oversight"
+        page_subtitle = f"{dept.upper()} • AUDIT DIRECTORY"
     else:
         nav_items = [
             {"id": "dashboard", "label": "Dashboard", "icon": "dashboard"},
             {"id": "future_lab", "label": "Future Lab", "icon": "model_training"},
-            {"id": "results", "label": "Transcripts & Results", "icon": "receipt_long"},
+            {"id": "results", "label": "Transcripts", "icon": "receipt_long"},
             {"id": "planner", "label": "CGPA Planner", "icon": "calculate"},
-            {"id": "placements", "label": "Placement Matrix", "icon": "work"},
+            {"id": "placements", "label": "Placements", "icon": "work"},
             {"id": "journey", "label": "My Journey", "icon": "route"},
             {"id": "advisor", "label": "AI Advisor", "icon": "psychology"},
             {"id": "regulations", "label": "Regulations", "icon": "menu_book"},
             {"id": "profile", "label": "Profile", "icon": "person"},
         ]
         page_title = "Student Dashboard"
-        page_subtitle = f"B.E. {dept.upper()} • REGULATION 2026 (CBCS)"
+        page_subtitle = f"{dept.upper()} • CBCS 2026"
 
     nav_links = []
     for item in nav_items:

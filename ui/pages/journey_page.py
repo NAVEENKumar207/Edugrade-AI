@@ -38,17 +38,12 @@ def JourneyPage(user):
         html.div(
             {"className": "border-b border-light-outline-variant pb-gutter-md flex justify-between items-end"},
             html.div(
-                html.div(
-                    {"className": "flex items-center gap-gutter-sm text-label-sm uppercase tracking-wider text-light-primary font-mono font-bold"},
-                    html.span({"className": "material-symbols-outlined text-[18px]"}, "route"),
-                    "Milestone Evolution & Growth Matrix"
-                ),
-                html.h1({"className": "text-display-sm font-headline font-bold text-light-on-surface mt-1"}, "My Academic Journey"),
-                html.p({"className": "text-body-md text-light-on-surface-variant mt-1"}, "Track semester-by-semester SGPA progression, key subject highlights, and earned achievements.")
+                html.h1({"className": "text-headline-md font-headline font-bold text-light-on-surface uppercase"}, "My Journey"),
+                html.p({"className": "text-mono-sm font-mono text-light-on-surface-variant uppercase mt-1"}, "Semester timeline and achievement badges.")
             ),
             html.div(
                 {"className": "badge badge-primary text-label-sm font-mono px-3 py-1.5"},
-                f"{earned_count} / {len(all_badges)} Badges Unlocked"
+                f"{earned_count} / {len(all_badges)} Badges"
             )
         ),
 
@@ -62,9 +57,9 @@ def JourneyPage(user):
                 html.div(
                     {"className": "flex items-center gap-2"},
                     html.span({"className": "material-symbols-outlined text-light-primary text-[22px]"}, "military_tech"),
-                    html.h2({"className": "text-title-md font-headline font-bold text-light-on-surface"}, "Achievement Shelf")
+                    html.h2({"className": "text-title-md font-headline font-bold text-light-on-surface uppercase"}, "Badges")
                 ),
-                html.span({"className": "text-label-xs font-mono text-light-on-surface-variant"}, "Institutional Career Milestones")
+                html.span({"className": "text-label-xs font-mono text-light-on-surface-variant"}, "Career Milestones")
             ),
             html.div(
                 {"className": "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter-sm"},

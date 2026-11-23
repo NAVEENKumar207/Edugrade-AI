@@ -59,8 +59,8 @@
         <!-- TOPBAR -->
         <header class="dashboard-header">
             <div>
-                <h1>Academic Data & Calculation Flow ⚡</h1>
-                <p>College Details → Syllabus Upload → Result Extraction → Live SGPA & CGPA.</p>
+                <h1>Calculate SGPA</h1>
+                <p>Enter details, verify grades, and compute SGPA & CGPA.</p>
             </div>
 
             <div class="profile">
@@ -100,8 +100,8 @@
             <div class="wizard-step-content active" id="wizard-step-1">
                 <div class="card-header" style="margin-bottom: 20px;">
                     <div>
-                        <h2>Step 1: University & Academic Profile</h2>
-                        <p>Specify your university system so AI applies accurate credit weightages.</p>
+                        <h2>Step 1: University Profile</h2>
+                        <p>Enter university and semester details.</p>
                     </div>
                 </div>
 
@@ -157,28 +157,28 @@
             <div class="wizard-step-content" id="wizard-step-2">
                 <div class="card-header" style="margin-bottom: 10px;">
                     <div>
-                        <h2>Step 2: Smart Document Upload (AI OCR & Parser)</h2>
-                        <p>Upload your semester syllabus or results sheet. EduGrade AI will extract your subjects automatically.</p>
+                        <h2>Step 2: Upload Documents</h2>
+                        <p>Upload syllabus or grade sheet to extract subjects.</p>
                     </div>
                 </div>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                     <div>
-                        <h3 style="font-size: 14px; margin-bottom: 8px; color: var(--dark);">📄 1. Semester Syllabus Document</h3>
+                        <h3 style="font-size: 14px; margin-bottom: 8px; color: var(--dark);">📄 1. Syllabus Document</h3>
                         <div class="dropzone" id="syllabus-dropzone" onclick="simulateFileUpload('syllabus')">
                             <div class="dropzone-icon">📄</div>
                             <h4>Drag & Drop Syllabus PDF</h4>
-                            <p>or click to browse files (PDF, DOCX, TXT)</p>
+                            <p>or click to browse (PDF, DOCX, TXT)</p>
                             <div class="file-preview" id="syllabus-preview" style="display: none;">
                                 <span>✓ Syllabus_Extracted_Success.pdf</span>
                             </div>
                         </div>
                     </div>
                     <div>
-                        <h3 style="font-size: 14px; margin-bottom: 8px; color: var(--dark);">📊 2. Semester Results / Grade Card</h3>
+                        <h3 style="font-size: 14px; margin-bottom: 8px; color: var(--dark);">📊 2. Results / Grade Card</h3>
                         <div class="dropzone" id="result-dropzone" onclick="simulateFileUpload('result')">
                             <div class="dropzone-icon">📊</div>
-                            <h4>Drag & Drop Result Sheet / PDF</h4>
-                            <p>or click to browse grade card (PDF, JPG, PNG)</p>
+                            <h4>Drag & Drop Result Sheet</h4>
+                            <p>or click to browse (PDF, JPG, PNG)</p>
                             <div class="file-preview" id="result-preview" style="display: none;">
                                 <span>✓ Result_Scanned_Success.pdf</span>
                             </div>
@@ -188,8 +188,7 @@
                 <div style="background: #f7f6ff; border-radius: 9px; padding: 15px; margin: 20px 0; font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 10px;">
                     <span style="font-size: 20px;">✨</span>
                     <div>
-                        <strong style="color: var(--primary);">AI Automatic Extraction Enabled:</strong>
-                        Clicking either box above will automatically detect subjects, course credits, and letter grades.
+                        <strong style="color: var(--primary);">AI Extraction:</strong> Click a box to extract subjects, credits, and grades.
                     </div>
                 </div>
                 <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -206,11 +205,11 @@
             <div class="wizard-step-content" id="wizard-step-3">
                 <div class="card-header" style="margin-bottom: 20px;">
                     <div>
-                        <h2>Step 3: Verify Subjects & Letter Grades</h2>
-                        <p>Confirm the detected credits and letter grades for your semester.</p>
+                        <h2>Step 3: Verify Grades</h2>
+                        <p>Confirm detected credits and letter grades.</p>
                     </div>
                     <button type="button" class="admin-btn" onclick="addNewSubjectRow()">
-                        + Add Custom Subject
+                        + Add Subject
                     </button>
                 </div>
                 <div class="table-container">
@@ -278,24 +277,24 @@
             <div class="wizard-step-content" id="wizard-step-4">
                 <div class="calculation-hero">
                     <div>
-                        <h3>🎉 Semester Calculation Complete</h3>
+                        <h3>Calculation Complete</h3>
                         <div class="score-display" id="final-sgpa-badge">--</div>
-                        <p>Total Credits Calculated: <strong id="final-credits">--</strong> • No Standing Arrears</p>
+                        <p>Credits: <strong id="final-credits">--</strong></p>
                     </div>
                     <div style="text-align: right; background: rgba(255,255,255,0.15); padding: 18px 24px; border-radius: 12px;">
                         <small style="opacity: 0.9;">Updated Overall CGPA</small>
                         <h2 style="font-size: 36px; margin: 4px 0;" id="final-cgpa-badge">--</h2>
-                        <span class="badge-tag badge-success">Academic Growth Recorded</span>
+                        <span class="badge-tag badge-success">Recorded</span>
                     </div>
                 </div>
                 <div class="stats-grid">
                     <div class="stat-card">
                         <div class="stat-top">
-                            <span>Target CGPA Status</span>
+                            <span>Target CGPA</span>
                             <div class="stat-icon">🎯</div>
                         </div>
                         <h2 id="target-cgpa-display">{{ user.profile.target_cgpa }}</h2>
-                        <p class="positive">Updated roadmap generated</p>
+                        <p class="positive">Roadmap updated</p>
                     </div>
                     <div class="stat-card">
                         <div class="stat-top">
@@ -303,34 +302,34 @@
                             <div class="stat-icon">💼</div>
                         </div>
                         <h2 id="placement-status" class="eligible">Eligible</h2>
-                        <p>Eligibility criteria verified</p>
+                        <p>Criteria verified</p>
                     </div>
                     <div class="stat-card">
                         <div class="stat-top">
-                            <span>Strength Area</span>
+                            <span>Top Subject</span>
                             <div class="stat-icon">💡</div>
                         </div>
-                        <h2 id="strength-area">Top-Scored Subject</h2>
-                        <p class="positive">High performance recorded</p>
+                        <h2 id="strength-area">Top-Scored</h2>
+                        <p class="positive">High performance</p>
                     </div>
                     <div class="stat-card">
                         <div class="stat-top">
-                            <span>Focus Recommended</span>
+                            <span>Focus Subject</span>
                             <div class="stat-icon">⚠️</div>
                         </div>
-                        <h2 id="focus-area"> Lowest-Scored Subject</h2>
-                        <p>Can gain CGPA by grade upgrade</p>
+                        <h2 id="focus-area">Lowest-Scored</h2>
+                        <p>Upgrade candidate</p>
                     </div>
                 </div>
                 <div style="display: flex; gap: 15px; margin-top: 25px;">
                     <a href="{% url 'dashboard' %}" class="primary-button" style="text-align: center;">
-                        Return to Main Dashboard →
+                        Dashboard →
                     </a>
                     <a href="{% url 'placement' %}" class="secondary-button">
-                        Check Placement Eligibility →
+                        Placements →
                     </a>
                     <a href="{% url 'ai_advisor' %}" class="secondary-button">
-                        Consult AI Academic Advisor →
+                        AI Advisor →
                     </a>
                 </div>
             </div>

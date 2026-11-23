@@ -78,15 +78,10 @@ def FutureLab(user, set_page=None):
         # Header Title
         html.div(
             {"className": "border-b border-light-outline-variant pb-gutter-md"},
-            html.div(
-                {"className": "flex items-center gap-gutter-sm text-label-sm uppercase tracking-wider text-light-primary font-mono font-bold"},
-                html.span({"className": "material-symbols-outlined text-[18px]"}, "model_training"),
-                "Academic Digital Twin & Predictive Intelligence"
-            ),
-            html.h1({"className": "text-display-sm font-headline font-bold text-light-on-surface mt-1"}, "Future Lab"),
+            html.h1({"className": "text-headline-md font-headline font-bold text-light-on-surface uppercase"}, "Future Lab"),
             html.p(
-                {"className": "text-body-md text-light-on-surface-variant max-w-3xl mt-1"},
-                "Simulate your future graduation outcomes using probabilistic Monte Carlo models, discover your highest-impact next moves, and compute end-semester examination targets."
+                {"className": "text-mono-sm font-mono text-light-on-surface-variant uppercase mt-1"},
+                "Predictive simulation, move ranking, and exam target modeling."
             )
         ),
 
@@ -401,8 +396,7 @@ def FutureLab(user, set_page=None):
                     # Disclaimer
                     html.div(
                         {"className": "p-2 text-center text-label-xs font-mono text-light-on-surface-variant border-t border-light-outline-variant"},
-                        "ℹ️ ",
-                        sim_result.get("disclaimer", "This simulation is an estimate based on your own past pattern, not a guarantee.")
+                        "Estimates outcomes from your history."
                     )
                 )
                 if sim_result else None
@@ -549,7 +543,7 @@ def FutureLab(user, set_page=None):
             # Regulation Citation Note
             html.div(
                 {"className": "text-label-xs font-mono text-light-on-surface-variant"},
-                "Note: Uses the rules in core/regulation.py - check them against your college regulation."
+                "Rules from Regulation 2026. Verify with your college."
             )
         )
     )

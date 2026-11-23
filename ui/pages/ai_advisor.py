@@ -118,10 +118,10 @@ def AiAdvisorPage(user):
 
     # Prompt chips
     prompts = [
-        "How do I reach 8.80 CGPA before graduation?",
-        "Audit Google 9.00 CGPA gap",
-        "தமிழில் எனது placement தகுதி பற்றி சொல்லுங்கள்",
-        "Build Sem VII weekly study schedule"
+        "Reach 8.80 CGPA",
+        "Audit Google Cutoff",
+        "தமிழில் placement தகுதி",
+        "Weekly Study Schedule"
     ]
 
     return html.div(
@@ -131,12 +131,12 @@ def AiAdvisorPage(user):
         html.div(
             {"class_name": "flex flex-wrap items-center justify-between gap-gutter-md pb-gutter-md border-b border-light-outline-variant"},
             html.div(
-                html.h1({"class_name": "font-headline text-headline-md text-light-on-surface uppercase tracking-tight"}, "AI Academic Advisor"),
-                html.p({"class_name": "font-mono text-mono-sm text-light-on-surface-variant uppercase"}, "Grounded Bilingual Academic Guidance • English & தமிழ்")
+                html.h1({"class_name": "font-headline text-headline-md text-light-on-surface uppercase tracking-tight"}, "AI Advisor"),
+                html.p({"class_name": "font-mono text-mono-sm text-light-on-surface-variant uppercase"}, "English & தமிழ் • AI advice is guidance, not an official decision.")
             ),
             html.div(
                 {"class_name": "flex items-center gap-gutter-sm"},
-                html.span({"class_name": "px-3 py-1.5 rounded-full bg-light-primary-container text-light-on-primary-container font-mono text-mono-sm uppercase whitespace-nowrap font-bold"}, "EN / தமிழ் Active")
+                html.span({"class_name": "px-3 py-1.5 rounded-full bg-light-primary-container text-light-on-primary-container font-mono text-mono-sm uppercase whitespace-nowrap font-bold"}, "EN / தமிழ்")
             )
         ),
 

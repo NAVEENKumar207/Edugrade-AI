@@ -45,13 +45,8 @@ def DriveManager(user):
         html.div(
             {"className": "border-b border-light-outline-variant pb-gutter-md flex flex-col md:flex-row md:items-center justify-between gap-gutter-md"},
             html.div(
-                html.div(
-                    {"className": "flex items-center gap-gutter-sm text-label-sm uppercase tracking-wider text-light-primary font-mono font-bold"},
-                    html.span({"className": "material-symbols-outlined text-[18px]"}, "business_center"),
-                    "Corporate Recruitment & Career Readiness"
-                ),
-                html.h1({"className": "text-display-sm font-headline font-bold text-light-on-surface mt-1"}, "Placement Drives Manager"),
-                html.p({"className": "text-body-md text-light-on-surface-variant mt-1"}, "Inspect corporate partner eligibility cohorts, review borderline candidates, and export candidate rosters.")
+                html.h1({"className": "text-headline-md font-headline font-bold text-light-on-surface uppercase"}, "Placement Drives"),
+                html.p({"className": "text-mono-sm font-mono text-light-on-surface-variant uppercase mt-1"}, "Recruitment criteria and candidate cohorts.")
             ),
             html.div(
                 html.a(
@@ -61,7 +56,7 @@ def DriveManager(user):
                         "download": True if selected_company else False
                     },
                     html.span({"className": "material-symbols-outlined text-[18px]"}, "download"),
-                    "Download Candidates CSV"
+                    "Download CSV"
                 )
             )
         ),
