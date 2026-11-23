@@ -33,7 +33,6 @@ class PlacementReadinessTests(TestCase):
         self.student_user = User.objects.create_user(username="placement_student", password="password123")
         self.student_profile = UserProfile.objects.create(
             user=self.student_user,
-            role="student",
             roll_number="CS2026555",
             department="CSE",
             current_semester=6,

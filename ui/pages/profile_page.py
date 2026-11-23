@@ -11,7 +11,6 @@ from ui.services.data_service import update_user_profile, change_user_password
 @component
 def ProfilePage(user):
     profile = getattr(user, 'profile', None)
-    is_admin = profile.is_admin() if profile else False
 
     # State for edit mode toggle
     is_editing, set_is_editing = use_state(False)
@@ -96,7 +95,7 @@ def ProfilePage(user):
             {"className": "pb-gutter-md border-b border-light-outline-variant flex flex-wrap items-center justify-between gap-gutter-md"},
             html.div(
                 html.h1({"className": "font-headline text-headline-md tracking-tight uppercase text-light-on-surface font-bold"}, "Institutional Profile & Credentials"),
-                html.p({"className": "font-mono text-mono-sm text-light-on-surface-variant uppercase mt-1"}, f"Identity • {profile.role.upper() if profile else 'STUDENT'} Standing • Security")
+                html.p({"className": "font-mono text-mono-sm text-light-on-surface-variant uppercase mt-1"}, "Identity • Student Standing • Security")
             ),
             html.div(
                 {"className": "flex items-center gap-3 flex-wrap"},
@@ -132,7 +131,7 @@ def ProfilePage(user):
                     {"className": "flex flex-col items-center gap-1"},
                     html.h2({"className": "font-headline text-headline-md text-light-on-surface uppercase font-bold"}, f"{first_name} {last_name}".strip() or (user.username if user else "STUDENT")),
                     html.p({"className": "font-mono text-mono-sm text-light-primary font-bold tracking-wider"}, getattr(profile, 'roll_number', user.username if user else "2026")),
-                    html.span({"className": "mt-2 inline-block px-3 py-1 bg-light-surface-container-highest text-light-on-surface font-mono text-mono-sm font-semibold border border-light-outline-variant"}, f"{department} • {profile.role.upper() if profile else 'STUDENT'}"),
+                    html.span({"className": "mt-2 inline-block px-3 py-1 bg-light-surface-container-highest text-light-on-surface font-mono text-mono-sm font-semibold border border-light-outline-variant"}, f"{department} • STUDENT"),
                     html.span(
                         {"className": "mt-2 inline-flex items-center gap-1.5 font-mono text-mono-xs uppercase text-success font-semibold"},
                         html.span({"className": "material-symbols-outlined text-[15px]"}, "verified"),

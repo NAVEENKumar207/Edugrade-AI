@@ -11,7 +11,6 @@ from ui.services.data_service import authenticate_user, register_user, quick_dem
 
 @component
 def LoginPage(set_page, set_user, current_role='student', theme='dark', toggle_theme=None):
-    role, set_role = use_state(current_role or 'student')
     username, set_username = use_state("")
     password, set_password = use_state("")
     show_password, set_show_password = use_state(False)
@@ -37,11 +36,7 @@ def LoginPage(set_page, set_user, current_role='student', theme='dark', toggle_t
 
             if user:
                 set_user(user)
-                profile = getattr(user, 'profile', None)
-                if profile and profile.is_admin():
-                    set_page("admin_dashboard")
-                else:
-                    set_page("dashboard")
+                set_page("dashboard")
             else:
                 set_error(auth_err or "Invalid credentials. Please verify your username and password.")
         except Exception as err:
@@ -52,18 +47,14 @@ def LoginPage(set_page, set_user, current_role='student', theme='dark', toggle_t
     def handle_submit(e=None):
         do_login(username, password)
 
-    def handle_1click_demo(demo_role):
+    def handle_1click_demo():
         set_error("")
         set_loading(True)
         try:
-            demo_user, demo_err = quick_demo_login(demo_role)
+            demo_user, demo_err = quick_demo_login()
             if demo_user:
                 set_user(demo_user)
-                profile = getattr(demo_user, 'profile', None)
-                if profile and profile.is_admin():
-                    set_page("admin_dashboard")
-                else:
-                    set_page("dashboard")
+                set_page("dashboard")
             else:
                 set_error(demo_err or "Unable to initialize demo account.")
         except Exception as err:
@@ -182,30 +173,15 @@ def LoginPage(set_page, set_user, current_role='student', theme='dark', toggle_t
             # Main Form Body
             html.div(
                 {"className": "max-w-xl w-full mx-auto my-auto py-8 flex flex-col gap-6"},
-                # Header & Role switcher
+                # Header & Portal Badge
                 html.div(
                     {"className": "flex flex-col gap-4"},
                     html.h2({"className": "font-headline text-3xl font-bold uppercase tracking-tight text-light-on-surface"}, "Secure Access Gateway"),
-                    html.p({"className": "font-mono text-mono-sm text-light-on-surface-variant uppercase"}, "Authenticate using institutional credentials to access academic records."),
-                    # Role Buttons
+                    html.p({"className": "font-mono text-mono-sm text-light-on-surface-variant uppercase"}, "Authenticate using student credentials to access academic records."),
                     html.div(
-                        {"className": "grid grid-cols-2 gap-3 mt-1"},
-                        html.button(
-                            {
-                                "className": f"p-3 border font-mono text-mono-sm uppercase text-left transition-colors cursor-pointer flex flex-col gap-1 {('border-light-primary bg-light-primary text-white font-semibold' if role == 'student' else 'border-light-outline-variant bg-light-surface-container-low text-light-on-surface-variant hover:border-light-secondary')}",
-                                "on_click": lambda e: set_role("student")
-                            },
-                            html.span({"className": "text-[11px] opacity-75"}, "Undergraduate"),
-                            html.span({"className": "text-sm font-bold"}, "Student Portal")
-                        ),
-                        html.button(
-                            {
-                                "className": f"p-3 border font-mono text-mono-sm uppercase text-left transition-colors cursor-pointer flex flex-col gap-1 {('border-light-primary bg-light-primary text-white font-semibold' if role == 'admin' else 'border-light-outline-variant bg-light-surface-container-low text-light-on-surface-variant hover:border-light-secondary')}",
-                                "on_click": lambda e: set_role("admin")
-                            },
-                            html.span({"className": "text-[11px] opacity-75"}, "Department"),
-                            html.span({"className": "text-sm font-bold"}, "Faculty / Admin")
-                        )
+                        {"className": "p-3 border border-light-primary bg-light-primary text-white font-mono text-mono-sm uppercase text-left flex flex-col gap-1"},
+                        html.span({"className": "text-[11px] opacity-75"}, "Undergraduate Academic Portal"),
+                        html.span({"className": "text-sm font-bold"}, "Student Sign In")
                     )
                 ),
 
@@ -218,32 +194,18 @@ def LoginPage(set_page, set_user, current_role='student', theme='dark', toggle_t
                         html.span({"className": "text-[10px] text-emerald-600 dark:text-emerald-400 font-bold"}, "● Auto Sign In")
                     ),
                     html.div(
-                        {"className": "grid grid-cols-2 gap-2"},
+                        {"className": "grid grid-cols-1 gap-2"},
                         html.button(
                             {
                                 "type": "button",
                                 "disabled": loading,
                                 "className": "px-3 py-2 bg-light-surface border border-light-outline-variant hover:border-light-primary font-mono text-[11px] uppercase text-left transition-colors cursor-pointer flex items-center justify-between shadow-sm",
-                                "on_click": lambda e: handle_1click_demo("student")
+                                "on_click": lambda e: handle_1click_demo()
                             },
                             html.div(
                                 {"className": "flex flex-col"},
                                 html.span({"className": "font-bold text-light-on-surface"}, "Demo Student"),
-                                html.span({"className": "text-[10px] text-light-on-surface-variant lowercase"}, "student01")
-                            ),
-                            html.span({"className": "text-[10px] font-bold text-light-primary px-2 py-0.5 bg-light-primary/10 rounded"}, "SIGN IN ⚡")
-                        ),
-                        html.button(
-                            {
-                                "type": "button",
-                                "disabled": loading,
-                                "className": "px-3 py-2 bg-light-surface border border-light-outline-variant hover:border-light-primary font-mono text-[11px] uppercase text-left transition-colors cursor-pointer flex items-center justify-between shadow-sm",
-                                "on_click": lambda e: handle_1click_demo("admin")
-                            },
-                            html.div(
-                                {"className": "flex flex-col"},
-                                html.span({"className": "font-bold text-light-on-surface"}, "Demo Faculty"),
-                                html.span({"className": "text-[10px] text-light-on-surface-variant lowercase"}, "admin01")
+                                html.span({"className": "text-[10px] text-light-on-surface-variant lowercase"}, "student01 • Kavitha Ramesh")
                             ),
                             html.span({"className": "text-[10px] font-bold text-light-primary px-2 py-0.5 bg-light-primary/10 rounded"}, "SIGN IN ⚡")
                         )
@@ -279,7 +241,7 @@ def LoginPage(set_page, set_user, current_role='student', theme='dark', toggle_t
                                 "value": username,
                                 "className": "w-full pl-10 pr-3 py-2.5 bg-light-surface border border-light-outline-variant focus:border-light-primary focus:ring-0 font-mono text-mono-sm text-light-on-surface outline-none transition-colors",
                                 "style": {"backgroundColor": "var(--bg-input)", "color": "var(--text-primary)"},
-                                "placeholder": "e.g. 22CSE041 or student01" if role == "student" else "e.g. faculty.cse or admin01",
+                                "placeholder": "e.g. 22CSE041 or student01",
                                 "on_change": lambda e: set_username(e.get("target", {}).get("value", "") if isinstance(e, dict) else str(e))
                             })
                         )
@@ -328,7 +290,7 @@ def LoginPage(set_page, set_user, current_role='student', theme='dark', toggle_t
                             "className": "w-full py-3.5 bg-light-primary text-white hover:bg-light-primary-container hover:text-light-secondary font-mono text-mono-sm uppercase font-semibold transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-sm mt-2 disabled:opacity-50",
                             "on_click": lambda e: handle_submit()
                         },
-                        html.span("Verifying..." if loading else (f"Sign In to {'Faculty Portal' if role == 'admin' else 'Student Portal'}")),
+                        html.span("Verifying..." if loading else "Sign In to Student Portal"),
                         html.span({"className": "material-symbols-outlined text-base"}, "login")
                     )
                 ),
@@ -359,12 +321,10 @@ def LoginPage(set_page, set_user, current_role='student', theme='dark', toggle_t
 
 @component
 def SignupPage(set_page, set_user, current_role='student', theme='dark', toggle_theme=None):
-    role, set_role = use_state(current_role or 'student')
     fullname, set_fullname = use_state("")
     username, set_username = use_state("")
     department, set_department = use_state("Computer Science and Engineering")
     roll_number, set_roll_number = use_state("")
-    admin_key, set_admin_key = use_state("")
     password, set_password = use_state("")
     confirm_password, set_confirm_password = use_state("")
     show_password, set_show_password = use_state(False)
@@ -373,18 +333,14 @@ def SignupPage(set_page, set_user, current_role='student', theme='dark', toggle_
 
     is_debug = getattr(settings, 'DEBUG', False)
 
-    def handle_1click_demo(demo_role):
+    def handle_1click_demo():
         set_error("")
         set_loading(True)
         try:
-            demo_user, demo_err = quick_demo_login(demo_role)
+            demo_user, demo_err = quick_demo_login()
             if demo_user:
                 set_user(demo_user)
-                profile = getattr(demo_user, 'profile', None)
-                if profile and profile.is_admin():
-                    set_page("admin_dashboard")
-                else:
-                    set_page("dashboard")
+                set_page("dashboard")
             else:
                 set_error(demo_err or "Unable to initialize demo account.")
         except Exception as err:
@@ -412,10 +368,8 @@ def SignupPage(set_page, set_user, current_role='student', theme='dark', toggle_
                 username=username.strip(),
                 password=password,
                 fullname=fullname.strip(),
-                role=role,
                 department=department.strip(),
-                roll_number=roll_number.strip(),
-                admin_key=admin_key.strip()
+                roll_number=roll_number.strip()
             )
             if isinstance(reg_res, tuple):
                 user, reg_err = reg_res
@@ -424,10 +378,7 @@ def SignupPage(set_page, set_user, current_role='student', theme='dark', toggle_
 
             if user:
                 set_user(user)
-                if role == "admin":
-                    set_page("admin_dashboard")
-                else:
-                    set_page("dashboard")
+                set_page("dashboard")
             else:
                 set_error(reg_err or "Registration failed. Please verify your details.")
         except Exception as err:
@@ -524,25 +475,11 @@ def SignupPage(set_page, set_user, current_role='student', theme='dark', toggle_
                     html.p({"className": "font-mono text-mono-sm text-light-on-surface-variant uppercase"}, "Enroll into the official institutional academic intelligence system.")
                 ),
 
-                # Role Selection
+                # Portal Badge
                 html.div(
-                    {"className": "grid grid-cols-2 gap-3"},
-                    html.button(
-                        {
-                            "className": f"p-3 border font-mono text-mono-sm uppercase text-left transition-colors cursor-pointer flex flex-col gap-1 {('border-light-primary bg-light-primary text-white font-semibold' if role == 'student' else 'border-light-outline-variant bg-light-surface-container-low text-light-on-surface-variant hover:border-light-secondary')}",
-                            "on_click": lambda e: set_role("student")
-                        },
-                        html.span({"className": "text-[11px] opacity-75"}, "Undergraduate"),
-                        html.span({"className": "text-sm font-bold"}, "Student Account")
-                    ),
-                    html.button(
-                        {
-                            "className": f"p-3 border font-mono text-mono-sm uppercase text-left transition-colors cursor-pointer flex flex-col gap-1 {('border-light-primary bg-light-primary text-white font-semibold' if role == 'admin' else 'border-light-outline-variant bg-light-surface-container-low text-light-on-surface-variant hover:border-light-secondary')}",
-                            "on_click": lambda e: set_role("admin")
-                        },
-                        html.span({"className": "text-[11px] opacity-75"}, "Department"),
-                        html.span({"className": "text-sm font-bold"}, "Faculty / Admin")
-                    )
+                    {"className": "p-3 border border-light-primary bg-light-primary text-white font-mono text-mono-sm uppercase text-left flex flex-col gap-1"},
+                    html.span({"className": "text-[11px] opacity-75"}, "Undergraduate Academic Portal"),
+                    html.span({"className": "text-sm font-bold"}, "New Student Registration")
                 ),
 
                 # 1-Click Demo Buttons (Only when DEBUG is True)
@@ -554,32 +491,18 @@ def SignupPage(set_page, set_user, current_role='student', theme='dark', toggle_
                         html.span({"className": "text-[10px] text-emerald-600 dark:text-emerald-400 font-bold"}, "● Auto Sign In")
                     ),
                     html.div(
-                        {"className": "grid grid-cols-2 gap-2"},
+                        {"className": "grid grid-cols-1 gap-2"},
                         html.button(
                             {
                                 "type": "button",
                                 "disabled": loading,
                                 "className": "px-3 py-2 bg-light-surface border border-light-outline-variant hover:border-light-primary font-mono text-[11px] uppercase text-left transition-colors cursor-pointer flex items-center justify-between shadow-sm",
-                                "on_click": lambda e: handle_1click_demo("student")
+                                "on_click": lambda e: handle_1click_demo()
                             },
                             html.div(
                                 {"className": "flex flex-col"},
                                 html.span({"className": "font-bold text-light-on-surface"}, "Demo Student"),
-                                html.span({"className": "text-[10px] text-light-on-surface-variant lowercase"}, "student01")
-                            ),
-                            html.span({"className": "text-[10px] font-bold text-light-primary px-2 py-0.5 bg-light-primary/10 rounded"}, "SIGN IN ⚡")
-                        ),
-                        html.button(
-                            {
-                                "type": "button",
-                                "disabled": loading,
-                                "className": "px-3 py-2 bg-light-surface border border-light-outline-variant hover:border-light-primary font-mono text-[11px] uppercase text-left transition-colors cursor-pointer flex items-center justify-between shadow-sm",
-                                "on_click": lambda e: handle_1click_demo("admin")
-                            },
-                            html.div(
-                                {"className": "flex flex-col"},
-                                html.span({"className": "font-bold text-light-on-surface"}, "Demo Faculty"),
-                                html.span({"className": "text-[10px] text-light-on-surface-variant lowercase"}, "admin01")
+                                html.span({"className": "text-[10px] text-light-on-surface-variant lowercase"}, "student01 • Kavitha Ramesh")
                             ),
                             html.span({"className": "text-[10px] font-bold text-light-primary px-2 py-0.5 bg-light-primary/10 rounded"}, "SIGN IN ⚡")
                         )
@@ -638,7 +561,7 @@ def SignupPage(set_page, set_user, current_role='student', theme='dark', toggle_
                             "on_change": lambda e: set_department(e.get("target", {}).get("value", "") if isinstance(e, dict) else str(e))
                         })
                     ),
-                    # Roll Number (if student)
+                    # Roll Number
                     html.div(
                         {"className": "flex flex-col gap-1.5"},
                         html.label({"className": "font-mono text-mono-sm uppercase text-light-on-surface-variant font-medium"}, "Register / Roll Number"),
@@ -650,20 +573,7 @@ def SignupPage(set_page, set_user, current_role='student', theme='dark', toggle_
                             "placeholder": "e.g. 22CSE041",
                             "on_change": lambda e: set_roll_number(e.get("target", {}).get("value", "") if isinstance(e, dict) else str(e))
                         })
-                    ) if role == "student" else None,
-                    # Admin Key (if faculty/admin)
-                    html.div(
-                        {"className": "flex flex-col gap-1.5"},
-                        html.label({"className": "font-mono text-mono-sm uppercase text-light-on-surface-variant font-medium flex items-center justify-between"}, html.span("Admin Verification Key"), html.span({"className": "text-light-primary text-[11px]"}, "REQUIRED")),
-                        html.input({
-                            "type": "password",
-                            "value": admin_key,
-                            "className": "w-full px-3.5 py-2.5 bg-light-surface border border-light-outline-variant focus:border-light-primary focus:ring-0 font-mono text-mono-sm text-light-on-surface outline-none transition-colors",
-                            "style": {"backgroundColor": "var(--bg-input)", "color": "var(--text-primary)"},
-                            "placeholder": "Enter institutional ADMIN_SIGNUP_KEY",
-                            "on_change": lambda e: set_admin_key(e.get("target", {}).get("value", "") if isinstance(e, dict) else str(e))
-                        })
-                    ) if role == "admin" else None,
+                    ),
                     # Password & Confirm Password in 2 cols
                     html.div(
                         {"className": "grid grid-cols-1 sm:grid-cols-2 gap-4"},
@@ -700,7 +610,7 @@ def SignupPage(set_page, set_user, current_role='student', theme='dark', toggle_
                             "className": "w-full py-3.5 bg-light-primary text-white hover:bg-light-primary-container hover:text-light-secondary font-mono text-mono-sm uppercase font-semibold transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-sm mt-3 disabled:opacity-50",
                             "on_click": lambda e: handle_signup()
                         },
-                        html.span("Registering..." if loading else (f"Register {'Faculty Account' if role == 'admin' else 'Student Account'}")),
+                        html.span("Registering..." if loading else "Register Student Account"),
                         html.span({"className": "material-symbols-outlined text-base"}, "person_add")
                     )
                 ),

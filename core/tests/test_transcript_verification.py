@@ -25,7 +25,6 @@ class TranscriptVerificationTests(TestCase):
         )
         self.profile = UserProfile.objects.create(
             user=self.user,
-            role='student',
             roll_number='71762104042',
             department='Computer Science & Engineering',
             current_cgpa=8.75,

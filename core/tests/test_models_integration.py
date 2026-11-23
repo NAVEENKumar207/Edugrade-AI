@@ -207,7 +207,6 @@ class DatabaseCRUDAndIntegrityTests(TestCase):
         self.user = User.objects.create_user(username='teststudent', password='password123', email='test@edu.com')
         self.profile = UserProfile.objects.create(
             user=self.user,
-            role='student',
             roll_number='7176TEST',
             current_semester=3,
             current_cgpa=8.10,

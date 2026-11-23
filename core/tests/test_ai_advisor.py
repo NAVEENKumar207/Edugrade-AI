@@ -16,7 +16,6 @@ class AIAdvisorImprovementsTests(TestCase):
         self.student1_user = User.objects.create_user(username="advisor_student1", password="password123")
         self.student1_profile = UserProfile.objects.create(
             user=self.student1_user,
-            role="student",
             roll_number="CS2026771",
             department="CSE",
             current_semester=5,
@@ -28,7 +27,6 @@ class AIAdvisorImprovementsTests(TestCase):
         self.student2_user = User.objects.create_user(username="advisor_student2", password="password123")
         self.student2_profile = UserProfile.objects.create(
             user=self.student2_user,
-            role="student",
             roll_number="CS2026772",
             department="ECE",
             current_semester=5,

@@ -1,5 +1,5 @@
 """
-Root ReactPy Application for EduGrade AI Platform.
+Root ReactPy Application for EduGrade AI Platform (Student-Only Portal).
 Manages global client-side routing, user session state, and component rendering.
 """
 
@@ -11,12 +11,10 @@ from ui.pages.results_page import ResultsPage
 from ui.pages.cgpa_planner import CgpaPlanner
 from ui.pages.placement_page import PlacementPage
 from ui.pages.ai_advisor import AiAdvisorPage
-from ui.pages.admin_dashboard import AdminDashboard
 from ui.pages.regulations_page import RegulationsPage
 from ui.pages.profile_page import ProfilePage
 from ui.pages.future_lab import FutureLab
 from ui.pages.journey_page import JourneyPage
-from ui.pages.drive_manager import DriveManager
 from ui.components.layout import AppLayout
 
 @component
@@ -24,7 +22,6 @@ def EduGradeApp():
     # Session user, route state, and theme state
     current_page, set_current_page = use_state("landing")
     current_user, set_current_user = use_state(None)
-    auth_role, set_auth_role = use_state("student")
     theme, set_theme = use_state("light")
 
     def toggle_theme():
@@ -40,7 +37,6 @@ def EduGradeApp():
             page_content = LoginPage(
                 set_page=set_current_page,
                 set_user=set_current_user,
-                current_role=auth_role,
                 theme=theme,
                 toggle_theme=toggle_theme
             )
@@ -83,7 +79,6 @@ def EduGradeApp():
         else:
             page_content = LandingPage(
                 set_page=set_current_page,
-                set_auth_role=set_auth_role,
                 theme=theme,
                 toggle_theme=toggle_theme
             )
@@ -98,16 +93,8 @@ def EduGradeApp():
             page_content
         )
 
-    # For authenticated users:
-    profile = getattr(current_user, 'profile', None)
-    is_admin = profile.is_admin() if profile else False
-
-    # Page routing logic
-    if current_page in ["admin_dashboard", "admin", "cohort"]:
-        page_content = AdminDashboard(user=current_user)
-    elif current_page in ["drives", "drive_manager"]:
-        page_content = DriveManager(user=current_user)
-    elif current_page in ["future_lab", "futurelab", "twin"]:
+    # For authenticated student users - Student-only routing
+    if current_page in ["future_lab", "futurelab", "twin"]:
         page_content = FutureLab(user=current_user, set_page=set_current_page)
     elif current_page in ["journey", "my_journey"]:
         page_content = JourneyPage(user=current_user)
@@ -124,11 +111,7 @@ def EduGradeApp():
     elif current_page == "profile":
         page_content = ProfilePage(user=current_user)
     else:
-        # Default view
-        if is_admin:
-            page_content = AdminDashboard(user=current_user)
-        else:
-            page_content = StudentDashboard(user=current_user, set_page=set_current_page)
+        page_content = StudentDashboard(user=current_user, set_page=set_current_page)
 
     return html.div(
         {

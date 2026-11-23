@@ -11,7 +11,6 @@ class DigitalTwinSimulatorTests(TestCase):
         self.student_user = User.objects.create_user(username='student_twin', password='password123')
         self.profile = UserProfile.objects.create(
             user=self.student_user,
-            role='student',
             roll_number='71762104101',
             current_semester=5,
             current_cgpa=7.50,
@@ -57,7 +56,7 @@ class DigitalTwinSimulatorTests(TestCase):
 
     def test_fewer_than_five_results_returns_enough_data_false(self):
         new_user = User.objects.create_user(username='sparse_user', password='password123')
-        sparse_profile = UserProfile.objects.create(user=new_user, role='student', current_cgpa=8.0)
+        sparse_profile = UserProfile.objects.create(user=new_user, current_cgpa=8.0)
         # Create only 3 courses
         for i in range(3):
             CourseResult.objects.create(student=sparse_profile, course_code=f"C{i}", course_name=f"Sub {i}", credits=3, grade="A", grade_point=8.0)
@@ -84,7 +83,7 @@ class DigitalTwinSimulatorTests(TestCase):
 
     def test_student_cannot_call_for_another_student(self):
         other_user = User.objects.create_user(username='other_student', password='password123')
-        other_profile = UserProfile.objects.create(user=other_user, role='student', current_cgpa=6.0)
+        other_profile = UserProfile.objects.create(user=other_user, current_cgpa=6.0)
 
         self.client.force_authenticate(user=self.student_user)
         resp = self.client.post('/api/twin/simulate/', {'target_cgpa': 8.5, 'effort': 'same', 'student_id': other_profile.id})
@@ -97,7 +96,6 @@ class NextBestMoveTests(TestCase):
         self.student_user = User.objects.create_user(username='arrear_student', password='password123')
         self.profile = UserProfile.objects.create(
             user=self.student_user,
-            role='student',
             current_cgpa=5.50,
             credits_earned=60,
             backlogs_count=2,

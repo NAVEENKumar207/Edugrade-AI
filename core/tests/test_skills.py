@@ -11,7 +11,6 @@ class SkillMapAndPlacementMatchTests(TestCase):
         self.user = User.objects.create_user(username='skill_student', password='password123')
         self.profile = UserProfile.objects.create(
             user=self.user,
-            role='student',
             current_cgpa=8.00,
             backlogs_count=0
         )
@@ -88,7 +87,7 @@ class SkillMapAndPlacementMatchTests(TestCase):
 
     def test_empty_data_works_without_crashes(self):
         new_user = User.objects.create_user(username='empty_student', password='password123')
-        empty_prof = UserProfile.objects.create(user=new_user, role='student', current_cgpa=0.0)
+        empty_prof = UserProfile.objects.create(user=new_user, current_cgpa=0.0)
 
         scores = skill_scores(empty_prof)
         self.assertEqual(scores, {})

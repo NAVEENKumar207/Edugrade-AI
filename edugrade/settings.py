@@ -19,8 +19,7 @@ DEBUG = (os.getenv('DEBUG') or os.getenv('DJANGO_DEBUG', 'False')).lower() in ('
 raw_hosts = os.getenv('ALLOWED_HOSTS') or os.getenv('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1')
 ALLOWED_HOSTS = [h.strip() for h in raw_hosts.split(',') if h.strip()]
 
-# Institutional Security & External AI Keys (empty string disables admin signup)
-ADMIN_SIGNUP_KEY = os.getenv('ADMIN_SIGNUP_KEY', '')
+# External AI Keys & Advisor Config
 GROQ_API_KEY = os.getenv('GROQ_API_KEY', '')
 GROQ_MODEL = os.getenv('GROQ_MODEL', 'llama-3.3-70b-versatile')
 GROQ_TIMEOUT_SECONDS = int(os.getenv('GROQ_TIMEOUT_SECONDS', '15'))

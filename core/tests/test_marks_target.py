@@ -9,10 +9,10 @@ class MarksTargetCalculatorTests(TestCase):
     def setUp(self):
         self.client = APIClient()
         self.student_user = User.objects.create_user(username='student_marks', password='password123')
-        self.student_profile = UserProfile.objects.create(user=self.student_user, role='student')
+        self.student_profile = UserProfile.objects.create(user=self.student_user)
 
         self.faculty_user = User.objects.create_user(username='faculty_marks', password='password123', is_staff=True)
-        self.faculty_profile = UserProfile.objects.create(user=self.faculty_user, role='admin')
+        self.faculty_profile = UserProfile.objects.create(user=self.faculty_user)
 
     def test_example_1_internal_36_target_A_plus(self):
         # internal 36, target A+ -> needed total 81 -> paper 75

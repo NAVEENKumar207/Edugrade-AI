@@ -25,7 +25,6 @@ class EmptyStateEndpointTests(TestCase):
         )
         self.student_profile = UserProfile.objects.create(
             user=self.student_user,
-            role="student",
             roll_number="NEW2026001",
             department="Computer Science & Engineering",
             current_semester=1,
@@ -35,7 +34,7 @@ class EmptyStateEndpointTests(TestCase):
             backlogs_count=0
         )
 
-        # Create fresh admin user
+        # Create fresh staff user
         self.admin_user = User.objects.create_user(
             username="empty_admin",
             password="password123",
@@ -45,7 +44,6 @@ class EmptyStateEndpointTests(TestCase):
         )
         self.admin_profile = UserProfile.objects.create(
             user=self.admin_user,
-            role="admin",
             roll_number="FAC-ADMIN-01",
             department="Dean Office"
         )
@@ -121,38 +119,11 @@ class EmptyStateEndpointTests(TestCase):
         self.assertTrue(data['is_achievable'])
         self.assertEqual(data['required_average_sgpa'], 8.5)
 
-    def test_faculty_overview_empty_state(self):
-        # Remove student profile so DB has zero students
-        self.student_profile.delete()
-        self.student_user.delete()
-
-        self.client.force_authenticate(user=self.admin_user)
-        response = self.client.get('/api/faculty/overview/')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        data = response.json()
-        self.assertEqual(data['metrics']['total_students'], 0)
-        self.assertEqual(data['metrics']['average_cgpa'], 0.0)
-
-    def test_admin_analytics_empty_state(self):
-        self.student_profile.delete()
-        self.student_user.delete()
-
-        self.client.force_authenticate(user=self.admin_user)
-        response = self.client.get('/api/admin/analytics/')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        data = response.json()
-        self.assertEqual(len(data['at_risk_students']), 0)
-        self.assertEqual(len(data['department_stats']), 0)
-
-    def test_faculty_students_list_empty_state(self):
-        self.student_profile.delete()
-        self.student_user.delete()
-
-        self.client.force_authenticate(user=self.admin_user)
-        response = self.client.get('/api/faculty/students/')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        data = response.json()
-        self.assertEqual(len(data['students']), 0)
+    def test_deleted_faculty_admin_endpoints_return_404(self):
+        self.client.force_authenticate(user=self.student_user)
+        for ep in ['/api/faculty/overview/', '/api/admin/analytics/', '/api/faculty/students/']:
+            response = self.client.get(ep)
+            self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_placement_readiness_service_zero_companies(self):
         CompanyPlacementCriteria.objects.all().delete()

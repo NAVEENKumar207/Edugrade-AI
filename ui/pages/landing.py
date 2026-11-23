@@ -11,56 +11,59 @@ from ui.services.data_service import get_landing_stats
 @component
 def LandingPage(set_page, set_auth_role=None, theme="dark", toggle_theme=None):
     stats = get_landing_stats()
-    selected_role, set_selected_role = use_state("student")
+    selected_feature, set_selected_feature = use_state("twin")
 
-    def go_to_login(role="student"):
-        if set_auth_role:
-            set_auth_role(role)
-        set_page("login")
-
-    role_data = {
-        "student": {
-            "tags": ["DIGITAL TWIN", "NEXT BEST MOVE", "MARKS TARGET", "EN / தமிழ் AI"],
-            "title": "Your Academic Digital Twin",
+    feature_data = {
+        "twin": {
+            "tags": ["DIGITAL TWIN", "MONTE CARLO", "P10 - P90 INTERVALS", "OUTCOME SIMULATION"],
+            "title": "Probabilistic Graduation Forecasting",
             "value": f"{stats.get('grades_count', 0)}",
-            "sub": "Course Records Evaluated",
-            "left": "MONTE CARLO TRAJECTORY",
-            "right": "TAMIL + ENG ADVISOR"
+            "sub": "Academic Records Modelled",
+            "left": "2,000 MONTE CARLO RUNS",
+            "right": "EFFORT-AWARE ENGINE"
         },
-        "faculty": {
-            "tags": ["DRIVE MANAGER", "EARLY WARNING", "AUDIT TRAIL", "QR TRANSCRIPTS"],
-            "title": "Institutional Oversight & Early Warning",
-            "value": f"{stats.get('students_count', 0)}",
-            "sub": "Enrolled Candidates",
-            "left": "LEAST-SQUARES PREDICTION",
-            "right": "ATOMIC AUDIT"
+        "moves": {
+            "tags": ["NEXT BEST MOVE", "ARREAR RECOVERY", "MARGINAL CGPA", "DRIVE UNLOCKS"],
+            "title": "Highest-Impact Arrear Prioritization",
+            "value": "Top Move",
+            "sub": "Impact-Ranked Remediation",
+            "left": "PLACEMENT BENEFIT",
+            "right": "ROI RANKING"
         },
-        "placement": {
-            "tags": ["SKILL MAPPING", "BORDERLINE COHORTS", "CSV EXPORT", "GAP ANALYSIS"],
-            "title": "Corporate Drive Intelligence",
-            "value": f"{stats.get('recruiters_count', 0)}",
-            "sub": "Corporate Recruitment Drives",
-            "left": "TIER-1 CUTOFF AUDIT",
-            "right": "SKILL FIT MATCH"
+        "target": {
+            "tags": ["MARKS TARGET", "CIA 40 / ESE 60", "ANNA UNIV CBCS", "PASS THRESHOLD"],
+            "title": "Reverse Exam Score Calculation",
+            "value": "45%",
+            "sub": "Min Theory Passing Paper",
+            "left": "REVERSE MARKS TARGET",
+            "right": "FEASIBILITY CHECK"
         },
-        "mentor": {
-            "tags": ["GROUNDED AI", "EN & தமிழ்", "VOICE INPUT", "STUDY PLANS"],
+        "advisor": {
+            "tags": ["GROUNDED AI", "EN & தமிழ்", "WEB SPEECH VOICE", "STUDY PLANS"],
             "title": "Bilingual Voice Academic Mentor",
             "value": "24/7",
-            "sub": "Automated Remediation",
-            "left": "WEB SPEECH API",
-            "right": "TAMIL + ENG"
+            "sub": "Automated Guidance",
+            "left": "VOICE DICTATION",
+            "right": "TAMIL + ENGLISH"
+        },
+        "badges": {
+            "tags": ["7 BADGES", "TIMELINE", "LEAST-SQUARES", "TREND ALERT"],
+            "title": "Milestone Badges & Growth Timeline",
+            "value": "7 Badges",
+            "sub": "Career Milestones",
+            "left": "REGRESSION PREDICTION",
+            "right": "CHRONOLOGICAL JOURNEY"
         }
     }
 
-    current = role_data.get(selected_role, role_data["student"])
+    current = feature_data.get(selected_feature, feature_data["twin"])
 
     return html.div(
         {
             "id": "top",
             "className": "min-h-screen flex flex-col bg-light-surface text-light-on-surface font-body antialiased selection:bg-light-primary selection:text-white"
         },
-        # 1. Top Site Navigation (Industrial Precision Style)
+        # 1. Top Site Navigation
         html.header(
             {"className": "bg-light-surface border-b border-light-outline-variant sticky top-0 z-30"},
             html.div(
@@ -79,7 +82,7 @@ def LandingPage(set_page, set_auth_role=None, theme="dark", toggle_theme=None):
                     html.div(
                         {"className": "flex flex-col"},
                         html.span({"className": "font-headline font-bold text-lg tracking-tight uppercase leading-none"}, "EduGrade AI"),
-                        html.span({"className": "font-mono text-[10px] text-light-on-surface-variant uppercase tracking-wider leading-none mt-0.5"}, "INDUSTRIAL ACADEMIC INTELLIGENCE")
+                        html.span({"className": "font-mono text-[10px] text-light-on-surface-variant uppercase tracking-wider leading-none mt-0.5"}, "STUDENT ACADEMIC DIGITAL TWIN")
                     )
                 ),
 
@@ -90,16 +93,16 @@ def LandingPage(set_page, set_auth_role=None, theme="dark", toggle_theme=None):
                     html.button(
                         {
                             "className": "px-4 py-2 border border-light-outline-variant hover:border-light-secondary font-mono text-mono-sm uppercase transition-colors cursor-pointer",
-                            "on_click": lambda e: go_to_login("student")
+                            "on_click": lambda e: set_page("signup")
                         },
-                        "Portal Login"
+                        "Register"
                     ),
                     html.button(
                         {
                             "className": "px-4 py-2 bg-light-primary text-white hover:bg-light-primary-container hover:text-light-secondary font-mono text-mono-sm uppercase font-semibold transition-colors cursor-pointer",
-                            "on_click": lambda e: go_to_login("admin")
+                            "on_click": lambda e: set_page("login")
                         },
-                        "Faculty Access"
+                        "Student Portal Login"
                     )
                 )
             )

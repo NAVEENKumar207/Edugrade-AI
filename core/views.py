@@ -16,16 +16,13 @@ def home(request):
     return render(request, 'reactpy_index.html')
 
 def login_view(request):
-    """Handle Student and Admin / Faculty sign in."""
+    """Handle Student sign in."""
     if request.user.is_authenticated:
-        if hasattr(request.user, 'profile') and request.user.profile.is_admin():
-            return redirect('admin_dashboard')
         return redirect('dashboard')
 
     if request.method == 'POST':
         username = request.POST.get('username', '').strip()
         password = request.POST.get('password', '')
-        selected_role = request.POST.get('role', 'student')
 
         # Check for account lockout after 5 consecutive failed attempts
         locked, mins = is_account_locked(username)
@@ -39,16 +36,8 @@ def login_view(request):
             login(request, user)
             
             # Check profile or create default profile if missing
-            profile, created = UserProfile.objects.get_or_create(
-                user=user,
-                defaults={'role': selected_role}
-            )
-
-            # Role-based redirection
-            if selected_role == 'admin' or profile.is_admin() or user.is_staff or user.is_superuser:
-                return redirect('admin_dashboard')
-            else:
-                return redirect('dashboard')
+            UserProfile.objects.get_or_create(user=user)
+            return redirect('dashboard')
         else:
             is_locked, mins = record_failed_login(username)
             if is_locked:
@@ -60,25 +49,18 @@ def login_view(request):
     return render(request, 'login.html', {'debug': settings.DEBUG})
 
 def signup_view(request):
-    """Handle Student and Admin / Faculty account registration."""
+    """Handle Student account registration."""
     if request.user.is_authenticated:
-        if hasattr(request.user, 'profile') and request.user.profile.is_admin():
-            return redirect('admin_dashboard')
         return redirect('dashboard')
 
     if request.method == 'POST':
-        role = request.POST.get('role', 'student')
         fullname = request.POST.get('fullname', '').strip()
         username = request.POST.get('username', '').strip()
         department = request.POST.get('department', 'Computer Science & Engineering')
         password = request.POST.get('password', '')
         confirm_password = request.POST.get('confirm_password', '')
-
-        # Student or Admin specific fields
         roll_number = request.POST.get('roll_number', '').strip()
-        semester = request.POST.get('semester', '5')
-        admin_id = request.POST.get('admin_id', '').strip()
-        admin_key = request.POST.get('admin_key', '').strip()
+        semester = request.POST.get('semester', '1')
 
         if password != confirm_password:
             messages.error(request, 'Passwords do not match.')
@@ -88,24 +70,12 @@ def signup_view(request):
             messages.error(request, 'An account with this email/username already exists.')
             return render(request, 'signup.html')
 
-        # Admin key validation
-        is_staff_user = False
-        admin_signup_key = getattr(settings, 'ADMIN_SIGNUP_KEY', '')
-        if role == 'admin':
-            if not admin_signup_key:
-                messages.error(request, 'Admin signup is disabled')
-                return render(request, 'signup.html', status=403)
-            if not admin_key or not hmac.compare_digest(admin_key, admin_signup_key):
-                messages.error(request, 'Invalid Admin Authorization Key. Please contact the administrator.')
-                return render(request, 'signup.html')
-            is_staff_user = True
-
         # Create user
         user = User.objects.create_user(
             username=username,
             password=password,
             email=username,
-            is_staff=is_staff_user
+            is_staff=False
         )
 
         if fullname:
@@ -118,17 +88,13 @@ def signup_view(request):
         # Create UserProfile
         UserProfile.objects.create(
             user=user,
-            role=role,
-            roll_number=admin_id if role == 'admin' else roll_number,
+            roll_number=roll_number or ('7176' + username),
             department=department,
-            current_semester=int(semester) if semester.isdigit() else 5
+            current_semester=int(semester) if semester.isdigit() else 1
         )
 
         login(request, user)
-        messages.success(request, f'Welcome! Your {role.capitalize()} account was created successfully.')
-
-        if role == 'admin':
-            return redirect('admin_dashboard')
+        messages.success(request, 'Welcome! Your student account was created successfully.')
         return redirect('dashboard')
 
     return render(request, 'signup.html')
@@ -158,32 +124,8 @@ def dashboard_view(request):
     return render(request, 'dashboard.html', context)
 
 def admin_dashboard_view(request):
-    """Render the faculty / admin academic management dashboard."""
-    if not request.user.is_authenticated:
-        return redirect('login')
-
-    # Institution-wide metrics
-    total_students = UserProfile.objects.filter(role='student').count()
-    all_cgpas = UserProfile.objects.filter(role='student').values_list('current_cgpa', flat=True)
-    avg_cgpa = round(sum(all_cgpas) / total_students, 2) if total_students > 0 else 0
-
-    eligible_count = UserProfile.objects.filter(role='student', is_placement_eligible=True).count()
-    eligibility_rate = round((eligible_count / total_students * 100), 1) if total_students > 0 else 0
-
-    # List of students for the table
-    students = UserProfile.objects.filter(role='student').select_related('user').all()
-
-    context = {
-        'metrics': {
-            'total_students': total_students,
-            'avg_cgpa': avg_cgpa,
-            'eligibility_rate': eligibility_rate,
-            'eligible_count': eligible_count,
-        },
-        'students': students,
-    }
-
-    return render(request, 'admin_dashboard.html', context)
+    """Legacy route: redirect to student performance dashboard."""
+    return redirect('dashboard')
 
 
 # =======================================================

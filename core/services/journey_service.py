@@ -74,15 +74,14 @@ def get_journey(student_profile, sem_records=None, courses=None) -> list:
 
     if sem_records is None:
         sem_records = list(SemesterRecord.objects.filter(
-            student=student_profile,
-            is_published=True
+            student=student_profile
         ).order_by('semester_number'))
 
     if not sem_records:
         return []
 
     if courses is None:
-        courses = list(CourseResult.objects.filter(student=student_profile, is_published=True))
+        courses = list(CourseResult.objects.filter(student=student_profile))
 
     courses_by_sem = {}
     for c in courses:
@@ -171,8 +170,7 @@ def get_badges(student_profile, sem_records=None, courses=None) -> dict:
 
     if sem_records is None:
         sem_records = list(SemesterRecord.objects.filter(
-            student=student_profile,
-            is_published=True
+            student=student_profile
         ).order_by('semester_number'))
     sem_count = len(sem_records)
 
@@ -180,7 +178,7 @@ def get_badges(student_profile, sem_records=None, courses=None) -> dict:
     backlogs = int(student_profile.backlogs_count) if student_profile.backlogs_count is not None else 0
 
     if courses is None:
-        courses = list(CourseResult.objects.filter(student=student_profile, is_published=True))
+        courses = list(CourseResult.objects.filter(student=student_profile))
 
     courses_by_sem = {}
     for c in courses:
@@ -305,8 +303,7 @@ def evaluate_student_risk(student_profile, prefetched_semesters=None) -> dict:
         semesters = list(prefetched_semesters)
     else:
         semesters = list(SemesterRecord.objects.filter(
-            student=student_profile,
-            is_published=True
+            student=student_profile
         ).order_by('semester_number'))
     sgpas = [float(s.sgpa) for s in semesters]
 

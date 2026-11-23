@@ -6,14 +6,8 @@ def generate_transcript_token():
     return uuid.uuid4().hex
 
 class UserProfile(models.Model):
-    ROLE_CHOICES = (
-        ('student', 'Student'),
-        ('faculty', 'Faculty'),
-        ('admin', 'Admin / Faculty'),
-    )
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='student')
-    roll_number = models.CharField(max_length=50, blank=True, null=True) # or Faculty ID
+    roll_number = models.CharField(max_length=50, blank=True, null=True)
     department = models.CharField(max_length=100, default='Computer Science & Engineering')
     current_semester = models.IntegerField(default=5, blank=True, null=True)
     target_cgpa = models.DecimalField(max_digits=4, decimal_places=2, default=9.00)
@@ -23,11 +17,8 @@ class UserProfile(models.Model):
     backlogs_count = models.IntegerField(default=0)
     is_placement_eligible = models.BooleanField(default=True)
 
-    def is_admin(self):
-        return self.role in ['admin', 'faculty'] or self.user.is_staff or self.user.is_superuser
-
     def __str__(self):
-        return f"{self.user.username} ({self.get_role_display()}) - {self.department}"
+        return f"{self.user.username} - {self.department}"
 
 # Backwards compatibility alias
 StudentProfile = UserProfile
@@ -37,7 +28,6 @@ class SemesterRecord(models.Model):
     semester_number = models.IntegerField()
     sgpa = models.DecimalField(max_digits=4, decimal_places=2)
     credits_earned = models.IntegerField(default=20)
-    is_published = models.BooleanField(default=True)
 
     class Meta:
         ordering = ['semester_number']
@@ -66,7 +56,6 @@ class CourseResult(models.Model):
     previous_grade = models.CharField(max_length=3, blank=True, default="")
     arrear_cleared = models.BooleanField(default=False)
     cleared_on = models.DateTimeField(null=True, blank=True)
-    is_published = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

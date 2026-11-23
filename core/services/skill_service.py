@@ -47,10 +47,9 @@ def skill_scores(student_profile) -> dict:
     if not student_profile:
         return {}
 
-    # Gather latest published result per course
+    # Gather latest result per course
     courses = CourseResult.objects.filter(
-        student=student_profile,
-        is_published=True
+        student=student_profile
     ).order_by('semester_number', 'id')
 
     latest_courses = {}

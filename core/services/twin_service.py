@@ -40,7 +40,7 @@ def simulate_future(profile_data, target_cgpa: float, effort: str = "same", runs
         return {"enough_data": False, "message": "Student profile not found."}
 
     # Fetch latest attempt per course for the student
-    all_results = CourseResult.objects.filter(student=student, is_published=True).order_by('semester_number', 'id')
+    all_results = CourseResult.objects.filter(student=student).order_by('semester_number', 'id')
     latest_courses = {}
     for cr in all_results:
         code = cr.course_code.strip().upper()
@@ -229,8 +229,7 @@ def rank_next_moves(student, assumed_grade: str = "B") -> list:
     if not active_arrears:
         # Fallback to weakest passed course suggestion
         weakest = CourseResult.objects.filter(
-            student=student_profile,
-            is_published=True
+            student=student_profile
         ).exclude(grade__in=FAILING_GRADES).order_by('grade_point', 'credits').first()
 
         if weakest:

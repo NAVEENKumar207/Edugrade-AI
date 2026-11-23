@@ -51,7 +51,7 @@ class NumberedCanvas(canvas.Canvas):
         self.line(40, 40, letter[0] - 40, 40)
 
         # Footer text
-        footer_left = "EduGrade AI Academic Intelligence Platform • CBCS Regulations • Computer-Generated Transcript"
+        footer_left = "EduGrade AI Student Portal • CBCS Regulations • Self-reported academic data"
         footer_right = f"Page {self._pageNumber} of {page_count}"
         self.drawString(40, 28, footer_left)
         self.drawRightString(letter[0] - 40, 28, footer_right)

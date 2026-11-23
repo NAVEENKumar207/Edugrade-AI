@@ -7,7 +7,7 @@ Matches New Ui/student_dashboard/code.html.
 from reactpy import component, html, use_state
 from ui.services.data_service import (
     get_student_dashboard_data, get_placement_matrix_data, get_arrears,
-    get_next_moves, get_journey_and_badges
+    get_next_moves, get_journey_and_badges, get_student_trend_alert
 )
 
 @component
@@ -17,6 +17,7 @@ def StudentDashboard(user, set_page):
     arrears_data, set_arrears_data = use_state(lambda: get_arrears(user))
     moves_data, set_moves_data = use_state(lambda: get_next_moves(user, assumed_grade="B"))
     journey_data, set_journey_data = use_state(lambda: get_journey_and_badges(user))
+    trend_data, set_trend_data = use_state(lambda: get_student_trend_alert(user))
 
     if not data:
         data = get_student_dashboard_data(user)
@@ -28,9 +29,16 @@ def StudentDashboard(user, set_page):
         moves_data = get_next_moves(user, assumed_grade="B")
     if not journey_data:
         journey_data = get_journey_and_badges(user)
+    if not trend_data:
+        trend_data = get_student_trend_alert(user)
 
     top_move_sentence = moves_data[0].get("sentence", "") if moves_data and len(moves_data) > 0 else ""
     earned_badges = journey_data.get("badges", {}).get("earned_badges", [])[:3]
+
+    risk_level = trend_data.get("risk_level", "low") if trend_data else "low"
+    predicted_sgpa = trend_data.get("predicted_next_sgpa") if trend_data else None
+    trend = trend_data.get("trend", "steady") if trend_data else "steady"
+    reasons = trend_data.get("reasons", []) if trend_data else []
 
     student = data.get("student", {})
     semesters = data.get("semesters", [])
@@ -207,6 +215,91 @@ def StudentDashboard(user, set_page):
                 )
             )
             if earned_badges else None
+        ),
+
+        # Personal Trend Alert (Repurposed Early Warning Intervention)
+        html.section(
+            {
+                "class_name": (
+                    "p-4 border-2 bg-light-surface-container-lowest flex flex-col md:flex-row items-start md:items-center justify-between gap-4 " +
+                    ("border-light-error bg-red-50/50 dark:bg-red-950/20" if risk_level == "high" else
+                     "border-amber-500 bg-amber-50/50 dark:bg-amber-950/20" if risk_level == "medium" else
+                     "border-emerald-500/80 bg-emerald-50/30 dark:bg-emerald-950/20")
+                )
+            },
+            html.div(
+                {"class_name": "flex items-start gap-3"},
+                html.span(
+                    {
+                        "class_name": (
+                            "material-symbols-outlined text-[26px] mt-0.5 " +
+                            ("text-light-error" if risk_level == "high" else
+                             "text-amber-500" if risk_level == "medium" else
+                             "text-emerald-500")
+                        )
+                    },
+                    "warning" if risk_level in ["high", "medium"] else "insights"
+                ),
+                html.div(
+                    {"class_name": "flex flex-col gap-1"},
+                    html.div(
+                        {"class_name": "flex items-center gap-2 flex-wrap"},
+                        html.span(
+                            {"class_name": "font-headline font-bold text-label-md uppercase tracking-tight text-light-on-surface"},
+                            "Personal Trend Alert • " +
+                            ("High Academic Warning" if risk_level == "high" else
+                             "Moderate Trajectory Alert" if risk_level == "medium" else
+                             "Positive Academic Momentum")
+                        ),
+                        html.span(
+                            {
+                                "class_name": (
+                                    "px-2 py-0.5 rounded font-mono text-[11px] font-bold uppercase " +
+                                    ("bg-light-error text-white" if risk_level == "high" else
+                                     "bg-amber-500 text-white" if risk_level == "medium" else
+                                     "bg-emerald-600 text-white")
+                                )
+                            },
+                            f"Trend: {trend.upper()}"
+                        ),
+                        html.span(
+                            {"class_name": "font-mono text-mono-xs text-light-on-surface-variant font-semibold"},
+                            f"Predicted Next SGPA: {predicted_sgpa:.2f}" if predicted_sgpa is not None else "Prediction: Need >= 2 Semesters"
+                        )
+                    ),
+                    html.div(
+                        {"class_name": "text-body-sm font-mono text-light-on-surface-variant mt-0.5"},
+                        " • ".join(reasons) if reasons else "Consistent standing across all enrolled semesters."
+                    ),
+                    html.p(
+                        {"class_name": "text-[12px] font-body text-light-on-surface-variant/80 mt-1 italic"},
+                        "💡 Tip: " + (
+                            "Consult AI Advisor to clear active arrears and raise internal marks before next exam." if risk_level == "high" else
+                            "Focus on upcoming core lab courses and internal assessments to stabilize SGPA trajectory." if risk_level == "medium" else
+                            "Maintain this consistent performance to stay on track for your target CGPA!"
+                        )
+                    )
+                )
+            ),
+            html.div(
+                {"class_name": "flex items-center gap-2 shrink-0 self-end md:self-center"},
+                html.button(
+                    {
+                        "type": "button",
+                        "on_click": lambda e: set_page("future_lab"),
+                        "class_name": "px-3 py-1.5 border border-light-outline-variant font-mono text-mono-xs uppercase text-light-on-surface hover:border-light-primary hover:text-light-primary transition-colors cursor-pointer whitespace-nowrap"
+                    },
+                    "Simulate in Lab →"
+                ),
+                html.button(
+                    {
+                        "type": "button",
+                        "on_click": lambda e: set_page("advisor"),
+                        "class_name": "px-3 py-1.5 bg-light-primary text-white font-mono text-mono-xs uppercase font-bold hover:bg-light-primary-container hover:text-light-secondary transition-colors cursor-pointer whitespace-nowrap"
+                    },
+                    "Ask Advisor ⚡"
+                )
+            )
         ),
 
         # 4-KPI Bento Row

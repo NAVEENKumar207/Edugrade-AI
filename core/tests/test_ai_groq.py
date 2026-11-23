@@ -27,7 +27,6 @@ class GroqAdvisorIntegrationTests(TestCase):
         )
         self.profile = UserProfile.objects.create(
             user=self.user,
-            role="student",
             roll_number="REG2026888",
             department="Computer Science & Engineering",
             current_semester=6,

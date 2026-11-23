@@ -13,7 +13,6 @@ from ui.components.theme_toggle import ThemeToggle
 def AppLayout(user, current_page, set_page, logout_action, children, theme="light", toggle_theme=None):
     mobile_open, set_mobile_open = use_state(False)
     profile = getattr(user, 'profile', None)
-    is_admin = profile.is_admin() if profile else False
     cgpa_val = float(profile.current_cgpa) if profile else 0.0
     full_name = f"{user.first_name} {user.last_name}".strip() or user.username if user else "Student"
     
@@ -23,29 +22,19 @@ def AppLayout(user, current_page, set_page, logout_action, children, theme="ligh
     dept = profile.department if profile and profile.department else "Computer Science"
     curr_sem = f"Sem {profile.current_semester}" if profile else "CBCS"
 
-    if is_admin:
-        nav_items = [
-            {"id": "admin_dashboard", "label": "Cohort Directory", "icon": "groups"},
-            {"id": "drives", "label": "Placement Drives", "icon": "business_center"},
-            {"id": "regulations", "label": "CBCS Framework", "icon": "menu_book"},
-            {"id": "profile", "label": "Faculty Profile", "icon": "person"},
-        ]
-        page_title = "Faculty & Institutional Oversight"
-        page_subtitle = f"{dept.upper()} • COHORT METRICS & AUDIT TRAIL"
-    else:
-        nav_items = [
-            {"id": "dashboard", "label": "Dashboard", "icon": "dashboard"},
-            {"id": "future_lab", "label": "Future Lab", "icon": "model_training"},
-            {"id": "results", "label": "Transcripts & Results", "icon": "receipt_long"},
-            {"id": "planner", "label": "CGPA Planner", "icon": "calculate"},
-            {"id": "placements", "label": "Placement Matrix", "icon": "work"},
-            {"id": "journey", "label": "My Journey", "icon": "route"},
-            {"id": "advisor", "label": "AI Advisor", "icon": "psychology"},
-            {"id": "regulations", "label": "Regulations", "icon": "menu_book"},
-            {"id": "profile", "label": "Profile", "icon": "person"},
-        ]
-        page_title = "Student Dashboard"
-        page_subtitle = f"B.E. {dept.upper()} • REGULATION 2026 (CBCS)"
+    nav_items = [
+        {"id": "dashboard", "label": "Dashboard", "icon": "dashboard"},
+        {"id": "future_lab", "label": "Future Lab", "icon": "model_training"},
+        {"id": "journey", "label": "My Journey", "icon": "route"},
+        {"id": "results", "label": "Results & Records", "icon": "receipt_long"},
+        {"id": "planner", "label": "CGPA Planner", "icon": "calculate"},
+        {"id": "placements", "label": "Placement Matrix", "icon": "work"},
+        {"id": "advisor", "label": "AI Advisor", "icon": "psychology"},
+        {"id": "regulations", "label": "Regulations", "icon": "menu_book"},
+        {"id": "profile", "label": "Profile", "icon": "person"},
+    ]
+    page_title = "Student Dashboard"
+    page_subtitle = f"B.E. {dept.upper()} • REGULATION 2026 (CBCS)"
 
     nav_links = []
     for item in nav_items:
@@ -55,8 +44,6 @@ def AppLayout(user, current_page, set_page, logout_action, children, theme="ligh
             or (item["id"] == "placements" and current_page in ["placements", "placement"])
             or (item["id"] == "advisor" and current_page in ["advisor", "ai_advisor", "ai-advisor"])
             or (item["id"] == "future_lab" and current_page in ["future_lab", "futurelab", "twin"])
-            or (item["id"] == "admin_dashboard" and current_page in ["admin_dashboard", "admin", "cohort"])
-            or (item["id"] == "drives" and current_page in ["drives", "drive_manager"])
             or (item["id"] == "regulations" and current_page in ["regulations", "syllabus"])
         )
         

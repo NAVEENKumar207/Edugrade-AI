@@ -14,7 +14,6 @@ class JourneyBadgesAndEarlyWarningTests(TestCase):
         self.user = User.objects.create_user(username='journey_student', password='password123')
         self.profile = UserProfile.objects.create(
             user=self.user,
-            role='student',
             current_cgpa=8.80,
             credits_earned=60,
             backlogs_count=0
@@ -37,7 +36,7 @@ class JourneyBadgesAndEarlyWarningTests(TestCase):
 
     def test_student_with_no_data_all_seven_locked_no_crash(self):
         sparse_user = User.objects.create_user(username='empty_student', password='password123')
-        sparse_profile = UserProfile.objects.create(user=sparse_user, role='student', current_cgpa=0.0, backlogs_count=0)
+        sparse_profile = UserProfile.objects.create(user=sparse_user, current_cgpa=0.0, backlogs_count=0)
         res = get_badges(sparse_profile)
         self.assertEqual(len(res["all_badges"]), 7)
         self.assertEqual(len(res["earned_badges"]), 0)
@@ -179,20 +178,17 @@ class JourneyBadgesAndEarlyWarningTests(TestCase):
         self.assertEqual(r_med["risk_level"], "medium")
         self.assertTrue(any("fell" in r.lower() for r in r_med["reasons"]))
 
-    def test_old_at_risk_outputs_are_unchanged_in_api(self):
+    def test_deleted_admin_analytics_endpoint_returns_404(self):
         admin_user = User.objects.create_user(username='admin_at_risk', password='password123', is_staff=True)
-        UserProfile.objects.create(user=admin_user, role='admin')
+        UserProfile.objects.create(user=admin_user)
 
         self.client.force_authenticate(user=admin_user)
         resp = self.client.get('/api/admin/analytics/')
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertIn('metrics', resp.data)
-        self.assertIn('grade_distribution', resp.data)
-        self.assertIn('at_risk_students', resp.data)
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_students_cannot_read_other_students_journeys(self):
         other_user = User.objects.create_user(username='other_journey_user', password='password123')
-        UserProfile.objects.create(user=other_user, role='student', current_cgpa=6.0)
+        UserProfile.objects.create(user=other_user, current_cgpa=6.0)
 
         self.client.force_authenticate(user=other_user)
         resp = self.client.get('/api/journey/')

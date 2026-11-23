@@ -160,5 +160,5 @@ def verify_transcript_token(token: str) -> dict:
         "backlogs": int(snap.get("backlogs", 0)),
         "semester_count": int(snap.get("semester_count", 0)),
         "token": issue.token,
-        "note": "This is a snapshot taken on the issue date; current records may differ."
+        "note": "Self-reported academic data • Cryptographically signed by EduGrade AI."
     }

@@ -621,7 +621,7 @@ def record_course_result(
     sem_record, _ = SemesterRecord.objects.get_or_create(
         student=student_profile,
         semester_number=sem_num,
-        defaults={'sgpa': grade_point, 'credits_earned': int(credits), 'is_published': True}
+        defaults={'sgpa': grade_point, 'credits_earned': int(credits)}
     )
 
     existing_cr = CourseResult.objects.filter(
@@ -651,7 +651,6 @@ def record_course_result(
 
         cr.grade = clean_grade
         cr.semester_record = sem_record
-        cr.is_published = True
         cr.save()
     else:
         cr = CourseResult.objects.create(
@@ -665,8 +664,7 @@ def record_course_result(
             grade_point=grade_point,
             previous_grade="",
             arrear_cleared=False,
-            cleared_on=None,
-            is_published=True
+            cleared_on=None
         )
 
     # Audit logging
@@ -690,23 +688,16 @@ def record_course_result(
     return cr, arrear_cleared
 
 
-def process_bulk_grades_csv(action_user, csv_text: str):
+def process_student_grades_csv(student_profile, action_user, csv_text: str):
     """
-    Parses and processes bulk grades CSV text.
-    Expected columns: roll_number, semester, course_code, course_title, credits, grade.
-    Returns:
-      {
-         "saved": int,
-         "skipped": int,
-         "errors": [{"row": int, "reason": str}],
-         "status_code": 200 or 400,
-         "error": str (if header/format failure)
-      }
+    Parses and processes CSV results upload for the authenticated student.
+    Expected columns: semester, course_code, course_title (or course_name), credits, grade.
+    Optional column: roll_number (if provided, must match student).
     """
     import csv
     import io
     from django.db import transaction
-    from core.models import UserProfile, AcademicAuditLog
+    from core.models import AcademicAuditLog
 
     if not csv_text or not csv_text.strip():
         return {
@@ -730,9 +721,8 @@ def process_bulk_grades_csv(action_user, csv_text: str):
             "status_code": 400
         }
 
-    # Normalize headers (support both course_title and course_name synonym)
     clean_header = ['course_title' if col.strip().lower() in ('course_title', 'course_name') else col.strip().lower() for col in header]
-    required_cols = ['roll_number', 'semester', 'course_code', 'course_title', 'credits', 'grade']
+    required_cols = ['semester', 'course_code', 'course_title', 'credits', 'grade']
     missing_cols = [c for c in required_cols if c not in clean_header]
     if missing_cols:
         return {
@@ -744,9 +734,10 @@ def process_bulk_grades_csv(action_user, csv_text: str):
         }
 
     col_idx = {c: clean_header.index(c) for c in required_cols}
+    has_roll = 'roll_number' in clean_header
+    roll_idx = clean_header.index('roll_number') if has_roll else None
     rows = list(reader)
 
-    # Validate row limit (up to 1000 data rows)
     non_empty_rows = [r for r in rows if any(cell.strip() for cell in r)]
     if len(non_empty_rows) > 1000:
         return {
@@ -760,7 +751,6 @@ def process_bulk_grades_csv(action_user, csv_text: str):
     saved = 0
     skipped = 0
     errors = []
-    affected_students = set()
 
     for idx, row in enumerate(rows, start=2):
         if not any(cell.strip() for cell in row):
@@ -771,23 +761,18 @@ def process_bulk_grades_csv(action_user, csv_text: str):
             skipped += 1
             continue
 
-        roll = row[col_idx['roll_number']].strip()
+        if has_roll:
+            row_roll = row[roll_idx].strip()
+            if row_roll and student_profile.roll_number and row_roll.lower() != student_profile.roll_number.lower():
+                errors.append({"row": idx, "reason": f"Row roll number '{row_roll}' does not match your profile roll number."})
+                skipped += 1
+                continue
+
         sem_raw = row[col_idx['semester']].strip()
-        code = row[col_idx['course_code']].strip()
+        code = row[col_idx['course_code']].strip().upper()
         title = row[col_idx['course_title']].strip()
         cred_raw = row[col_idx['credits']].strip()
         grade_raw = row[col_idx['grade']].strip().upper()
-
-        if not roll:
-            errors.append({"row": idx, "reason": "Roll number cannot be empty."})
-            skipped += 1
-            continue
-
-        student_prof = UserProfile.objects.filter(roll_number=roll, role='student').first()
-        if not student_prof:
-            errors.append({"row": idx, "reason": f"Student with roll number '{roll}' does not exist."})
-            skipped += 1
-            continue
 
         try:
             sem_num = int(sem_raw)
@@ -814,7 +799,7 @@ def process_bulk_grades_csv(action_user, csv_text: str):
                 raise ValueError()
             credits_num = int(credits_val) if credits_val.is_integer() else credits_val
         except (ValueError, TypeError):
-            errors.append({"row": idx, "reason": f"Credits must be a number between 0 and 10 (got '{cred_raw}')."})
+            errors.append({"row": idx, "reason": f"Credits must be a number between 1 and 10 (got '{cred_raw}')."})
             skipped += 1
             continue
 
@@ -827,7 +812,7 @@ def process_bulk_grades_csv(action_user, csv_text: str):
             with transaction.atomic():
                 record_course_result(
                     action_user=action_user,
-                    student_profile=student_prof,
+                    student_profile=student_profile,
                     semester_number=sem_num,
                     course_code=code,
                     course_name=title,
@@ -836,21 +821,17 @@ def process_bulk_grades_csv(action_user, csv_text: str):
                     recalculate=False
                 )
             saved += 1
-            affected_students.add(student_prof)
         except Exception as ex:
             errors.append({"row": idx, "reason": f"Database save error: {str(ex)}"})
             skipped += 1
 
-    # Recalculate affected students once
-    for s_prof in affected_students:
-        recalculate_student_metrics(s_prof)
-
     if saved > 0:
+        recalculate_student_metrics(student_profile)
         actor = action_user if getattr(action_user, 'is_authenticated', False) else None
         AcademicAuditLog.objects.create(
             action_by=actor,
-            action_type="BULK_CSV_UPLOAD",
-            description=f"Bulk grade import: {saved} saved, {skipped} skipped."
+            action_type="STUDENT_CSV_IMPORT",
+            description=f"Student grade import: {saved} course results imported."
         )
 
     return {
@@ -859,5 +840,13 @@ def process_bulk_grades_csv(action_user, csv_text: str):
         "errors": errors,
         "status_code": 200
     }
+
+
+def process_bulk_grades_csv(action_user, csv_text: str):
+    """Backward compatibility wrapper delegating to student import."""
+    profile = getattr(action_user, 'profile', None)
+    if profile:
+        return process_student_grades_csv(profile, action_user, csv_text)
+    return {"saved": 0, "skipped": 0, "errors": [], "status_code": 400, "error": "No student profile found."}
 
 

@@ -34,138 +34,124 @@ def is_debug_mode():
 def quick_demo_login(role='student'):
     """
     1-Click Demo Access for development / DEBUG mode.
-    Auto-provisions the demo account (with realistic semester results and telemetry)
+    Auto-provisions the demo student account (with realistic semester results and telemetry)
     if it does not yet exist, and logs in immediately without manual credential entry.
     """
-    username = 'student01' if role == 'student' else 'admin01'
-    password = 'student123' if role == 'student' else 'admin123'
+    user = User.objects.filter(username__in=['demo_student', 'student01']).first()
+    password = 'student123'
 
-    user = User.objects.filter(username=username).first()
     if not user:
+        try:
+            from django.core.management import call_command
+            call_command('seed_demo_student')
+            user = User.objects.filter(username='demo_student').first()
+        except Exception:
+            pass
+
+    if not user:
+        username = 'student01'
         with transaction.atomic():
-            if role == 'student':
-                user = User.objects.create_user(
-                    username='student01',
-                    password='student123',
-                    email='student01@edugrade.ai',
-                    first_name='Kavitha',
-                    last_name='Ramesh',
-                    is_staff=False
-                )
-                profile = UserProfile.objects.create(
-                    user=user,
-                    role='student',
-                    roll_number='717622CS041',
-                    department='Computer Science & Engineering',
-                    current_semester=6,
-                    current_cgpa=8.42,
-                    target_cgpa=9.00,
-                    credits_earned=88,
-                    total_credits=160,
-                    backlogs_count=0,
-                    is_placement_eligible=True
-                )
-                sample_courses = [
-                    (1, "CS101", "Problem Solving & Python Programming", 4, "A+", 9.0),
-                    (1, "MA101", "Matrices and Calculus", 4, "A", 8.0),
-                    (1, "PH101", "Engineering Physics", 3, "A", 8.0),
-                    (1, "CY101", "Engineering Chemistry", 3, "B+", 7.0),
-                    (1, "GE101", "Engineering Graphics", 4, "A", 8.0),
-                    (1, "GE102", "Python Programming Lab", 2, "O", 10.0),
-                    (1, "BS101", "Physics & Chemistry Lab", 2, "O", 10.0),
+            user = User.objects.create_user(
+                username='student01',
+                password='student123',
+                email='student01@edugrade.ai',
+                first_name='Kavitha',
+                last_name='Ramesh',
+                is_staff=False
+            )
+            profile = UserProfile.objects.create(
+                user=user,
+                roll_number='717622CS041',
+                department='Computer Science & Engineering',
+                current_semester=6,
+                current_cgpa=8.42,
+                target_cgpa=9.00,
+                credits_earned=88,
+                total_credits=160,
+                backlogs_count=0,
+                is_placement_eligible=True
+            )
+            sample_courses = [
+                (1, "CS101", "Problem Solving & Python Programming", 4, "A+", 9.0),
+                (1, "MA101", "Matrices and Calculus", 4, "A", 8.0),
+                (1, "PH101", "Engineering Physics", 3, "A", 8.0),
+                (1, "CY101", "Engineering Chemistry", 3, "B+", 7.0),
+                (1, "GE101", "Engineering Graphics", 4, "A", 8.0),
+                (1, "GE102", "Python Programming Lab", 2, "O", 10.0),
+                (1, "BS101", "Physics & Chemistry Lab", 2, "O", 10.0),
 
-                    (2, "CS201", "Data Structures", 4, "A+", 9.0),
-                    (2, "MA201", "Statistics and Linear Algebra", 4, "A", 8.0),
-                    (2, "CS202", "Digital Principles & System Design", 3, "A", 8.0),
-                    (2, "CS203", "Programming in C", 3, "A+", 9.0),
-                    (2, "GE201", "Environmental Science", 3, "B+", 7.0),
-                    (2, "CS204", "Data Structures Lab", 2, "O", 10.0),
-                    (2, "CS205", "C Programming Lab", 2, "O", 10.0),
+                (2, "CS201", "Data Structures", 4, "A+", 9.0),
+                (2, "MA201", "Statistics and Linear Algebra", 4, "A", 8.0),
+                (2, "CS202", "Digital Principles & System Design", 3, "A", 8.0),
+                (2, "CS203", "Programming in C", 3, "A+", 9.0),
+                (2, "GE201", "Environmental Science", 3, "B+", 7.0),
+                (2, "CS204", "Data Structures Lab", 2, "O", 10.0),
+                (2, "CS205", "C Programming Lab", 2, "O", 10.0),
 
-                    (3, "CS301", "Design and Analysis of Algorithms", 4, "A+", 9.0),
-                    (3, "CS302", "Database Management Systems", 4, "O", 10.0),
-                    (3, "CS303", "Operating Systems", 3, "A", 8.0),
-                    (3, "MA301", "Discrete Mathematics", 4, "B+", 7.0),
-                    (3, "CS304", "Software Engineering", 3, "A", 8.0),
-                    (3, "CS305", "DBMS Laboratory", 2, "O", 10.0),
-                    (3, "CS306", "Operating Systems Lab", 2, "A+", 9.0),
+                (3, "CS301", "Design and Analysis of Algorithms", 4, "A+", 9.0),
+                (3, "CS302", "Database Management Systems", 4, "O", 10.0),
+                (3, "CS303", "Operating Systems", 3, "A", 8.0),
+                (3, "MA301", "Discrete Mathematics", 4, "B+", 7.0),
+                (3, "CS304", "Software Engineering", 3, "A", 8.0),
+                (3, "CS305", "DBMS Laboratory", 2, "O", 10.0),
+                (3, "CS306", "Operating Systems Lab", 2, "A+", 9.0),
 
-                    (4, "CS401", "Computer Networks", 4, "A", 8.0),
-                    (4, "CS402", "Object Oriented Analysis & Design", 3, "A", 8.0),
-                    (4, "CS403", "Theory of Computation", 4, "B+", 7.0),
-                    (4, "CS404", "Artificial Intelligence & ML", 4, "O", 10.0),
-                    (4, "CS405", "Web Technology", 3, "A+", 9.0),
-                    (4, "CS406", "Networks & Web Lab", 2, "O", 10.0),
-                    (4, "CS407", "AI & ML Laboratory", 2, "O", 10.0),
-                ]
-                sem_totals = {}
-                for s_num, code, name, cr, gr, gp in sample_courses:
-                    if s_num not in sem_totals:
-                        sem_totals[s_num] = {'points': 0.0, 'credits': 0}
-                    sem_totals[s_num]['points'] += float(gp) * cr
-                    sem_totals[s_num]['credits'] += cr
+                (4, "CS401", "Computer Networks", 4, "A", 8.0),
+                (4, "CS402", "Object Oriented Analysis & Design", 3, "A", 8.0),
+                (4, "CS403", "Theory of Computation", 4, "B+", 7.0),
+                (4, "CS404", "Artificial Intelligence & ML", 4, "O", 10.0),
+                (4, "CS405", "Web Technology", 3, "A+", 9.0),
+                (4, "CS406", "Networks & Web Lab", 2, "O", 10.0),
+                (4, "CS407", "AI & ML Laboratory", 2, "O", 10.0),
+            ]
+            sem_totals = {}
+            for s_num, code, name, cr, gr, gp in sample_courses:
+                if s_num not in sem_totals:
+                    sem_totals[s_num] = {'points': 0.0, 'credits': 0}
+                sem_totals[s_num]['points'] += float(gp) * cr
+                sem_totals[s_num]['credits'] += cr
 
-                for s_num, totals in sem_totals.items():
-                    sgpa = round(totals['points'] / totals['credits'], 2) if totals['credits'] > 0 else 8.0
-                    sem_rec, _ = SemesterRecord.objects.get_or_create(
-                        student=profile,
-                        semester_number=s_num,
-                        defaults={'sgpa': sgpa, 'credits_earned': totals['credits'], 'is_published': True}
-                    )
-                    for sem_n, code, name, cr, gp_grade, gp in sample_courses:
-                        if sem_n == s_num:
-                            CourseResult.objects.create(
-                                student=profile,
-                                semester_record=sem_rec,
-                                semester_number=s_num,
-                                course_code=code,
-                                course_name=name,
-                                credits=cr,
-                                grade=gp_grade,
-                                grade_point=gp,
-                                is_published=True
-                            )
-                SubjectInsight.objects.get_or_create(
+            for s_num, totals in sem_totals.items():
+                sgpa = round(totals['points'] / totals['credits'], 2) if totals['credits'] > 0 else 8.0
+                sem_rec, _ = SemesterRecord.objects.get_or_create(
                     student=profile,
-                    subject_name="Database Management Systems",
-                    defaults={'grade_point': 10.0, 'status_label': 'Strong'}
+                    semester_number=s_num,
+                    defaults={'sgpa': sgpa, 'credits_earned': totals['credits']}
                 )
-                SubjectInsight.objects.get_or_create(
-                    student=profile,
-                    subject_name="Artificial Intelligence & ML",
-                    defaults={'grade_point': 10.0, 'status_label': 'Strong'}
-                )
-                SubjectInsight.objects.get_or_create(
-                    student=profile,
-                    subject_name="Data Structures",
-                    defaults={'grade_point': 9.0, 'status_label': 'Strong'}
-                )
-                SubjectInsight.objects.get_or_create(
-                    student=profile,
-                    subject_name="Theory of Computation",
-                    defaults={'grade_point': 7.0, 'status_label': 'Good'}
-                )
-            else:
-                user = User.objects.create_user(
-                    username='admin01',
-                    password='admin123',
-                    email='admin01@edugrade.ai',
-                    first_name='Dr. Arumugam',
-                    last_name='K.',
-                    is_staff=True
-                )
-                UserProfile.objects.create(
-                    user=user,
-                    role='admin',
-                    roll_number='FAC-CSE01',
-                    department='Computer Science & Engineering',
-                    current_semester=1,
-                    current_cgpa=0.0,
-                    target_cgpa=9.0,
-                    credits_earned=0,
-                    total_credits=160
-                )
+                for sem_n, code, name, cr, gp_grade, gp in sample_courses:
+                    if sem_n == s_num:
+                        CourseResult.objects.create(
+                            student=profile,
+                            semester_record=sem_rec,
+                            semester_number=s_num,
+                            course_code=code,
+                            course_name=name,
+                            credits=cr,
+                            grade=gp_grade,
+                            grade_point=gp
+                        )
+            SubjectInsight.objects.get_or_create(
+                student=profile,
+                subject_name="Database Management Systems",
+                defaults={'grade_point': 10.0, 'status_label': 'Strong'}
+            )
+            SubjectInsight.objects.get_or_create(
+                student=profile,
+                subject_name="Artificial Intelligence & ML",
+                defaults={'grade_point': 10.0, 'status_label': 'Strong'}
+            )
+            SubjectInsight.objects.get_or_create(
+                student=profile,
+                subject_name="Data Structures",
+                defaults={'grade_point': 9.0, 'status_label': 'Strong'}
+            )
+            SubjectInsight.objects.get_or_create(
+                student=profile,
+                subject_name="Theory of Computation",
+                defaults={'grade_point': 7.0, 'status_label': 'Good'}
+            )
     else:
+        username = user.username
         if not user.check_password(password):
             user.set_password(password)
             user.save()
@@ -220,29 +206,20 @@ def change_user_password(user, old_password, new_password, confirm_password):
     )
     return True, "Password changed successfully."
 
-def register_user(role, fullname, username, department, password, roll_number='', semester=1, admin_key=''):
-    """Registers a new user and user profile."""
+def register_user(username, password, fullname='', department='Computer Science & Engineering', roll_number='', semester=1, **kwargs):
+    """Registers a new student user and student profile."""
     if not username or not password:
         return False, "Username and password are required."
     
     if User.objects.filter(username=username).exists():
         return False, "An account with this username already exists."
 
-    is_staff = False
-    admin_signup_key = getattr(settings, 'ADMIN_SIGNUP_KEY', '')
-    if role in ['admin', 'faculty']:
-        if not admin_signup_key:
-            return False, "Admin signup is disabled"
-        if not admin_key or not hmac.compare_digest(admin_key, admin_signup_key):
-            return False, "Invalid Faculty/Admin Authorization Key."
-        is_staff = True
-
     with transaction.atomic():
         user = User.objects.create_user(
             username=username,
             password=password,
             email=username if '@' in username else f"{username}@edugrade.ai",
-            is_staff=is_staff
+            is_staff=False
         )
         if fullname:
             parts = fullname.split(' ', 1)
@@ -253,8 +230,7 @@ def register_user(role, fullname, username, department, password, roll_number=''
 
         UserProfile.objects.create(
             user=user,
-            role=role,
-            roll_number=roll_number or ('FAC-' + username.upper() if is_staff else '7176' + username),
+            roll_number=roll_number or ('7176' + username),
             department=department,
             current_semester=int(semester) if str(semester).isdigit() else 1,
             current_cgpa=0.00,
@@ -389,74 +365,6 @@ def clear_advisor_chat_history(user):
     )
     return True
 
-def get_faculty_overview_data():
-    """Aggregates institution metrics, department stats, and audit logs."""
-    from django.db.models import Avg, Count, Q
-
-    students = UserProfile.objects.filter(role='student')
-    agg = students.aggregate(
-        total_students=Count('id'),
-        avg_cgpa=Avg('current_cgpa', filter=Q(current_cgpa__gt=0)),
-        eligible_count=Count('id', filter=Q(is_placement_eligible=True))
-    )
-    total_students = agg['total_students']
-    avg_cgpa = round(float(agg['avg_cgpa'] or 0.0), 2)
-    eligible_count = agg['eligible_count']
-    eligibility_rate = round((eligible_count / total_students * 100), 1) if total_students > 0 else 0.0
-
-    dept_qs = students.values('department').annotate(
-        count=Count('id'),
-        avg_cgpa=Avg('current_cgpa', filter=Q(current_cgpa__gt=0))
-    ).order_by('department')
-
-    dept_stats = [
-        {
-            'department': d['department'],
-            'student_count': d['count'],
-            'avg_cgpa': round(float(d['avg_cgpa'] or 0.0), 2)
-        }
-        for d in dept_qs
-    ]
-
-    recent_audits = AcademicAuditLog.objects.all()[:5]
-
-    return {
-        'metrics': {
-            'total_students': total_students,
-            'average_cgpa': avg_cgpa,
-            'eligible_count': eligible_count,
-            'eligibility_rate': eligibility_rate,
-            'active_regulations': '2026 Choice Based Credit System (CBCS)',
-        },
-        'department_stats': dept_stats,
-        'recent_audits': recent_audits,
-    }
-
-def get_faculty_students_list(search='', status='all', department='all'):
-    """Queries and filters student records."""
-    qs = UserProfile.objects.filter(role='student').select_related('user').order_by('-current_cgpa')
-
-    if search:
-        qs = qs.filter(
-            user__first_name__icontains=search
-        ) | qs.filter(
-            user__last_name__icontains=search
-        ) | qs.filter(
-            roll_number__icontains=search
-        ) | qs.filter(
-            user__username__icontains=search
-        )
-
-    if status == 'eligible':
-        qs = qs.filter(is_placement_eligible=True)
-    elif status == 'ineligible':
-        qs = qs.filter(is_placement_eligible=False)
-
-    if department != 'all':
-        qs = qs.filter(department__icontains=department)
-
-    return list(qs)
-
 def get_arrears(student):
     """
     Returns active and cleared arrears for student (User or UserProfile).
@@ -501,27 +409,86 @@ def get_arrears(student):
 
     return {'active': active, 'cleared': cleared}
 
-def save_single_course_result(action_user, roll_number, semester_number, course_code, course_name, credits, grade, grade_point):
-    """Validates and persists a single student course result atomically using shared helper."""
-    student_prof = UserProfile.objects.filter(roll_number=roll_number, role='student').first()
-    if not student_prof:
-        return False, f"Student with roll number '{roll_number}' not found."
+def save_student_course_result(user, semester_number, course_code, course_name, credits, grade):
+    """Validates and persists a student-owned course result atomically."""
+    profile = getattr(user, 'profile', None)
+    if not profile:
+        return False, "Student profile not found."
+    from core.services.academic_service import grade_to_point
+    g_clean = str(grade).strip().upper()
+    gp = grade_to_point(g_clean)
+    try:
+        with transaction.atomic():
+            cr, arrear_cleared = record_course_result(
+                action_user=user,
+                student_profile=profile,
+                semester_number=int(semester_number),
+                course_code=str(course_code).strip().upper(),
+                course_name=str(course_name).strip(),
+                credits=int(credits),
+                grade=g_clean,
+                grade_point=gp,
+                recalculate=True
+            )
+        msg = f"Course result saved successfully. {'(Arrear marked as cleared)' if arrear_cleared else ''}"
+        return True, msg.strip()
+    except Exception as e:
+        return False, str(e)
 
-    with transaction.atomic():
-        cr, arrear_cleared = record_course_result(
-            action_user=action_user,
-            student_profile=student_prof,
-            semester_number=int(semester_number),
-            course_code=course_code,
-            course_name=course_name,
-            credits=int(credits),
-            grade=grade,
-            grade_point=grade_point,
-            recalculate=True
-        )
+def update_student_course_result(user, course_id, semester_number, course_code, course_name, credits, grade):
+    """Updates an existing student-owned course result atomically with recalculation."""
+    profile = getattr(user, 'profile', None)
+    if not profile:
+        return False, "Student profile not found."
+    cr = CourseResult.objects.filter(id=course_id, student=profile).first()
+    if not cr:
+        return False, "Course result record not found or not owned by student."
+    from core.services.academic_service import grade_to_point
+    g_clean = str(grade).strip().upper()
+    gp = grade_to_point(g_clean)
+    try:
+        with transaction.atomic():
+            failing = ['U', 'RA', 'SA', 'W']
+            passing = ['O', 'A+', 'A', 'B+', 'B', 'C']
+            if cr.grade in failing and g_clean in passing:
+                cr.arrear_cleared = True
+                cr.previous_grade = cr.grade
+                from django.utils import timezone
+                cr.cleared_on = timezone.now()
+            cr.semester_number = int(semester_number)
+            cr.course_code = str(course_code).strip().upper()
+            cr.course_name = str(course_name).strip()
+            cr.credits = int(credits)
+            cr.grade = g_clean
+            cr.grade_point = gp
+            cr.save()
+            from core.services.academic_service import recalculate_student_metrics
+            recalculate_student_metrics(profile)
+        return True, "Course result updated successfully."
+    except Exception as e:
+        return False, str(e)
 
-    msg = f"Course result published successfully. {'(Arrear marked as cleared)' if arrear_cleared else ''}"
-    return True, msg.strip()
+def delete_student_course_result(user, course_id):
+    """Deletes a student-owned course result atomically with recalculation."""
+    profile = getattr(user, 'profile', None)
+    if not profile:
+        return False, "Student profile not found."
+    cr = CourseResult.objects.filter(id=course_id, student=profile).first()
+    if not cr:
+        return False, "Course result record not found or not owned by student."
+    try:
+        with transaction.atomic():
+            cr.delete()
+            from core.services.academic_service import recalculate_student_metrics
+            recalculate_student_metrics(profile)
+        return True, "Course result deleted successfully."
+    except Exception as e:
+        return False, str(e)
+
+def import_student_grades_csv(user, csv_text: str):
+    """Processes student-owned CSV grade import."""
+    from core.services.academic_service import process_student_grades_csv
+    return process_student_grades_csv(user, csv_text)
 
 def update_user_profile(user, first_name=None, last_name=None, email=None, target_cgpa=None, department=None):
     """Updates user and user profile details."""
@@ -554,85 +521,9 @@ def update_user_profile(user, first_name=None, last_name=None, email=None, targe
     except Exception as e:
         return False, str(e)
 
-def bulk_upload_grades_csv(user, csv_text: str):
-    """Processes bulk CSV text input for faculty/admin."""
-    from core.services.academic_service import process_bulk_grades_csv
-    return process_bulk_grades_csv(user, csv_text)
-
-def get_admin_analytics_data():
-    """Aggregates institution analytics: grade distribution, dept CGPA, at-risk students."""
-    from django.db.models import Avg, Count, Q
-    from core.api_views import AT_RISK_CGPA_THRESHOLD, AT_RISK_BACKLOG_THRESHOLD
-
-    students_qs = UserProfile.objects.filter(role='student')
-
-    # 1. Grade distribution
-    grade_counts = {g: 0 for g in GRADE_ORDER}
-    for item in CourseResult.objects.values('grade').annotate(count=Count('id')):
-        g = str(item['grade']).strip().upper()
-        if g in grade_counts:
-            grade_counts[g] += item['count']
-        elif g in ['RA', 'SA', 'W', 'U']:
-            grade_counts[g] = grade_counts.get(g, 0) + item['count']
-
-    # 2. Dept stats
-    dept_stats = []
-    departments = students_qs.values('department').annotate(
-        student_count=Count('id'),
-        avg_cgpa=Avg('current_cgpa')
-    ).order_by('-student_count')
-
-    for d in departments:
-        dept_stats.append({
-            'department': d['department'] or 'General',
-            'student_count': d['student_count'],
-            'avg_cgpa': round(float(d['avg_cgpa'] or 0.0), 2)
-        })
-
-    # 3. At-risk students
-    from core.services.journey_service import evaluate_student_risk
-    at_risk_qs = students_qs.filter(
-        Q(current_cgpa__lt=AT_RISK_CGPA_THRESHOLD) | Q(backlogs_count__gte=AT_RISK_BACKLOG_THRESHOLD)
-    ).select_related('user').order_by('current_cgpa')
-
-    at_risk_students = []
-    for s in at_risk_qs:
-        reasons = []
-        if float(s.current_cgpa) < AT_RISK_CGPA_THRESHOLD:
-            reasons.append(f"CGPA {float(s.current_cgpa):.2f} < {AT_RISK_CGPA_THRESHOLD}")
-        if s.backlogs_count >= AT_RISK_BACKLOG_THRESHOLD:
-            reasons.append(f"{s.backlogs_count} Active Arrears (>= {AT_RISK_BACKLOG_THRESHOLD})")
-
-        risk_data = evaluate_student_risk(s)
-
-        at_risk_students.append({
-            'id': s.id,
-            'name': f"{s.user.first_name} {s.user.last_name}".strip() or s.user.username,
-            'roll_number': s.roll_number,
-            'department': s.department,
-            'current_semester': s.current_semester,
-            'current_cgpa': float(s.current_cgpa),
-            'backlogs_count': s.backlogs_count,
-            'reason': " & ".join(reasons) if reasons else "Academic review needed",
-            'predicted_next_sgpa': risk_data['predicted_next_sgpa'],
-            'trend': risk_data['trend'],
-            'risk_level': risk_data['risk_level'],
-            'reasons': risk_data['reasons'],
-        })
-
-    return {
-        'grade_distribution': grade_counts,
-        'department_stats': dept_stats,
-        'at_risk_students': at_risk_students,
-        'thresholds': {
-            'cgpa': AT_RISK_CGPA_THRESHOLD,
-            'backlogs': AT_RISK_BACKLOG_THRESHOLD
-        }
-    }
-
 def get_landing_stats():
     """Returns real counts from the database for landing page highlights without hardcoded figures."""
-    students_count = UserProfile.objects.filter(role='student').count()
+    students_count = UserProfile.objects.count()
     grades_count = CourseResult.objects.count()
     recruiters_count = CompanyPlacementCriteria.objects.filter(is_active=True).count()
     return {
@@ -650,7 +541,7 @@ def get_student_profile(user):
     """Retrieves student UserProfile instance for authenticated user."""
     if not user or not user.is_authenticated:
         return None
-    return UserProfile.objects.filter(user=user, role='student').first()
+    return getattr(user, 'profile', None)
 
 def run_digital_twin_simulation(user, target_cgpa, effort="same", seed=None):
     """Executes Monte Carlo academic simulation for current student."""
@@ -704,131 +595,19 @@ def get_journey_and_badges(user):
         'badges': get_badges(profile)
     }
 
-def get_admin_drives_data(company_id=None, department=None):
-    """Returns corporate placement drives list or single drive details for faculty."""
-    companies_qs = CompanyPlacementCriteria.objects.all().order_by('-package_lpa')
-    companies = list(companies_qs)
-
-    if not companies:
-        return {'companies': [], 'selected_company': None, 'eligible_students': [], 'almost_eligible_students': []}
-
-    selected = None
-    if company_id:
-        selected = next((c for c in companies if c.id == int(company_id)), None)
-    if not selected and companies:
-        selected = companies[0]
-
-    # Pre-fetch candidate cohorts for the selected company
-    students_qs = UserProfile.objects.filter(role='student').select_related('user').order_by('-current_cgpa')
-    if department:
-        students_qs = students_qs.filter(department=department)
-    students = list(students_qs)
-
-    from core.models import CourseResult, CourseSkillMap
-    all_courses = list(CourseResult.objects.filter(student__in=students, is_published=True).order_by('semester_number', 'id'))
-    courses_by_student = {}
-    for c in all_courses:
-        courses_by_student.setdefault(c.student_id, []).append(c)
-
-    db_mappings = list(CourseSkillMap.objects.all())
-    mappings_by_code = {}
-    for m in db_mappings:
-        mappings_by_code.setdefault(m.course_code.upper(), []).append(m.skill)
-
-    min_cgpa = float(selected.min_cgpa)
-    max_backlogs = selected.max_backlogs
-    raw_req = selected.required_skills or ""
-    req_list = [s.strip() for s in raw_req.replace(';', ',').split(',') if s.strip()]
-
-    aliases = {
-        "sql": "dbms", "database": "dbms", "algorithms": "dsa", "data structures": "dsa",
-        "operating systems": "os", "networking": "networks", "machine learning": "ai/ml",
-        "mathematics": "maths"
-    }
-    from core.services.skill_service import _match_keywords_for_title
-
-    eligible_list = []
-    almost_list = []
-
-    for s in students:
-        cgpa = float(s.current_cgpa or 0.0)
-        backlogs = int(s.backlogs_count or 0)
-        name = f"{s.user.first_name} {s.user.last_name}".strip() or s.user.username
-
-        c_list = courses_by_student.get(s.id, [])
-        latest_c = {}
-        for c in c_list:
-            latest_c[c.course_code.upper()] = c
-
-        skill_buckets = {}
-        for c in latest_c.values():
-            skills = mappings_by_code.get(c.course_code.upper())
-            if not skills:
-                skills = _match_keywords_for_title(c.course_name)
-            for sk in skills:
-                skill_buckets.setdefault(sk, []).append(c)
-
-        s_scores = {}
-        for sk, clist in skill_buckets.items():
-            tot_cr = sum(float(c.credits) for c in clist)
-            tot_pt = sum(float(c.credits) * float(c.grade_point) for c in clist)
-            s_scores[sk.lower()] = round(((tot_pt / tot_cr) / 10.0) * 100.0, 1) if tot_cr > 0 else 0.0
-
-        cov = []
-        for req in req_list:
-            k = aliases.get(req.lower(), req.lower())
-            if k in s_scores:
-                cov.append(s_scores[k])
-        skill_match = round(sum(cov) / len(cov), 1) if cov else 0.0
-
-        cgpa_short = round(min_cgpa - cgpa, 2)
-        backlogs_over = backlogs - max_backlogs
-
-        student_info = {
-            'id': s.id,
-            'name': name,
-            'roll_number': s.roll_number,
-            'department': s.department,
-            'current_cgpa': cgpa,
-            'backlogs_count': backlogs,
-            'skill_match': skill_match,
+def get_student_trend_alert(user):
+    """Evaluates student academic trajectory risk & predicted SGPA for personal dashboard alert card."""
+    profile = get_student_profile(user)
+    if not profile:
+        return {
+            'predicted_next_sgpa': None,
+            'trend': 'steady',
+            'risk_level': 'low',
+            'reasons': ['Consistent academic standing']
         }
+    from core.services.journey_service import evaluate_student_risk
+    return evaluate_student_risk(profile)
 
-        if cgpa >= min_cgpa and backlogs <= max_backlogs:
-            student_info['status'] = 'Eligible'
-            eligible_list.append(student_info)
-        elif cgpa_short <= 0.50 and backlogs_over <= 1:
-            gaps = []
-            if cgpa_short > 0:
-                gaps.append(f"needs +{cgpa_short:.2f} CGPA")
-            if backlogs_over > 0:
-                gaps.append(f"clear {backlogs_over} arrear")
-            student_info['status'] = 'Almost Eligible'
-            student_info['gap_text'] = ", ".join(gaps) if gaps else "Near eligibility threshold"
-            almost_list.append(student_info)
-
-    return {
-        'companies': [
-            {'id': c.id, 'company_name': c.company_name, 'role_title': c.role_title, 'min_cgpa': float(c.min_cgpa), 'max_backlogs': c.max_backlogs, 'package_lpa': float(c.package_lpa)}
-            for c in companies
-        ],
-        'selected_company': {
-            'id': selected.id,
-            'company_name': selected.company_name,
-            'role_title': selected.role_title,
-            'min_cgpa': min_cgpa,
-            'max_backlogs': max_backlogs,
-            'package_lpa': float(selected.package_lpa),
-            'required_skills': selected.required_skills
-        },
-        'counts': {
-            'eligible': len(eligible_list),
-            'almost_eligible': len(almost_list),
-            'total': len(students)
-        },
-        'eligible_students': eligible_list,
-        'almost_eligible_students': almost_list
-    }
 
 
 

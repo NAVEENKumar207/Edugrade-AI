@@ -210,8 +210,7 @@ class PlacementEligibilityTests(TestCase):
         self.profile = UserProfile.objects.create(
             user=self.user,
             current_cgpa=8.20,
-            backlogs_count=0,
-            role='student'
+            backlogs_count=0
         )
         self.company = CompanyPlacementCriteria.objects.create(
             company_name='Apex Corp',

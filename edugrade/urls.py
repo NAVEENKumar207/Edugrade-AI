@@ -19,6 +19,9 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
+# Restrict Django admin portal strictly to superusers
+admin.site.has_permission = lambda request: request.user.is_active and request.user.is_superuser
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('core.urls')),

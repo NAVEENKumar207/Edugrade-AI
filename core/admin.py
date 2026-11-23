@@ -7,14 +7,14 @@ from .models import (
 
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'role', 'roll_number', 'department', 'current_semester', 'current_cgpa', 'is_placement_eligible')
-    list_filter = ('role', 'department', 'is_placement_eligible')
+    list_display = ('user', 'roll_number', 'department', 'current_semester', 'current_cgpa', 'is_placement_eligible')
+    list_filter = ('department', 'is_placement_eligible')
     search_fields = ('user__username', 'roll_number', 'user__first_name', 'user__last_name')
 
 @admin.register(SemesterRecord)
 class SemesterRecordAdmin(admin.ModelAdmin):
-    list_display = ('student', 'semester_number', 'sgpa', 'credits_earned', 'is_published')
-    list_filter = ('semester_number', 'is_published')
+    list_display = ('student', 'semester_number', 'sgpa', 'credits_earned')
+    list_filter = ('semester_number',)
     search_fields = ('student__user__username', 'student__roll_number')
 
 @admin.register(SubjectInsight)

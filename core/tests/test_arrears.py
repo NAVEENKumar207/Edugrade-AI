@@ -20,7 +20,6 @@ class ArrearTrackerTests(TestCase):
         self.user = User.objects.create_user(username='arrear_student', password='password123')
         self.profile = UserProfile.objects.create(
             user=self.user,
-            role='student',
             roll_number='71762104099',
             current_cgpa=0.00,
             backlogs_count=0

@@ -14,14 +14,11 @@ def run_all_tests():
     uid = uuid.uuid4().hex[:8]
     student_user = f"test_student_{uid}"
     student_pass = f"Pass_{uid}_123!"
-    admin_user = f"test_admin_{uid}"
-    admin_pass = f"Admin_{uid}_123!"
 
-    # Create temporary isolated test users
+    # Create temporary isolated test student
     s_user = User.objects.create_user(username=student_user, password=student_pass, first_name="Test", last_name="Student")
     s_profile = UserProfile.objects.create(
         user=s_user,
-        role="student",
         roll_number=f"ROLL{uid[:6].upper()}",
         department="Computer Science & Engineering",
         current_semester=5,
@@ -32,8 +29,8 @@ def run_all_tests():
         backlogs_count=0,
         is_placement_eligible=True
     )
-    s_sem = SemesterRecord.objects.create(student=s_profile, semester_number=4, sgpa=8.20, credits_earned=20, is_published=True)
-    CourseResult.objects.create(
+    s_sem = SemesterRecord.objects.create(student=s_profile, semester_number=4, sgpa=8.20, credits_earned=20)
+    cr = CourseResult.objects.create(
         student=s_profile,
         semester_record=s_sem,
         semester_number=4,
@@ -41,16 +38,7 @@ def run_all_tests():
         course_name="Operating Systems",
         credits=3,
         grade="A",
-        grade_point=8.0,
-        is_published=True
-    )
-
-    a_user = User.objects.create_user(username=admin_user, password=admin_pass, first_name="Test", last_name="Admin", is_staff=True, is_superuser=True)
-    a_profile = UserProfile.objects.create(
-        user=a_user,
-        role="admin",
-        roll_number=f"FAC{uid[:6].upper()}",
-        department="Computer Science & Engineering"
+        grade_point=8.0
     )
 
     client = Client()
@@ -58,7 +46,7 @@ def run_all_tests():
     try:
         # 1. Test Student Login (Form post)
         print(f"Testing Student Session Login ({student_user})...")
-        resp = client.post('/login/', {'username': student_user, 'password': student_pass, 'role': 'student'})
+        resp = client.post('/login/', {'username': student_user, 'password': student_pass})
         assert resp.status_code == 302, f"Expected 302 on login, got {resp.status_code}"
         assert resp.headers.get('Location') in ['/dashboard/', 'dashboard/']
 
@@ -72,7 +60,8 @@ def run_all_tests():
         assert me_resp.status_code == 200
         me_data = me_resp.json()
         assert me_data['authenticated'] is True
-        assert me_data['profile']['role'] == 'student'
+        assert me_data['is_admin'] is False
+        assert me_data['profile']['roll_number'] == s_profile.roll_number
         print("[PASS] /api/auth/me/ returned student profile.")
 
         dash_resp = client.get('/api/students/dashboard/')
@@ -123,74 +112,96 @@ def run_all_tests():
         assert 'active' in arrears_resp.json()
         print("[PASS] /api/student/arrears/ verified.")
 
-        # PDF Transcript API
+        # PDF Transcript API (Student isolation & PDF output)
         pdf_resp = client.get('/api/transcript/pdf/')
         assert pdf_resp.status_code == 200
         assert pdf_resp['Content-Type'] == 'application/pdf'
         assert pdf_resp.content.startswith(b'%PDF')
         print("[PASS] /api/transcript/pdf/ verified (PDF generated).")
 
+        # Digital Twin & Tools APIs
+        sim_resp = client.post('/api/twin/simulate/', data=json.dumps({
+            'planned_sgpas': [8.5, 9.0, 9.0],
+            'planned_credits': [20, 20, 20]
+        }), content_type='application/json')
+        assert sim_resp.status_code == 200
+        print("[PASS] /api/twin/simulate/ verified.")
+
+        moves_resp = client.get('/api/twin/next-moves/')
+        assert moves_resp.status_code == 200
+        print("[PASS] /api/twin/next-moves/ verified.")
+
+        skills_resp = client.get('/api/skills/')
+        assert skills_resp.status_code == 200
+        print("[PASS] /api/skills/ verified.")
+
+        journey_resp = client.get('/api/journey/')
+        assert journey_resp.status_code == 200
+        assert len(journey_resp.json()['badges']) == 7
+        print("[PASS] /api/journey/ verified (7 badges).")
+
         # Clear Advisor Chat History API (DELETE)
         del_chat_resp = client.delete('/api/advisor/history/')
         assert del_chat_resp.status_code == 200
         print("[PASS] DELETE /api/advisor/history/ verified.")
 
-        # Role Protection Check: Student should NOT access faculty endpoint
-        fac_forbidden = client.get('/api/faculty/overview/')
-        assert fac_forbidden.status_code == 403
-        print("[PASS] Security Check: Student forbidden from /api/faculty/overview/ (HTTP 403).")
+        # 3. Test Student Academic Results CRUD & CSV
+        print("\nTesting Student-Owned Results CRUD & CSV APIs...")
 
-        fac_analytics_forbidden = client.get('/api/admin/analytics/')
-        assert fac_analytics_forbidden.status_code == 403
-        print("[PASS] Security Check: Student forbidden from /api/admin/analytics/ (HTTP 403).")
-
-        client.logout()
-
-        # 3. Test Admin REST APIs
-        print(f"\nTesting Faculty / Admin Login & APIs ({admin_user})...")
-        admin_login_resp = client.post('/api/auth/login/', data=json.dumps({
-            'username': admin_user,
-            'password': admin_pass,
-            'role': 'admin'
-        }), content_type='application/json')
-        assert admin_login_resp.status_code == 200
-        assert admin_login_resp.json()['is_admin'] is True
-
-        fac_overview = client.get('/api/faculty/overview/')
-        assert fac_overview.status_code == 200
-        fac_data = fac_overview.json()
-        assert fac_data['metrics']['total_students'] >= 1
-        print(f"[PASS] /api/faculty/overview/ verified (Total Students={fac_data['metrics']['total_students']}).")
-
-        fac_students = client.get('/api/faculty/students/')
-        assert fac_students.status_code == 200
-        assert len(fac_students.json()['students']) >= 1
-        print(f"[PASS] /api/faculty/students/ verified ({len(fac_students.json()['students'])} students retrieved).")
-
-        # Sample CSV Template API
-        sample_csv_resp = client.get('/api/admin/grades/sample-csv/')
+        # Sample CSV template download
+        sample_csv_resp = client.get('/api/academics/results/sample-csv/')
         assert sample_csv_resp.status_code == 200
-        assert sample_csv_resp['Content-Type'] == 'text/csv'
-        print("[PASS] /api/admin/grades/sample-csv/ verified.")
+        assert 'text/csv' in sample_csv_resp['Content-Type']
+        assert 'semester,course_code,course_name,credits,grade' in sample_csv_resp.content.decode()
+        print("[PASS] /api/academics/results/sample-csv/ verified.")
 
-        # Admin Analytics API
-        analytics_resp = client.get('/api/admin/analytics/')
-        assert analytics_resp.status_code == 200
-        analytics_data = analytics_resp.json()
-        assert 'grade_distribution' in analytics_data
-        assert 'at_risk_students' in analytics_data
-        print(f"[PASS] /api/admin/analytics/ verified ({len(analytics_data['at_risk_students'])} at-risk students flagged).")
+        # POST single course result
+        create_res = client.post('/api/academics/results/', data=json.dumps({
+            'semester_number': 4,
+            'course_code': 'CS8402',
+            'course_name': 'Database Management Systems',
+            'credits': 3,
+            'grade': 'B+'
+        }), content_type='application/json')
+        assert create_res.status_code in [200, 201]
+        created_id = create_res.json()['result']['id']
+        print(f"[PASS] POST /api/academics/results/ verified (Created id={created_id}).")
 
-        # Health API
+        # PUT single course result
+        update_res = client.put(f'/api/academics/results/{created_id}/', data=json.dumps({
+            'grade': 'A+'
+        }), content_type='application/json')
+        assert update_res.status_code == 200
+        assert update_res.json()['result']['grade'] == 'A+'
+        print(f"[PASS] PUT /api/academics/results/{created_id}/ verified.")
+
+        # DELETE single course result
+        delete_res = client.delete(f'/api/academics/results/{created_id}/')
+        assert delete_res.status_code == 200
+        assert delete_res.json()['deleted'] is True
+        print(f"[PASS] DELETE /api/academics/results/{created_id}/ verified.")
+
+        # 4. Verify Deleted Faculty/Admin Endpoints return 404
+        print("\nVerifying Deleted Faculty/Admin Endpoints return HTTP 404...")
+        assert client.get('/api/faculty/overview/').status_code == 404
+        assert client.get('/api/faculty/students/').status_code == 404
+        assert client.post('/api/faculty/results/upload/').status_code == 404
+        assert client.get('/api/admin/drives/').status_code == 404
+        assert client.get('/api/admin/analytics/').status_code == 404
+        assert client.get('/api/admin/grades/sample-csv/').status_code == 404
+        assert client.post('/api/admin/grades/bulk-upload/').status_code == 404
+        print("[PASS] All removed faculty/admin REST endpoints return HTTP 404.")
+
+        # 5. Health API
         health_resp = client.get('/api/health/')
         assert health_resp.status_code == 200
         assert health_resp.json()['status'] == 'healthy'
         print("[PASS] /api/health/ verified.")
 
-        # 4. Test .html legacy alias routes
+        # 6. Test .html legacy alias routes
         print("\nTesting .html legacy alias routes...")
         assert client.get('/dashboard.html').status_code == 200
-        assert client.get('/admin_dashboard.html').status_code == 200
+        assert client.get('/admin_dashboard.html').status_code in [200, 302]
         assert client.get('/upload.html').status_code == 200
         assert client.get('/cgpa_planner.html').status_code == 200
         assert client.get('/placement.html').status_code == 200
@@ -205,12 +216,10 @@ def run_all_tests():
         # Clean up temporary users and records
         CourseResult.objects.filter(student=s_profile).delete()
         SemesterRecord.objects.filter(student=s_profile).delete()
-        AdvisorChatMessage.objects.filter(user__in=[s_user, a_user]).delete()
-        AcademicAuditLog.objects.filter(action_by__in=[s_user, a_user]).delete()
+        AdvisorChatMessage.objects.filter(user=s_user).delete()
+        AcademicAuditLog.objects.filter(action_by=s_user).delete()
         s_profile.delete()
-        a_profile.delete()
         s_user.delete()
-        a_user.delete()
 
 if __name__ == '__main__':
     run_all_tests()
