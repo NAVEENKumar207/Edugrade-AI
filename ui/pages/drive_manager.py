@@ -36,7 +36,7 @@ def DriveManager(user):
             )
         )
 
-    export_url = f"/api/admin/drives/{selected_company['id']}/export/" if selected_company else "#"
+    export_url = f"/api/admin/drives/{selected_company['id']}/export/" if selected_company else ""
 
     return html.div(
         {"className": "p-gutter-xl max-w-7xl mx-auto flex flex-col gap-gutter-xl animate-fade-in"},
@@ -56,9 +56,9 @@ def DriveManager(user):
             html.div(
                 html.a(
                     {
-                        "href": export_url,
-                        "className": "btn btn-primary flex items-center gap-2",
-                        "download": True
+                        "href": export_url or "javascript:void(0)",
+                        "className": f"btn btn-primary flex items-center gap-2 {'opacity-50 pointer-events-none' if not selected_company else ''}",
+                        "download": True if selected_company else False
                     },
                     html.span({"className": "material-symbols-outlined text-[18px]"}, "download"),
                     "Download Candidates CSV"

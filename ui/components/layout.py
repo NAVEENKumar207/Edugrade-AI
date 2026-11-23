@@ -2,14 +2,16 @@
 Layout Component for EduGrade AI ReactPy Frontend.
 Implements the Swiss-Brutalist 'Industrial Academic Precision' layout from New Ui.
 Pairs a persistent 256px architectural left rail with an exposed 1px hairline border top shell.
+Includes responsive mobile drawer navigation and accessibility attributes.
 """
 
-from reactpy import component, html
+from reactpy import component, html, use_state
 from ui.components.theme_toggle import ThemeToggle
 
 
 @component
 def AppLayout(user, current_page, set_page, logout_action, children, theme="light", toggle_theme=None):
+    mobile_open, set_mobile_open = use_state(False)
     profile = getattr(user, 'profile', None)
     is_admin = profile.is_admin() if profile else False
     cgpa_val = float(profile.current_cgpa) if profile else 0.0
@@ -47,7 +49,16 @@ def AppLayout(user, current_page, set_page, logout_action, children, theme="ligh
 
     nav_links = []
     for item in nav_items:
-        is_active = (current_page == item["id"]) or (current_page == "student_dashboard" and item["id"] == "dashboard")
+        is_active = (
+            (current_page == item["id"])
+            or (item["id"] == "dashboard" and current_page in ["dashboard", "student_dashboard"])
+            or (item["id"] == "placements" and current_page in ["placements", "placement"])
+            or (item["id"] == "advisor" and current_page in ["advisor", "ai_advisor", "ai-advisor"])
+            or (item["id"] == "future_lab" and current_page in ["future_lab", "futurelab", "twin"])
+            or (item["id"] == "admin_dashboard" and current_page in ["admin_dashboard", "admin", "cohort"])
+            or (item["id"] == "drives" and current_page in ["drives", "drive_manager"])
+            or (item["id"] == "regulations" and current_page in ["regulations", "syllabus"])
+        )
         
         link_class = (
             "flex items-center gap-gutter-sm px-3 py-2.5 bg-light-secondary text-light-on-secondary font-label text-label-lg transition-colors duration-state-change ease-state-change cursor-pointer"
@@ -60,7 +71,7 @@ def AppLayout(user, current_page, set_page, logout_action, children, theme="ligh
                 {
                     "key": item["id"],
                     "className": link_class,
-                    "on_click": lambda e, pid=item["id"]: set_page(pid)
+                    "on_click": lambda e, pid=item["id"]: (set_page(pid), set_mobile_open(False))
                 },
                 html.span(
                     {
@@ -74,11 +85,11 @@ def AppLayout(user, current_page, set_page, logout_action, children, theme="ligh
         )
 
     return html.div(
-        {"className": "min-h-screen flex bg-light-surface-container-low font-body antialiased"},
+        {"className": "min-h-screen flex bg-light-surface-container-low font-body antialiased relative"},
         
         # Persistent 256px Desktop Left Sidebar
         html.aside(
-            {"className": "w-64 shrink-0 min-h-screen bg-light-surface-container-lowest border-r border-light-outline-variant flex flex-col justify-between"},
+            {"className": "hidden md:flex w-64 shrink-0 min-h-screen bg-light-surface-container-lowest border-r border-light-outline-variant flex-col justify-between"},
             html.div(
                 {"className": "p-gutter-lg flex flex-col gap-gutter-xl"},
                 
@@ -149,7 +160,7 @@ def AppLayout(user, current_page, set_page, logout_action, children, theme="ligh
                         {
                             "type": "button",
                             "aria-label": "Sign out",
-                            "className": "inline-flex items-center gap-1.5 px-3 py-1.5 text-light-on-surface-variant hover:bg-light-surface-container-low hover:text-light-primary font-mono text-mono-sm uppercase transition-colors shrink-0",
+                            "className": "inline-flex items-center gap-1.5 px-3 py-1.5 text-light-on-surface-variant hover:bg-light-surface-container-low hover:text-light-primary font-mono text-mono-sm uppercase transition-colors shrink-0 cursor-pointer",
                             "on_click": lambda e: logout_action()
                         },
                         html.span({"className": "material-symbols-outlined text-[18px]"}, "logout"),
@@ -157,6 +168,58 @@ def AppLayout(user, current_page, set_page, logout_action, children, theme="ligh
                     )
                 )
             )
+        ),
+
+        # Mobile Navigation Drawer (Hidden on Desktop)
+        (
+            html.div(
+                {"className": "fixed inset-0 z-50 md:hidden bg-light-on-surface/50 flex"},
+                html.div(
+                    {"className": "w-72 max-w-[85vw] bg-light-surface-container-lowest h-full p-4 flex flex-col justify-between shadow-2xl overflow-y-auto border-r border-light-outline-variant"},
+                    html.div(
+                        {"className": "flex flex-col gap-4"},
+                        html.div(
+                            {"className": "flex items-center justify-between pb-3 border-b border-light-outline-variant"},
+                            html.div(
+                                {"className": "flex items-center gap-2 cursor-pointer", "on_click": lambda e: (set_page("landing"), set_mobile_open(False))},
+                                html.div({"className": "w-8 h-8 bg-light-primary text-white font-bold flex items-center justify-center font-display text-sm"}, "EG"),
+                                html.span({"className": "font-headline font-bold uppercase"}, "EduGrade AI")
+                            ),
+                            html.button(
+                                {
+                                    "type": "button",
+                                    "aria-label": "Close navigation menu",
+                                    "className": "p-1.5 text-light-on-surface hover:text-light-primary cursor-pointer",
+                                    "on_click": lambda e: set_mobile_open(False)
+                                },
+                                html.span({"className": "material-symbols-outlined text-[20px]"}, "close")
+                            )
+                        ),
+                        html.nav({"aria-label": "Mobile Navigation", "className": "flex flex-col gap-1"}, nav_links)
+                    ),
+                    html.div(
+                        {"className": "pt-4 border-t border-light-outline-variant flex flex-col gap-2"},
+                        html.div(
+                            {"className": "flex items-center justify-between"},
+                            ThemeToggle(theme=theme, toggle_theme=toggle_theme, compact=True) if toggle_theme else html.span(),
+                            html.button(
+                                {
+                                    "type": "button",
+                                    "aria-label": "Sign out",
+                                    "className": "inline-flex items-center gap-1.5 px-3 py-1.5 text-light-on-surface-variant hover:text-light-primary font-mono text-mono-sm uppercase cursor-pointer",
+                                    "on_click": lambda e: (set_mobile_open(False), logout_action())
+                                },
+                                html.span({"className": "material-symbols-outlined text-[18px]"}, "logout"),
+                                html.span("Sign Out")
+                            )
+                        )
+                    )
+                ),
+                html.div(
+                    {"className": "flex-1 cursor-pointer", "on_click": lambda e: set_mobile_open(False)}
+                )
+            )
+            if mobile_open else None
         ),
         
         # Main Workspace Column
@@ -168,6 +231,15 @@ def AppLayout(user, current_page, set_page, logout_action, children, theme="ligh
                 {"className": "bg-light-surface-container-lowest border-b border-light-outline-variant px-gutter-lg py-gutter-md flex items-center justify-between gap-gutter-md sticky top-0 z-20"},
                 html.div(
                     {"className": "flex items-center gap-gutter-md"},
+                    html.button(
+                        {
+                            "type": "button",
+                            "aria-label": "Toggle navigation menu",
+                            "className": "md:hidden flex items-center justify-center p-1.5 text-light-on-surface border border-light-outline-variant hover:bg-light-surface-container cursor-pointer",
+                            "on_click": lambda e: set_mobile_open(not mobile_open)
+                        },
+                        html.span({"className": "material-symbols-outlined text-[20px]"}, "menu" if not mobile_open else "close")
+                    ),
                     html.div(
                         html.h1({"className": "font-headline text-headline-md text-light-on-surface uppercase tracking-tight font-bold"}, page_title),
                         html.p({"className": "font-mono text-mono-sm text-light-on-surface-variant uppercase"}, page_subtitle)

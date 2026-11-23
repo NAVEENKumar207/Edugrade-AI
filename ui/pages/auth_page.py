@@ -136,7 +136,12 @@ def LoginPage(set_page, set_user, current_role='student', theme='dark', toggle_t
                 html.div(
                     {"className": "flex items-center gap-2 font-mono text-mono-sm uppercase"},
                     html.button(
-                        {"className": "px-4 py-1.5 bg-light-secondary text-light-on-secondary font-semibold cursor-pointer"},
+                        {
+                            "type": "button",
+                            "disabled": True,
+                            "aria-selected": "true",
+                            "className": "px-4 py-1.5 bg-light-secondary text-light-on-secondary font-semibold cursor-default"
+                        },
                         "Sign In"
                     ),
                     html.button(
@@ -440,7 +445,12 @@ def SignupPage(set_page, set_user, current_role='student', theme='dark', toggle_
                         "Sign In"
                     ),
                     html.button(
-                        {"className": "px-4 py-1.5 bg-light-secondary text-light-on-secondary font-semibold cursor-pointer"},
+                        {
+                            "type": "button",
+                            "disabled": True,
+                            "aria-selected": "true",
+                            "className": "px-4 py-1.5 bg-light-secondary text-light-on-secondary font-semibold cursor-default"
+                        },
                         "Create Account"
                     )
                 ),

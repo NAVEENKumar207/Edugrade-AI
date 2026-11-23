@@ -730,8 +730,8 @@ def process_bulk_grades_csv(action_user, csv_text: str):
             "status_code": 400
         }
 
-    # Normalize headers
-    clean_header = [col.strip().lower() for col in header]
+    # Normalize headers (support both course_title and course_name synonym)
+    clean_header = ['course_title' if col.strip().lower() in ('course_title', 'course_name') else col.strip().lower() for col in header]
     required_cols = ['roll_number', 'semester', 'course_code', 'course_title', 'credits', 'grade']
     missing_cols = [c for c in required_cols if c not in clean_header]
     if missing_cols:

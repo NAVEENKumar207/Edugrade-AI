@@ -211,6 +211,8 @@ def AiAdvisorPage(user):
                             html.button(
                                 {
                                     "type": "button",
+                                    "data-voice-lang": "ta-IN",
+                                    "aria-label": "Set Tamil Language",
                                     "on_click": lambda e: None,
                                     "onclick": "window.setVoiceLang('ta-IN')",
                                     "class_name": "px-2 py-0.5 font-mono text-[11px] font-bold text-light-on-surface hover:text-light-primary cursor-pointer"
@@ -221,6 +223,8 @@ def AiAdvisorPage(user):
                             html.button(
                                 {
                                     "type": "button",
+                                    "data-voice-lang": "en-IN",
+                                    "aria-label": "Set English Language",
                                     "on_click": lambda e: None,
                                     "onclick": "window.setVoiceLang('en-IN')",
                                     "class_name": "px-2 py-0.5 font-mono text-[11px] font-bold text-light-on-surface hover:text-light-primary cursor-pointer"

@@ -294,6 +294,25 @@
                 console.log("Voice synthesis error:", err);
             }
         };
+
+        // 7. Event Delegation for Voice Actions
+        document.addEventListener('click', function(e) {
+            var mic = e.target.closest('#voice-mic-btn');
+            if (mic) {
+                window.startVoiceInput();
+                return;
+            }
+            var speak = e.target.closest('#voice-speak-btn');
+            if (speak) {
+                window.readLatestReplyAloud();
+                return;
+            }
+            var langBtn = e.target.closest('[data-voice-lang]');
+            if (langBtn) {
+                window.setVoiceLang(langBtn.getAttribute('data-voice-lang'));
+                return;
+            }
+        });
     </script>
 </head>
 <body class="bg-light-surface text-light-on-surface dark:bg-dark-surface dark:text-dark-on-surface font-body antialiased">

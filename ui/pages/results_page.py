@@ -178,6 +178,7 @@ def ResultsPage(user):
                     {
                         "href": "/api/transcript/pdf/",
                         "target": "_blank",
+                        "rel": "noopener noreferrer",
                         "class_name": "inline-flex items-center gap-2 px-gutter-md py-2 bg-light-primary text-light-on-primary font-mono text-mono-sm font-bold uppercase hover:bg-light-primary-container hover:text-light-on-primary-container transition-colors duration-state-change whitespace-nowrap cursor-pointer"
                     },
                     html.span({"class_name": "material-symbols-outlined text-[18px]"}, "picture_as_pdf"),

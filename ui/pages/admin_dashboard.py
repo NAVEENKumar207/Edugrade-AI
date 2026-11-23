@@ -616,13 +616,13 @@ def AdminDashboard(user):
 
                 html.div(
                     {"class_name": "flex flex-col gap-gutter-sm"},
-                    html.p({"class_name": "font-mono text-mono-sm text-light-on-surface-variant"}, "Format: roll_number,semester,course_code,course_name,credits,grade,grade_point"),
+                    html.p({"class_name": "font-mono text-mono-sm text-light-on-surface-variant"}, "Format: roll_number,semester,course_code,course_title,credits,grade"),
                     html.textarea(
                         {
                             "rows": 8,
                             "value": csv_text,
                             "on_change": lambda e: set_csv_text(e.get("target", {}).get("value", "")),
-                            "placeholder": "21CS042,6,CS3601,Compiler Design,4,O,10.0\n21CS019,6,CS3602,Distributed Systems,3,A+,9.0",
+                            "placeholder": "21CS042,6,CS3601,Compiler Design,4,O\n21CS019,6,CS3602,Distributed Systems,3,A+",
                             "class_name": "w-full border border-light-outline-variant p-2 font-mono text-mono-sm"
                         }
                     ),
