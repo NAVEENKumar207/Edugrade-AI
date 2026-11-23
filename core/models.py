@@ -8,6 +8,7 @@ def generate_transcript_token():
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     roll_number = models.CharField(max_length=50, blank=True, null=True)
+    institution_name = models.CharField(max_length=200, default='Anna University / Affiliated Institution', blank=True)
     department = models.CharField(max_length=100, default='Computer Science & Engineering')
     current_semester = models.IntegerField(default=5, blank=True, null=True)
     target_cgpa = models.DecimalField(max_digits=4, decimal_places=2, default=9.00)
@@ -17,8 +18,11 @@ class UserProfile(models.Model):
     backlogs_count = models.IntegerField(default=0)
     is_placement_eligible = models.BooleanField(default=True)
 
+    def is_admin(self):
+        return self.user.is_staff or self.user.is_superuser
+
     def __str__(self):
-        return f"{self.user.username} - {self.department}"
+        return f"{self.user.username} - {self.department} ({self.institution_name})"
 
 # Backwards compatibility alias
 StudentProfile = UserProfile

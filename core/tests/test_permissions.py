@@ -146,6 +146,7 @@ class ApiPermissionsTests(TestCase):
         res = self.client.post('/api/auth/signup/', {
             'username': 'newstudent',
             'password': 'strongpassword123',
+            'confirm_password': 'strongpassword123',
             'fullname': 'New Student',
             'department': 'CSE',
             'roll_number': '717622CS999',

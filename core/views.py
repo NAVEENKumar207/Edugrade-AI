@@ -56,6 +56,7 @@ def signup_view(request):
     if request.method == 'POST':
         fullname = request.POST.get('fullname', '').strip()
         username = request.POST.get('username', '').strip()
+        institution_name = request.POST.get('institution_name', 'Anna University / Affiliated Institution').strip()
         department = request.POST.get('department', 'Computer Science & Engineering')
         password = request.POST.get('password', '')
         confirm_password = request.POST.get('confirm_password', '')
@@ -89,6 +90,7 @@ def signup_view(request):
         UserProfile.objects.create(
             user=user,
             roll_number=roll_number or ('7176' + username),
+            institution_name=institution_name or 'Anna University / Affiliated Institution',
             department=department,
             current_semester=int(semester) if semester.isdigit() else 1
         )

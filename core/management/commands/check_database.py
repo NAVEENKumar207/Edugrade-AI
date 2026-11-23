@@ -60,8 +60,7 @@ class Command(BaseCommand):
         # 4. Record counts & Integrity check
         user_count = User.objects.count()
         profile_count = UserProfile.objects.count()
-        student_count = UserProfile.objects.filter(role='student').count()
-        admin_count = UserProfile.objects.filter(role__in=['admin', 'faculty']).count()
+        superuser_count = User.objects.filter(is_superuser=True).count()
         semester_count = SemesterRecord.objects.count()
         insight_count = SubjectInsight.objects.count()
         course_count = CourseResult.objects.count()
@@ -71,7 +70,7 @@ class Command(BaseCommand):
 
         self.stdout.write(self.style.MIGRATE_LABEL("\n--- Record Statistics ---"))
         self.stdout.write(f"  Total Auth Users:          {user_count}")
-        self.stdout.write(f"  Total User Profiles:       {profile_count} (Students: {student_count}, Admins/Faculty: {admin_count})")
+        self.stdout.write(f"  Total Student Profiles:    {profile_count} (Superusers: {superuser_count})")
         self.stdout.write(f"  Semester Records:          {semester_count}")
         self.stdout.write(f"  Subject Insights:          {insight_count}")
         self.stdout.write(f"  Course Results:            {course_count}")

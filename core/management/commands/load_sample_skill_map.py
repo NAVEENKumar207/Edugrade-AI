@@ -1,7 +1,7 @@
 """
 Management command to map existing course codes to sample career skills.
 Creates mappings only for courses that already exist in CourseResult records.
-Faculty can edit, refine, or add mappings via the Django Admin interface.
+Administrators can edit, refine, or add mappings via the Django Admin interface.
 Safe to execute multiple times (idempotent).
 """
 
@@ -44,5 +44,5 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS(
             f"Successfully processed course skills: {created_count} new mappings created, "
             f"{existing_count} already existed.\n"
-            f"Note: These are sample mappings that faculty can edit or extend in Django Admin (/admin/)."
+            f"Note: These are sample mappings that administrators can edit or extend in Django Admin (/admin/)."
         ))

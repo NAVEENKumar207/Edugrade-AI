@@ -206,7 +206,7 @@ def change_user_password(user, old_password, new_password, confirm_password):
     )
     return True, "Password changed successfully."
 
-def register_user(username, password, fullname='', department='Computer Science & Engineering', roll_number='', semester=1, **kwargs):
+def register_user(username, password, fullname='', department='Computer Science & Engineering', roll_number='', semester=1, institution_name='Anna University / Affiliated Institution', **kwargs):
     """Registers a new student user and student profile."""
     if not username or not password:
         return False, "Username and password are required."
@@ -231,6 +231,7 @@ def register_user(username, password, fullname='', department='Computer Science 
         UserProfile.objects.create(
             user=user,
             roll_number=roll_number or ('7176' + username),
+            institution_name=institution_name or 'Anna University / Affiliated Institution',
             department=department,
             current_semester=int(semester) if str(semester).isdigit() else 1,
             current_cgpa=0.00,
@@ -490,7 +491,7 @@ def import_student_grades_csv(user, csv_text: str):
     from core.services.academic_service import process_student_grades_csv
     return process_student_grades_csv(user, csv_text)
 
-def update_user_profile(user, first_name=None, last_name=None, email=None, target_cgpa=None, department=None):
+def update_user_profile(user, first_name=None, last_name=None, email=None, target_cgpa=None, department=None, institution_name=None):
     """Updates user and user profile details."""
     try:
         profile = getattr(user, 'profile', None)
@@ -515,6 +516,9 @@ def update_user_profile(user, first_name=None, last_name=None, email=None, targe
 
         if department is not None and department.strip():
             profile.department = department.strip()
+
+        if institution_name is not None and institution_name.strip():
+            profile.institution_name = institution_name.strip()
 
         profile.save()
         return True, "Profile details updated successfully."

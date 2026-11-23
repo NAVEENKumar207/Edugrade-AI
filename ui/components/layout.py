@@ -237,18 +237,10 @@ def AppLayout(user, current_page, set_page, logout_action, children, theme="ligh
                 html.div(
                     {"className": "flex items-center gap-gutter-sm"},
                     ThemeToggle(theme=theme, toggle_theme=toggle_theme, compact=True) if toggle_theme else None,
-                    (
-                        html.span(
-                            {"className": "inline-flex items-center gap-gutter-xs px-3 py-1.5 rounded-full bg-light-primary text-white font-mono text-mono-sm uppercase whitespace-nowrap shrink-0 font-bold"},
-                            html.span({"className": "material-symbols-outlined text-[15px]"}, "shield_person"),
-                            html.span("Faculty / Admin")
-                        )
-                        if is_admin else
-                        html.span(
-                            {"className": "inline-flex items-center gap-gutter-xs px-3 py-1.5 rounded-full bg-light-secondary text-light-on-secondary font-mono text-mono-sm uppercase whitespace-nowrap shrink-0"},
-                            html.span({"className": "material-symbols-outlined text-[15px]"}, "verified"),
-                            html.span(f"CGPA: {cgpa_val:.2f} • {'Placement Eligible' if getattr(profile, 'is_placement_eligible', True) else 'Remediation Needed'}")
-                        )
+                    html.span(
+                        {"className": "inline-flex items-center gap-gutter-xs px-3 py-1.5 rounded-full bg-light-secondary text-light-on-secondary font-mono text-mono-sm uppercase whitespace-nowrap shrink-0"},
+                        html.span({"className": "material-symbols-outlined text-[15px]"}, "verified"),
+                        html.span(f"CGPA: {cgpa_val:.2f} • {'Placement Eligible' if getattr(profile, 'is_placement_eligible', True) else 'Remediation Needed'}")
                     )
                 )
             ),

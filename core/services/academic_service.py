@@ -725,11 +725,13 @@ def process_student_grades_csv(student_profile, action_user, csv_text: str):
     required_cols = ['semester', 'course_code', 'course_title', 'credits', 'grade']
     missing_cols = [c for c in required_cols if c not in clean_header]
     if missing_cols:
+        missing_display = [('course_name' if c == 'course_title' else c) for c in missing_cols]
         return {
             "saved": 0,
+            "imported_count": 0,
             "skipped": 0,
             "errors": [],
-            "error": f"Missing required column(s): {', '.join(missing_cols)}",
+            "error": f"Missing required column(s): {', '.join(missing_display)}",
             "status_code": 400
         }
 
@@ -749,6 +751,7 @@ def process_student_grades_csv(student_profile, action_user, csv_text: str):
         }
 
     saved = 0
+    cleared_arrears_count = 0
     skipped = 0
     errors = []
 
@@ -810,7 +813,7 @@ def process_student_grades_csv(student_profile, action_user, csv_text: str):
 
         try:
             with transaction.atomic():
-                record_course_result(
+                _, arrear_cleared = record_course_result(
                     action_user=action_user,
                     student_profile=student_profile,
                     semester_number=sem_num,
@@ -820,6 +823,8 @@ def process_student_grades_csv(student_profile, action_user, csv_text: str):
                     grade=grade_raw,
                     recalculate=False
                 )
+            if arrear_cleared:
+                cleared_arrears_count += 1
             saved += 1
         except Exception as ex:
             errors.append({"row": idx, "reason": f"Database save error: {str(ex)}"})
@@ -836,6 +841,8 @@ def process_student_grades_csv(student_profile, action_user, csv_text: str):
 
     return {
         "saved": saved,
+        "imported_count": saved,
+        "cleared_arrears_count": cleared_arrears_count,
         "skipped": skipped,
         "errors": errors,
         "status_code": 200

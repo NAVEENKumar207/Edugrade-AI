@@ -1,5 +1,5 @@
 """
-Student & Faculty Profile Page Component for EduGrade AI ReactPy Frontend.
+Student Profile Page Component for EduGrade AI ReactPy Frontend.
 Industrial Academic Precision Design (Space Grotesk, IBM Plex Mono, Inter, Vermilion, Espresso).
 Fully responsive, accessible, with high-contrast text and interactive profile editing.
 """
@@ -21,6 +21,11 @@ def ProfilePage(user):
     email, set_email = use_state(user.email if user else "")
     target_cgpa, set_target_cgpa = use_state(str(profile.target_cgpa) if profile else "8.80")
     department, set_department = use_state(profile.department if profile else "Computer Science & Engineering")
+    institution_name, set_institution_name = use_state(
+        getattr(profile, 'institution_name', 'Anna University / Affiliated Institution')
+        if profile and getattr(profile, 'institution_name', None)
+        else "Anna University / Affiliated Institution"
+    )
 
     save_status, set_save_status = use_state("")
     save_error, set_save_error = use_state("")
@@ -50,7 +55,8 @@ def ProfilePage(user):
             last_name=last_name,
             email=email,
             target_cgpa=target_cgpa,
-            department=department
+            department=department,
+            institution_name=institution_name
         )
         if ok:
             set_save_status(msg)
@@ -64,6 +70,11 @@ def ProfilePage(user):
         set_email(user.email if user else "")
         set_target_cgpa(str(profile.target_cgpa) if profile else "8.80")
         set_department(profile.department if profile else "Computer Science & Engineering")
+        set_institution_name(
+            getattr(profile, 'institution_name', 'Anna University / Affiliated Institution')
+            if profile and getattr(profile, 'institution_name', None)
+            else "Anna University / Affiliated Institution"
+        )
         set_save_error("")
         set_is_editing(False)
 
@@ -132,6 +143,11 @@ def ProfilePage(user):
                     html.h2({"className": "font-headline text-headline-md text-light-on-surface uppercase font-bold"}, f"{first_name} {last_name}".strip() or (user.username if user else "STUDENT")),
                     html.p({"className": "font-mono text-mono-sm text-light-primary font-bold tracking-wider"}, getattr(profile, 'roll_number', user.username if user else "2026")),
                     html.span({"className": "mt-2 inline-block px-3 py-1 bg-light-surface-container-highest text-light-on-surface font-mono text-mono-sm font-semibold border border-light-outline-variant"}, f"{department} • STUDENT"),
+                    html.p(
+                        {"className": "mt-2 text-center font-body text-body-xs font-semibold text-light-on-surface flex items-center justify-center gap-1.5 max-w-[240px]"},
+                        html.span({"className": "material-symbols-outlined text-[16px] text-light-primary shrink-0"}, "account_balance"),
+                        html.span({"className": "truncate"}, institution_name)
+                    ),
                     html.span(
                         {"className": "mt-2 inline-flex items-center gap-1.5 font-mono text-mono-xs uppercase text-success font-semibold"},
                         html.span({"className": "material-symbols-outlined text-[15px]"}, "verified"),
@@ -254,6 +270,14 @@ def ProfilePage(user):
                             html.p({"className": "font-body text-body-md font-semibold text-light-on-surface"}, department or "Computer Science & Engineering")
                         ),
                         html.div(
+                            {"className": "flex flex-col gap-1 p-3 bg-light-surface-container-low border border-light-outline-variant sm:col-span-2 md:col-span-2"},
+                            html.span({"className": "font-mono text-mono-xs font-bold text-light-on-surface-variant uppercase flex items-center gap-1"},
+                                html.span({"className": "material-symbols-outlined text-[15px] text-light-primary"}, "school"),
+                                "Affiliated Institution / University"
+                            ),
+                            html.p({"className": "font-body text-body-md font-semibold text-light-on-surface truncate"}, institution_name or "Anna University / Affiliated Institution")
+                        ),
+                        html.div(
                             {"className": "flex flex-col gap-1 p-3 bg-light-surface-container-low border border-light-outline-variant"},
                             html.span({"className": "font-mono text-mono-xs font-bold text-light-on-surface-variant uppercase"}, "Roll Number / ID"),
                             html.p({"className": "font-mono text-mono-md font-bold text-light-primary"}, getattr(profile, 'roll_number', user.username if user else "—"))
@@ -347,17 +371,34 @@ def ProfilePage(user):
                         )
                     ),
                     html.div(
-                        {"className": "flex flex-col gap-1"},
-                        html.label({"className": "font-mono text-mono-sm font-bold text-light-on-surface uppercase"}, "Academic Department"),
-                        html.input(
-                            {
-                                "type": "text",
-                                "value": department,
-                                "on_change": lambda e: set_department(e.get("target", {}).get("value", "")),
-                                "className": input_class,
-                                "style": input_style,
-                                "placeholder": "e.g. Computer Science & Engineering"
-                            }
+                        {"className": "grid grid-cols-1 sm:grid-cols-2 gap-gutter-md"},
+                        html.div(
+                            {"className": "flex flex-col gap-1"},
+                            html.label({"className": "font-mono text-mono-sm font-bold text-light-on-surface uppercase"}, "Academic Department"),
+                            html.input(
+                                {
+                                    "type": "text",
+                                    "value": department,
+                                    "on_change": lambda e: set_department(e.get("target", {}).get("value", "")),
+                                    "className": input_class,
+                                    "style": input_style,
+                                    "placeholder": "e.g. Computer Science & Engineering"
+                                }
+                            )
+                        ),
+                        html.div(
+                            {"className": "flex flex-col gap-1"},
+                            html.label({"className": "font-mono text-mono-sm font-bold text-light-on-surface uppercase"}, "Institution / University"),
+                            html.input(
+                                {
+                                    "type": "text",
+                                    "value": institution_name,
+                                    "on_change": lambda e: set_institution_name(e.get("target", {}).get("value", "")),
+                                    "className": input_class,
+                                    "style": input_style,
+                                    "placeholder": "e.g. Anna University / Affiliated Institution"
+                                }
+                            )
                         )
                     ),
 

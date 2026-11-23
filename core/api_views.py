@@ -163,7 +163,7 @@ def api_logout(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def api_change_password(request):
-    """Updates password for authenticated student or faculty."""
+    """Updates password for authenticated student."""
     old_password = request.data.get('old_password', '')
     new_password = request.data.get('new_password', '')
     confirm_password = request.data.get('confirm_password', '')
@@ -467,7 +467,7 @@ def api_results_sample_csv(request):
     """Returns downloadable sample CSV template for student results upload."""
     from django.http import HttpResponse
     csv_content = (
-        "semester,course_code,course_title,credits,grade\r\n"
+        "semester,course_code,course_name,credits,grade\r\n"
         "1,HS8151,Communicative English,3,A\r\n"
         "1,MA8151,Engineering Mathematics - I,4,A+\r\n"
         "1,PH8151,Engineering Physics,3,A\r\n"
@@ -475,7 +475,7 @@ def api_results_sample_csv(request):
         "1,GE8151,Problem Solving & Python Programming,3,O\r\n"
     )
     response = HttpResponse(csv_content, content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="sample_results.csv"'
+    response['Content-Disposition'] = 'attachment; filename="sample_grades_template.csv"'
     return response
 
 

@@ -177,38 +177,45 @@ def LandingPage(set_page, set_auth_role=None, theme="dark", toggle_theme=None):
                     # Right Column: 3D Telemetry Bento Box (5 cols)
                     html.div(
                         {"className": "lg:col-span-5 bg-light-primary-container text-light-on-primary-container p-6 lg:p-8 flex flex-col justify-between min-h-[460px] border border-light-primary"},
-                        # Role Switcher Tabs
+                        # Feature Switcher Tabs
                         html.div(
                             {"className": "flex flex-col gap-6"},
                             html.div(
                                 {"className": "flex flex-wrap items-center gap-4 border-b border-light-on-primary-container/20 pb-4 font-mono text-mono-sm uppercase"},
                                 html.button(
                                     {
-                                        "className": f"cursor-pointer transition-colors {'underline underline-offset-4 font-bold' if selected_role == 'student' else 'text-light-on-primary-container/70 hover:text-light-on-primary-container'}",
-                                        "on_click": lambda e: set_selected_role("student")
+                                        "className": f"cursor-pointer transition-colors {'underline underline-offset-4 font-bold' if selected_feature == 'twin' else 'text-light-on-primary-container/70 hover:text-light-on-primary-container'}",
+                                        "on_click": lambda e: set_selected_feature("twin")
                                     },
-                                    "Student"
+                                    "Digital Twin"
                                 ),
                                 html.button(
                                     {
-                                        "className": f"cursor-pointer transition-colors {'underline underline-offset-4 font-bold' if selected_role == 'faculty' else 'text-light-on-primary-container/70 hover:text-light-on-primary-container'}",
-                                        "on_click": lambda e: set_selected_role("faculty")
+                                        "className": f"cursor-pointer transition-colors {'underline underline-offset-4 font-bold' if selected_feature == 'moves' else 'text-light-on-primary-container/70 hover:text-light-on-primary-container'}",
+                                        "on_click": lambda e: set_selected_feature("moves")
                                     },
-                                    "Faculty / Admin"
+                                    "Next Best Move"
                                 ),
                                 html.button(
                                     {
-                                        "className": f"cursor-pointer transition-colors {'underline underline-offset-4 font-bold' if selected_role == 'placement' else 'text-light-on-primary-container/70 hover:text-light-on-primary-container'}",
-                                        "on_click": lambda e: set_selected_role("placement")
+                                        "className": f"cursor-pointer transition-colors {'underline underline-offset-4 font-bold' if selected_feature == 'target' else 'text-light-on-primary-container/70 hover:text-light-on-primary-container'}",
+                                        "on_click": lambda e: set_selected_feature("target")
                                     },
-                                    "Placement Cell"
+                                    "Marks Target"
                                 ),
                                 html.button(
                                     {
-                                        "className": f"cursor-pointer transition-colors {'underline underline-offset-4 font-bold' if selected_role == 'mentor' else 'text-light-on-primary-container/70 hover:text-light-on-primary-container'}",
-                                        "on_click": lambda e: set_selected_role("mentor")
+                                        "className": f"cursor-pointer transition-colors {'underline underline-offset-4 font-bold' if selected_feature == 'advisor' else 'text-light-on-primary-container/70 hover:text-light-on-primary-container'}",
+                                        "on_click": lambda e: set_selected_feature("advisor")
                                     },
-                                    "AI Mentor"
+                                    "AI Advisor"
+                                ),
+                                html.button(
+                                    {
+                                        "className": f"cursor-pointer transition-colors {'underline underline-offset-4 font-bold' if selected_feature == 'badges' else 'text-light-on-primary-container/70 hover:text-light-on-primary-container'}",
+                                        "on_click": lambda e: set_selected_feature("badges")
+                                    },
+                                    "Milestones"
                                 )
                             ),
                             # Dynamic Tags
@@ -368,7 +375,7 @@ def LandingPage(set_page, set_auth_role=None, theme="dark", toggle_theme=None):
                                 {"num": "03", "icon": "trending_up", "title": "Next Best Move", "desc": "Impact ranking analyzing your active arrears to identify which subject to clear first for the maximum CGPA boost and corporate recruiter unlocks."},
                                 {"num": "04", "icon": "calculate", "title": "Marks Target Calculator", "desc": "Instant dual-mode examination target calculator determining exactly what paper marks you need to score your desired grade."},
                                 {"num": "05", "icon": "psychology", "title": "Skill Map & Placement Fit", "desc": "Course-to-skill alignment comparing your academic mastery against corporate recruitment requirements with clear fit labels (Ready, Almost, Not yet)."},
-                                {"num": "06", "icon": "business_center", "title": "Faculty Drive Manager", "desc": "Candidate cohort intelligence for placement officers with optimized constant-query speed, borderline candidate tracking, and CSV export."},
+                                {"num": "06", "icon": "receipt_long", "title": "Student Results & CSV Import", "desc": "Direct ownership of your semester records with interactive course CRUD, bulk CSV upload, downloadable template, and automatic SGPA/CGPA updates."},
                                 {"num": "07", "icon": "verified", "title": "QR-Verified Transcripts", "desc": "Tamper-proof ReportLab academic transcripts embedding an autonomous cryptographic HMAC-SHA256 snapshot verification QR code."},
                                 {"num": "08", "icon": "route", "title": "Journey & Milestone Badges", "desc": "Chronological semester progression timeline tracking SGPA changes and gamified achievement badges (Zero Arrears, Comeback, Distinction)."},
                                 {"num": "09", "icon": "mic", "title": "Tamil & English Voice Mode", "desc": "Grounded bilingual academic advising with speech recognition and read-aloud playback right in the browser."},

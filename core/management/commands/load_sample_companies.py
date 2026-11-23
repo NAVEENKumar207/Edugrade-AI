@@ -3,7 +3,7 @@ from core.models import CompanyPlacementCriteria
 
 
 class Command(BaseCommand):
-    help = "Loads sample placement criteria that faculty can edit into the database."
+    help = "Loads sample placement criteria that administrators can edit into the database."
 
     def handle(self, *args, **options):
         criteria_list = [

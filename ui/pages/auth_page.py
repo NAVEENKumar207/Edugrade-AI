@@ -323,6 +323,7 @@ def LoginPage(set_page, set_user, current_role='student', theme='dark', toggle_t
 def SignupPage(set_page, set_user, current_role='student', theme='dark', toggle_theme=None):
     fullname, set_fullname = use_state("")
     username, set_username = use_state("")
+    institution_name, set_institution_name = use_state("Anna University / Affiliated Institution")
     department, set_department = use_state("Computer Science and Engineering")
     roll_number, set_roll_number = use_state("")
     password, set_password = use_state("")
@@ -368,6 +369,7 @@ def SignupPage(set_page, set_user, current_role='student', theme='dark', toggle_
                 username=username.strip(),
                 password=password,
                 fullname=fullname.strip(),
+                institution_name=institution_name.strip(),
                 department=department.strip(),
                 roll_number=roll_number.strip()
             )
@@ -546,6 +548,19 @@ def SignupPage(set_page, set_user, current_role='student', theme='dark', toggle_
                             "style": {"backgroundColor": "var(--bg-input)", "color": "var(--text-primary)"},
                             "placeholder": "e.g. anand01",
                             "on_change": lambda e: set_username(e.get("target", {}).get("value", "") if isinstance(e, dict) else str(e))
+                        })
+                    ),
+                    # Institution Name
+                    html.div(
+                        {"className": "flex flex-col gap-1.5"},
+                        html.label({"className": "font-mono text-mono-sm uppercase text-light-on-surface-variant font-medium"}, "Institution Name"),
+                        html.input({
+                            "type": "text",
+                            "value": institution_name,
+                            "className": "w-full px-3.5 py-2.5 bg-light-surface border border-light-outline-variant focus:border-light-primary focus:ring-0 font-mono text-mono-sm text-light-on-surface outline-none transition-colors",
+                            "style": {"backgroundColor": "var(--bg-input)", "color": "var(--text-primary)"},
+                            "placeholder": "e.g. Anna University / Affiliated Institution",
+                            "on_change": lambda e: set_institution_name(e.get("target", {}).get("value", "") if isinstance(e, dict) else str(e))
                         })
                     ),
                     # Department

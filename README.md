@@ -1,8 +1,8 @@
-# EduGrade AI — Academic Digital Twin and Career Readiness Platform
+# EduGrade AI — Student Academic Digital Twin and Career Readiness Platform
 
 > *"Your Academic Digital Twin — See Your Future, Not Just Your Past."*
 
-An enterprise-grade, full-stack academic intelligence platform, credit-weighted CGPA/SGPA calculation engine, predictive milestone simulator, campus placement eligibility platform, and hybrid AI Academic Advisor.
+An enterprise-grade, student-centric academic intelligence platform, credit-weighted CGPA/SGPA calculation engine, predictive milestone simulator, campus placement eligibility platform, and hybrid AI Academic Advisor.
 
 Built with a unified, high-performance **Django REST Backend** and an interactive, real-time **ReactPy Python Frontend** powered by `reactpy-django` and Django Channels over WebSockets.
 
@@ -22,12 +22,12 @@ EduGrade AI transforms traditional student record keeping into an active, forwar
    A deterministic reverse-calculation tool that takes continuous internal assessment marks (out of 40) and determines the exact external exam marks (out of 100) needed to achieve desired letter grades (O down to C), warning when higher grades are mathematically unattainable.
 5. **Academic Skill Map & Placement Match**:
    Maps completed coursework to industry technical competencies (Algorithms, Web, Systems, AI/ML, Cloud, Data, Security) via `CourseSkillMap` and title keyword fallback. Computes credit-weighted mastery percentages and benchmarks students against corporate recruitment criteria.
-6. **Drive Manager for Faculty & TPO**:
-   A dedicated campus placement dashboard (`ui/pages/drive_manager.py`) enabling faculty and Training & Placement Officers to review eligible and almost-eligible candidates (within 0.50 CGPA or 1 backlog) with specific gap diagnostics and one-click CSV export.
-7. **QR-Verified Anti-Tamper Transcripts**:
-   Cryptographically secured academic transcripts using HMAC-SHA256 digital signatures, embedded ReportLab QR codes, and a public verification gateway (`/verify/<token>/`) providing instant verification while strictly masking student PII.
-8. **Academic Journey, Badges & Early Warning**:
-   A chronological visual timeline celebrating student progress paired with 7 milestone badges (*Zero Arrears*, *Comeback*, *Rising Star*, *Steady*, *Distinction*, *Full Credit Semester*, *Placement Ready*). For faculty, least-squares linear regression flags at-risk students with specific early warning diagnostic indicators.
+6. **Student-Owned Academic Data Entry & CSV Import**:
+   Students maintain full ownership of their academic records. Under the Results page, students can perform single-course CRUD operations (Add, Edit, Delete) or upload multiple semesters via bulk CSV import, supported by a downloadable template (`sample_grades_template.csv`) and row-by-row error diagnostics.
+7. **QR-Verified Self-Reported Transcripts**:
+   Cryptographically secured academic transcripts using HMAC-SHA256 digital signatures, embedded ReportLab QR codes, and a public verification gateway (`/verify/<token>/`) providing instant verification while strictly masking student PII and explicitly denoting self-reported status.
+8. **Academic Journey, 7 Milestone Badges & Personal Trend Alert**:
+   A chronological visual timeline celebrating student progress paired with 7 milestone badges (*Zero Arrears*, *Comeback*, *Rising Star*, *Steady*, *Distinction*, *Full Credit Semester*, *Placement Ready*). The dashboard features a Personal Trend Alert card using least-squares linear regression to project future SGPA and early warnings.
 9. **Tamil Voice-Assisted AI Advisor**:
    A bilingual academic counseling interface supporting both English and Tamil. Uses the browser Web Speech API for voice dictation and speech synthesis, allowing students to speak and listen in their preferred language.
 
@@ -39,41 +39,40 @@ EduGrade AI transforms traditional student record keeping into an active, forwar
 EduGrade AI/
 │
 ├── core/                                → Django Application (Business Logic & APIs)
-│   ├── models.py                        → UserProfile, SemesterRecord, CourseResult, CourseSkillMap, TranscriptIssue, etc.
+│   ├── models.py                        → UserProfile (student), SemesterRecord, CourseResult, CourseSkillMap, TranscriptIssue, etc.
 │   ├── regulation.py                    → Single source of truth for academic regulation constants & marks boundaries
-│   ├── api_views.py                     → Secure REST API endpoints (Auth, Students, Academics, Placements, AI, Admin)
+│   ├── api_views.py                     → Secure REST API endpoints (Auth, Students, Academics CRUD & CSV, Placements, AI, Tools)
 │   ├── views.py                         → Legacy template views, QR transcript verification view & session management
 │   ├── services/
-│   │   ├── academic_service.py          → Pure deterministic calculation engine (SGPA/CGPA/Planner/Arrears/Marks Target)
+│   │   ├── academic_service.py          → Pure calculation engine (SGPA/CGPA/Planner/Arrears/Marks Target/Student CSV import)
 │   │   ├── twin_service.py              → Monte Carlo academic future simulator & Next Best Move ranking engine
 │   │   ├── skill_service.py             → Credit-weighted skill mapping & corporate placement fit evaluator
 │   │   ├── transcript_service.py        → HMAC-SHA256 transcript token generation & tamper verification
-│   │   ├── journey_service.py           → Milestone badge evaluator, chronological journey timeline & risk prediction
+│   │   ├── journey_service.py           → Milestone badge evaluator (7 badges), chronological journey & risk prediction
 │   │   ├── ai_service.py                → Grounded AI Academic Advisor powered by Groq Cloud & bilingual fallback
 │   │   ├── security_service.py          → Cache-backed login brute-force rate limiter (5 attempts / 5-min lockout)
 │   │   └── pdf_service.py               → ReportLab official transcript generator with embedded verification QR code
-│   ├── tests/                           → Comprehensive automated unit and integration test suite (146 test cases)
-│   │   ├── helpers.py                   → Reusable factory functions (create_student, create_admin, add_result)
+│   ├── tests/                           → Comprehensive automated unit and integration test suite (162 test cases)
+│   │   ├── helpers.py                   → Reusable factory functions (create_student, add_result)
 │   │   ├── test_regulation.py           → Internal/external marks-to-grade boundaries and passing rules
 │   │   ├── test_twin.py                 → Monte Carlo simulation determinism, seed repeatability & next moves
 │   │   ├── test_marks_target.py         → Reverse marks target calculator and validation
 │   │   ├── test_skills.py               → Skill map scoring and company fit matching
-│   │   ├── test_admin_drives.py         → Drive Manager candidate classification, query count & CSV export
 │   │   ├── test_transcript_verification.py → Anti-tamper transcript verification, QR token & PII masking
 │   │   ├── test_journey.py              → Journey timeline, milestone badges & least-squares predictive risk
 │   │   ├── test_academic_service.py     → Grade points, SGPA, CGPA, target planner, what-if simulator
 │   │   ├── test_models_integration.py   → Referential integrity, models, cascade deletions
-│   │   ├── test_permissions.py          → DRF API client authentication & role-based access control guards
+│   │   ├── test_permissions.py          → DRF API client authentication & student isolation guards
 │   │   ├── test_arrears.py              → Backlog tracking, arrear clearance, and audit logging
-│   │   ├── test_csv_upload.py           → Bulk faculty CSV grade ingestion and error validation
+│   │   ├── test_csv_upload.py           → Student CSV grade ingestion, validation, and sample template download
 │   │   ├── test_pdf_transcript.py       → PDF transcript generation and student data isolation
 │   │   ├── test_placement_readiness.py  → 100-point placement readiness index & actionable guidance
-│   │   ├── test_admin_analytics.py      → Grade distribution, department CGPA benchmark, at-risk criteria
 │   │   ├── test_ai_advisor.py           → Contextual memory, weakest course fallback, and chat history deletion
 │   │   ├── test_ai_groq.py              → Mocked Groq Cloud integration, failure resilience, and privacy tests
 │   │   └── test_empty_state.py          → Fresh empty database state handling across all views & APIs
 │   ├── management/commands/
 │   │   ├── check_database.py            → Database health, migration, and referential integrity diagnostic tool
+│   │   ├── seed_demo_student.py         → Seeds realistic demo student (717622CS101) with 5 semesters of courses
 │   │   ├── load_sample_companies.py     → Loads standard corporate campus placement criteria
 │   │   ├── load_sample_skill_map.py     → Populates standard technical course-to-skill mappings
 │   │   └── remove_demo_data.py          → Safely purges demo accounts and associated academic records
@@ -82,23 +81,21 @@ EduGrade AI/
 ├── ui/                                  → ReactPy Python Frontend (100% Python Single-Page Interface)
 │   ├── app.py                           → Root application component, routing, navigation & state management
 │   ├── components/
-│   │   ├── layout.py                    → Responsive layout with sidebar, topbar, role badges & signout
+│   │   ├── layout.py                    → Responsive layout with sidebar, topbar, theme toggle & student signout
 │   │   ├── common.py                    → Reusable UI cards (EmptyStateCard, StatCard, AlertBanner)
 │   │   └── icons.py                     → Crisp SVG vector icons (Sparkles, Award, Trending, Bot, etc.)
 │   ├── services/
 │   │   └── data_service.py              → Secure ORM and academic calculation data bridge for ReactPy
 │   └── pages/
 │       ├── landing.py                   → Academic intelligence landing page & portal triggers
-│       ├── auth_page.py                 → Student & Faculty login & registration
-│       ├── student_dashboard.py         → Real-time CGPA, SGPA, credits, placement readiness & Next Best Move
+│       ├── auth_page.py                 → Student login & registration (Student-only portal)
+│       ├── student_dashboard.py         → Real-time CGPA, SGPA, Trend Alert, placement readiness & Next Best Move
 │       ├── future_lab.py                → Academic Digital Twin, Next Best Move card & Marks Target Calculator
-│       ├── journey_page.py              → Milestone badge shelf & vertical chronological journey timeline
-│       ├── drive_manager.py             → Campus placement candidate manager, gap analysis & CSV exporter
-│       ├── results_page.py              → Detailed semester transcripts, course grade breakdown & PDF export
+│       ├── journey_page.py              → Milestone badge shelf (7 badges) & vertical chronological journey timeline
+│       ├── results_page.py              → Detailed semester transcripts, course CRUD drawer, CSV import & PDF export
 │       ├── cgpa_planner.py              → Interactive Target CGPA slider & what-if simulator
 │       ├── placement_page.py            → Corporate criteria matrix, Academic Skill Map & 100-pt readiness
 │       ├── ai_advisor.py                → Contextual AI advisor chat with prompt chips, Tamil voice mode
-│       ├── admin_dashboard.py           → Faculty analytics, student directory, CSV upload & early warning table
 │       ├── profile_page.py              → Student profile management & secure change password card
 │       └── regulations_page.py          → Curriculum & Choice Based Credit System (CBCS) explorer
 │
@@ -120,7 +117,7 @@ EduGrade AI/
 │   └── *.html                           → Legacy Django template frontend views (see Legacy Compatibility Notice)
 │
 ├── test_reactpy.py                      → Verification test for ReactPy component mounting & host view
-├── test_routes.py                       → Comprehensive end-to-end route, API, and permission test runner
+├── test_routes.py                       → Comprehensive end-to-end route, API, and student isolation test runner
 ├── requirements.txt                     → Python dependencies (Django, DRF, ReactPy, reactpy-django, Channels, ReportLab)
 ├── manage.py                            → Django management script
 ├── .env.example                         → Template for required environment variables
@@ -131,18 +128,18 @@ EduGrade AI/
 
 ## ⚠️ Legacy Compatibility Notice
 
-The HTML templates located in `templates/` (e.g., `dashboard.html`, `admin_dashboard.html`, `results.html`, `cgpa_planner.html`, `placement.html`, `ai_advisor.html`) and legacy static assets in `static/css/style.css` and `static/js/script.js` are **preserved as legacy Django template frontend views for backward compatibility**. 
+The HTML templates located in `templates/` (e.g., `dashboard.html`, `results.html`, `cgpa_planner.html`, `placement.html`, `ai_advisor.html`) and legacy static assets in `static/css/style.css` and `static/js/script.js` are **preserved as legacy Django template frontend views for backward compatibility**. Legacy admin routes automatically redirect to `/dashboard/`.
 
-The **primary modern frontend** is the reactive Single-Page Application (SPA) powered by **ReactPy (`reactpy-django`)**, mounted via `templates/reactpy_index.html` and rendered via `ui/app.py` over WebSocket channels. All contemporary interactive capabilities, theme switching, dynamic modals, and live calculations run through the ReactPy architecture.
+The **primary modern frontend** is the reactive Single-Page Application (SPA) powered by **ReactPy (`reactpy-django`)**, mounted via `templates/reactpy_index.html` and rendered via `ui/app.py` over WebSocket channels. All contemporary interactive capabilities, theme switching, student CRUD modals, CSV importing, and live calculations run through the ReactPy architecture.
 
 ---
 
 ## 🚀 Setup & Initialization
 
-EduGrade AI starts with a clean database ready for institutional onboarding:
+EduGrade AI is configured as a student-only portal ready for use:
 
 ### 1. Initial Setup
-1. **Configure Environment**: Copy `.env.example` to `.env` and set signing keys:
+1. **Configure Environment**: Copy `.env.example` to `.env`:
    ```bash
    cp .env.example .env
    ```
@@ -157,23 +154,27 @@ EduGrade AI starts with a clean database ready for institutional onboarding:
    ```
    *Loads 6 standard corporate recruitment criteria and 15 course-to-skill mappings.*
 
-### 2. Registering Accounts
-- **Faculty / Admin Account**:
-  Navigate to the Sign Up page, select **Faculty / Admin**, enter username/password, and provide the `ADMIN_SIGNUP_KEY`.
-- **Student Account**:
-  Select **Student**, enter username, password, roll number (e.g., `717622CS101`), department, and current semester.
-- **Bulk Grade Ingestion**:
-  Faculty can download the CSV template (`sample_grades.csv`) directly from the Faculty Dashboard and upload student grades in bulk.
-
-### 3. Demo Data Management
-To audit or purge demo records from the database:
+### 2. Seeding Demo Student Account (Optional)
+To test immediately with pre-populated multi-semester course records:
 ```bash
-# Preview records to be removed
-python manage.py remove_demo_data --dry-run
-
-# Execute clean removal
-python manage.py remove_demo_data --yes
+python manage.py seed_demo_student
 ```
+This generates a demo student account:
+- **Username**: `demo_student`
+- **Password**: `student01`
+- **Roll Number**: `717622CS101`
+- **Department**: Computer Science & Engineering
+- **Current Semester**: 6 (CGPA: 8.55, Credits: 108, Backlogs: 0, Cleared Arrear: MA201)
+
+### 3. Registering a New Student Account
+Navigate to `/login` and click **"Don't have an account? Sign up"**.
+Fill in your student details:
+- Username & Password
+- Full Name
+- Roll Number (e.g., `717622CS102`)
+- Department & Current Semester
+
+All registrations create student accounts. Django's administrative interface (`/admin/`) is restricted strictly to superusers.
 
 ---
 
@@ -187,7 +188,6 @@ EduGrade AI uses a `.env` file for runtime configuration. Copy `.env.example` to
 | `DEBUG` | `False` | Debug mode toggle (defaults to `False` if unset) |
 | `ALLOWED_HOSTS` | `localhost,127.0.0.1` | Comma-separated list of host/domain names |
 | `CORS_ALLOWED_ORIGINS` | `http://localhost:3000,...` | Comma-separated origins allowed for cross-origin requests |
-| `ADMIN_SIGNUP_KEY` | *(none / empty)* | Secret registration key required for creating faculty/admin accounts |
 | `TRANSCRIPT_SIGNING_KEY`| *(django secret key)* | Secret key used to sign HMAC-SHA256 transcript verification tokens |
 | `SITE_URL` | `http://127.0.0.1:8000` | Base public URL used in transcript QR verification links |
 | `GROQ_API_KEY` | *(none)* | Groq Cloud API key (optional; get one at https://console.groq.com/keys) |
@@ -200,7 +200,7 @@ EduGrade AI uses a `.env` file for runtime configuration. Copy `.env.example` to
 ## 📐 Academic Regulations & Single Source of Truth
 
 > [!IMPORTANT]
-> **Institutional Verification**: All grading scales, internal/external assessment proportions, passing minimums, and grade cutoff boundaries are defined exclusively in `core/regulation.py`. Institutions should verify and adjust these values to conform to their specific university regulations before deploying to production.
+> **Institutional Verification**: All grading scales, internal/external assessment proportions, passing minimums, and grade cutoff boundaries are defined exclusively in `core/regulation.py`.
 
 ```python
 # core/regulation.py
@@ -229,37 +229,33 @@ $$\text{Total Marks} = \text{Internal Marks (out of 40)} + \left(\frac{\text{Ext
 
 ## 📡 Complete REST API Specification
 
-All modern API endpoints are registered in `core/urls.py` under `/api/` and enforce role-based authentication and student isolation:
+All modern API endpoints are registered in `core/urls.py` under `/api/` and enforce student isolation:
 
-| Endpoint | Method | Auth Required | Role | Description |
+| Endpoint | Method | Auth Required | Scope | Description |
 | :--- | :---: | :---: | :---: | :--- |
-| `/api/auth/me/` | `GET` | Yes | Student/Admin | Returns authenticated user profile and session role |
-| `/api/auth/login/` | `POST` | No | Public | Authenticates user; rate-limited (5 failed attempts locks for 5 min) |
-| `/api/auth/signup/` | `POST` | No | Public | Registers student or faculty (requires `admin_key` for faculty) |
-| `/api/auth/logout/` | `POST` | Yes | Student/Admin | Invalidates active user session |
-| `/api/auth/change-password/` | `POST` | Yes | Student/Admin | Validates old password and updates to new password |
+| `/api/auth/me/` | `GET` | Yes | Student | Returns authenticated student profile and account metadata |
+| `/api/auth/login/` | `POST` | No | Public | Authenticates student; rate-limited (5 failed attempts locks for 5 min) |
+| `/api/auth/signup/` | `POST` | No | Public | Registers a new student account |
+| `/api/auth/logout/` | `POST` | Yes | Student | Invalidates active user session |
+| `/api/auth/change-password/` | `POST` | Yes | Student | Validates old password and updates to new password |
 | `/api/students/dashboard/` | `GET` | Yes | Student | Returns student metrics, CGPA, SGPA history, readiness score, and tips |
 | `/api/student/arrears/` | `GET` | Yes | Student | Returns breakdown of active and cleared arrears |
-| `/api/academics/results/` | `GET` | Yes | Student | Returns semester course results and grade points |
+| `/api/academics/results/` | `GET` | Yes | Student | Returns student's semester course results and grade points |
+| `/api/academics/results/` | `POST` | Yes | Student | Creates an individual course grade record and recalculates metrics |
+| `/api/academics/results/<id>/` | `PUT` | Yes | Student | Updates an existing course result and recalculates metrics |
+| `/api/academics/results/<id>/` | `DELETE`| Yes | Student | Deletes a course result and recalculates metrics |
+| `/api/academics/results/import/` | `POST` | Yes | Student | Imports bulk grades from CSV text or uploaded file |
+| `/api/academics/results/sample-csv/`| `GET` | Yes | Student | Downloads sample CSV template for student grade import |
 | `/api/planner/cgpa/` | `POST` | No / Optional | Public/Student | Target CGPA simulator returning required upcoming SGPA and feasibility |
 | `/api/twin/simulate/` | `POST` | Yes | Student | Digital Twin Monte Carlo trajectory simulation (runs, expected CGPA, P10-P90) |
 | `/api/twin/next-moves/` | `GET` | Yes | Student | Impact ranking of arrear clearing on CGPA and placement eligibility |
-| `/api/tools/marks-target/` | `POST` | Yes (any role) | Student/Admin | Reverse marks calculator for required external exam score |
+| `/api/tools/marks-target/` | `POST` | Yes | Student | Reverse marks calculator for required external exam score |
 | `/api/skills/` | `GET` | Yes | Student | Credit-weighted skill mastery scores and company placement fit |
-| `/api/journey/` | `GET` | Yes | Student | Chronological academic milestone journey and earned/locked badges |
+| `/api/journey/` | `GET` | Yes | Student | Chronological academic milestone journey and 7 milestone badges |
 | `/api/placements/eligibility/` | `GET` | Yes | Student | Evaluates eligibility across all corporate placement drives |
 | `/api/advisor/chat/` | `GET`, `POST` | Yes | Student | Retrieves chat history (`GET`) or generates grounded AI advice (`POST`) |
 | `/api/advisor/history/` | `DELETE` | Yes | Student | Deletes student conversation history and creates an audit log |
-| `/api/faculty/overview/` | `GET` | Yes | Admin/Faculty | Department overview, total students, average CGPA, and metrics |
-| `/api/faculty/students/` | `GET` | Yes | Admin/Faculty | Searchable student directory with CGPA, credits, and backlogs |
-| `/api/faculty/results/upload/` | `POST` | Yes | Admin/Faculty | Ingests semester academic records and computes metrics atomically |
-| `/api/admin/drives/` | `GET` | Yes | Admin/Faculty | Campus placement drive listing with eligible candidate counts |
-| `/api/admin/drives/<id>/` | `GET` | Yes | Admin/Faculty | Detailed drive candidates (Eligible and Almost-Eligible) with gap analysis |
-| `/api/admin/drives/<id>/export/`| `GET` | Yes | Admin/Faculty | Exports drive candidate roster to CSV |
-| `/api/admin/grades/sample-csv/` | `GET` | Yes | Admin/Faculty | Downloads standard CSV grade entry template |
-| `/api/admin/grades/bulk-upload/` | `POST` | Yes | Admin/Faculty | Validates and ingests bulk grade CSV with detailed error report |
-| `/api/admin/analytics/` | `GET` | Yes | Admin/Faculty | Grade distribution, department CGPA, and predictive early-warning table |
-| `/api/transcript/pdf/` | `GET` | Yes | Student/Admin | Streams generated official academic PDF transcript with verification QR code |
+| `/api/transcript/pdf/` | `GET` | Yes | Student | Streams generated self-reported academic PDF transcript with verification QR code |
 | `/verify/<token>/` | `GET` | No | Public | HTML tamper-proof transcript verification portal |
 | `/api/verify/<token>/` | `GET` | No | Public | JSON tamper-proof transcript verification API endpoint |
 | `/api/health/` | `GET` | No | Public | Health check endpoint returning status 200 OK |
@@ -268,16 +264,16 @@ All modern API endpoints are registered in `core/urls.py` under `/api/` and enfo
 
 ## 🧪 Verification & Automated Test Suites
 
-EduGrade AI includes 146 automated tests across 18 specialized test suites:
+EduGrade AI includes 162 automated tests across 16 specialized test suites:
 
 ```bash
-# 1. Run all 146 Django unit and integration tests
+# 1. Run all 162 Django unit and integration tests
 python manage.py test
 
 # 2. Run test suite in reverse order
 python manage.py test --reverse
 
-# 3. Run end-to-end route, API and permission verification
+# 3. Run end-to-end route, API, and student isolation verification
 python test_routes.py
 
 # 4. Verify ReactPy host component mounting
@@ -292,8 +288,9 @@ python manage.py check_database
 ## 📌 Limitations & Assumptions
 
 1. **Digital Twin Simulator**: The simulation engine provides statistical projections based on past academic patterns and user-selected effort adjustments; it serves as an advisory estimate and does not guarantee academic outcomes.
-2. **Skill Mappings & Placement Criteria**: Default technical categories and company criteria represent sample institutional baselines. Faculty and administrators can configure both via Django Admin or custom management commands.
-3. **Voice Recognition**: Tamil and English voice input/output utilizes the standard browser Web Speech API (`webkitSpeechRecognition` / `speechSynthesis`). Functionality and accent accuracy depend on client browser and operating system support (Google Chrome recommended).
+2. **Skill Mappings & Placement Criteria**: Default technical categories and company criteria represent sample institutional baselines that can be configured via superuser admin or custom management commands.
+3. **Self-Reported Academic Data**: As a student portal, grades entered by students are classified as self-reported academic data on generated transcripts and verification gateways.
+4. **Voice Recognition**: Tamil and English voice input/output utilizes the standard browser Web Speech API (`webkitSpeechRecognition` / `speechSynthesis`). Functionality and accent accuracy depend on client browser and operating system support (Google Chrome recommended).
 
 ---
 

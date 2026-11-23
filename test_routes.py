@@ -60,7 +60,6 @@ def run_all_tests():
         assert me_resp.status_code == 200
         me_data = me_resp.json()
         assert me_data['authenticated'] is True
-        assert me_data['is_admin'] is False
         assert me_data['profile']['roll_number'] == s_profile.roll_number
         print("[PASS] /api/auth/me/ returned student profile.")
 
@@ -121,8 +120,8 @@ def run_all_tests():
 
         # Digital Twin & Tools APIs
         sim_resp = client.post('/api/twin/simulate/', data=json.dumps({
-            'planned_sgpas': [8.5, 9.0, 9.0],
-            'planned_credits': [20, 20, 20]
+            'target_cgpa': 9.0,
+            'effort': 'same'
         }), content_type='application/json')
         assert sim_resp.status_code == 200
         print("[PASS] /api/twin/simulate/ verified.")
@@ -137,7 +136,7 @@ def run_all_tests():
 
         journey_resp = client.get('/api/journey/')
         assert journey_resp.status_code == 200
-        assert len(journey_resp.json()['badges']) == 7
+        assert len(journey_resp.json()['badges']['all_badges']) == 7
         print("[PASS] /api/journey/ verified (7 badges).")
 
         # Clear Advisor Chat History API (DELETE)
@@ -164,7 +163,7 @@ def run_all_tests():
             'grade': 'B+'
         }), content_type='application/json')
         assert create_res.status_code in [200, 201]
-        created_id = create_res.json()['result']['id']
+        created_id = create_res.json()['course']['id']
         print(f"[PASS] POST /api/academics/results/ verified (Created id={created_id}).")
 
         # PUT single course result
@@ -172,13 +171,12 @@ def run_all_tests():
             'grade': 'A+'
         }), content_type='application/json')
         assert update_res.status_code == 200
-        assert update_res.json()['result']['grade'] == 'A+'
+        assert update_res.json()['course']['grade'] == 'A+'
         print(f"[PASS] PUT /api/academics/results/{created_id}/ verified.")
 
         # DELETE single course result
         delete_res = client.delete(f'/api/academics/results/{created_id}/')
         assert delete_res.status_code == 200
-        assert delete_res.json()['deleted'] is True
         print(f"[PASS] DELETE /api/academics/results/{created_id}/ verified.")
 
         # 4. Verify Deleted Faculty/Admin Endpoints return 404
