@@ -82,20 +82,7 @@ def LandingPage(set_page, set_auth_role=None, theme="dark", toggle_theme=None):
                         html.span({"className": "font-mono text-[10px] text-light-on-surface-variant uppercase tracking-wider leading-none mt-0.5"}, "INDUSTRIAL ACADEMIC INTELLIGENCE")
                     )
                 ),
-                # Nav links
-                html.nav(
-                    {"className": "hidden md:flex items-center gap-8 font-mono text-mono-sm uppercase text-light-on-surface-variant"},
-                    html.a({"href": "#features", "className": "hover:text-light-primary transition-colors"}, "Capabilities"),
-                    html.a({"href": "#workflow", "className": "hover:text-light-primary transition-colors"}, "Workflow"),
-                    html.a({"href": "#effect", "className": "hover:text-light-primary transition-colors"}, "Effect"),
-                    html.button(
-                        {
-                            "className": "hover:text-light-primary transition-colors uppercase font-mono text-mono-sm cursor-pointer",
-                            "on_click": lambda e: set_page("regulations")
-                        },
-                        "CBCS 2026 Spec"
-                    )
-                ),
+
                 # Actions & Theme Toggle
                 html.div(
                     {"className": "flex items-center gap-3"},
@@ -391,54 +378,11 @@ def LandingPage(set_page, set_auth_role=None, theme="dark", toggle_theme=None):
 
         # 5. Matte Carbon Dark Footer
         html.footer(
-            {"className": "bg-light-inverse-surface text-light-inverse-on-surface py-12 px-6"},
+            {"className": "bg-light-inverse-surface text-light-inverse-on-surface py-8 px-6"},
             html.div(
-                {"className": "max-w-[1440px] mx-auto flex flex-col gap-8"},
-                html.div(
-                    {"className": "flex flex-wrap items-center justify-between gap-4 border-b border-light-inverse-on-surface/20 pb-4"},
-                    html.span({"className": "font-mono text-mono-sm uppercase"}, "© EduGrade AI 2026 • Regulation CBCS"),
-                    html.a({"href": "#top", "className": "font-mono text-mono-sm uppercase hover:text-light-inverse-primary transition-colors"}, "Back to the Top ↑")
-                ),
-                html.div(
-                    {"className": "grid grid-cols-2 md:grid-cols-4 gap-6 font-mono text-mono-sm"},
-                    html.div(
-                        {"className": "flex flex-col gap-2"},
-                        html.span({"className": "text-light-inverse-on-surface/60 uppercase font-semibold"}, "Portal"),
-                        html.a({"href": "#features", "className": "hover:text-light-inverse-primary transition-colors"}, "Student Dashboard"),
-                        html.a({"href": "#workflow", "className": "hover:text-light-inverse-primary transition-colors"}, "CGPA Simulator"),
-                        html.a({"href": "#effect", "className": "hover:text-light-inverse-primary transition-colors"}, "Placement Matrix")
-                    ),
-                    html.div(
-                        {"className": "flex flex-col gap-2"},
-                        html.span({"className": "text-light-inverse-on-surface/60 uppercase font-semibold"}, "Institution"),
-                        html.button(
-                            {
-                                "className": "text-left hover:text-light-inverse-primary transition-colors cursor-pointer",
-                                "on_click": lambda e: set_page("regulations")
-                            },
-                            "CBCS 2026 Rules"
-                        ),
-                        html.button(
-                            {
-                                "className": "text-left hover:text-light-inverse-primary transition-colors cursor-pointer",
-                                "on_click": lambda e: go_to_login("admin")
-                            },
-                            "Faculty Admin"
-                        )
-                    ),
-                    html.div(
-                        {"className": "flex flex-col gap-2"},
-                        html.span({"className": "text-light-inverse-on-surface/60 uppercase font-semibold"}, "Languages"),
-                        html.span("English (EN)"),
-                        html.span("தமிழ் (Tamil)")
-                    ),
-                    html.div(
-                        {"className": "flex flex-col gap-2"},
-                        html.span({"className": "text-light-inverse-on-surface/60 uppercase font-semibold"}, "Scale"),
-                        html.span("O (10) → RA (0)"),
-                        html.span("Credits: 160 Total")
-                    )
-                )
+                {"className": "max-w-[1440px] mx-auto flex flex-wrap items-center justify-between gap-4 font-mono text-mono-sm uppercase text-light-inverse-on-surface/60"},
+                html.span("© EduGrade AI 2026 • Regulation CBCS"),
+                html.span("Industrial Academic Intelligence Platform")
             )
         )
     )
