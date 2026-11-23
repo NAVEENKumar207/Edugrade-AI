@@ -11,11 +11,11 @@ from core.models import (
     CourseResult, CompanyPlacementCriteria, AdvisorChatMessage, AcademicAuditLog
 )
 
-DEMO_USERNAMES = ['admin', 'student', 'priya']
+DEMO_USERNAMES = ['admin', 'student', 'priya', 'student01', 'admin01']
 
 
 class Command(BaseCommand):
-    help = "Safely removes demo accounts ('admin', 'student', 'priya') and their linked records."
+    help = "Safely removes demo accounts ('admin', 'student', 'priya', 'student01', 'admin01') and their linked records."
 
     def add_arguments(self, parser):
         parser.add_argument(

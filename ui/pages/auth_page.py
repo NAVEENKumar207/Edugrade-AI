@@ -7,7 +7,7 @@ Matches New Ui/authentication_login_signup/code.html.
 from django.conf import settings
 from reactpy import component, html, use_state
 from ui.components.theme_toggle import ThemeToggle
-from ui.services.data_service import authenticate_user, register_user
+from ui.services.data_service import authenticate_user, register_user, quick_demo_login
 
 @component
 def LoginPage(set_page, set_user, current_role='student', theme='dark', toggle_theme=None):
@@ -52,11 +52,24 @@ def LoginPage(set_page, set_user, current_role='student', theme='dark', toggle_t
     def handle_submit(e=None):
         do_login(username, password)
 
-    def fill_demo(u, p, r):
-        set_username(u)
-        set_password(p)
-        set_role(r)
-        do_login(u, p)
+    def handle_1click_demo(demo_role):
+        set_error("")
+        set_loading(True)
+        try:
+            demo_user, demo_err = quick_demo_login(demo_role)
+            if demo_user:
+                set_user(demo_user)
+                profile = getattr(demo_user, 'profile', None)
+                if profile and profile.is_admin():
+                    set_page("admin_dashboard")
+                else:
+                    set_page("dashboard")
+            else:
+                set_error(demo_err or "Unable to initialize demo account.")
+        except Exception as err:
+            set_error(f"Demo access error: {str(err)}")
+        finally:
+            set_loading(False)
 
     return html.div(
         {
@@ -198,29 +211,41 @@ def LoginPage(set_page, set_user, current_role='student', theme='dark', toggle_t
 
                 # 1-Click Demo Buttons (Only when DEBUG is True)
                 html.div(
-                    {"className": "p-3.5 bg-light-surface-container-low border border-light-outline-variant flex flex-col gap-2"},
+                    {"className": "p-3.5 bg-light-surface-container-low border border-light-outline-variant flex flex-col gap-2.5"},
                     html.div(
                         {"className": "flex items-center justify-between font-mono text-[11px] uppercase text-light-on-surface-variant"},
                         html.span({"className": "font-semibold flex items-center gap-1.5"}, html.span({"className": "material-symbols-outlined text-sm text-light-primary"}, "bolt"), "1-Click Demo Credentials (DEBUG Active)"),
-                        html.span("Pre-seeded")
+                        html.span({"className": "text-[10px] text-emerald-600 dark:text-emerald-400 font-bold"}, "● Auto Sign In")
                     ),
                     html.div(
                         {"className": "grid grid-cols-2 gap-2"},
                         html.button(
                             {
-                                "className": "px-3 py-1.5 bg-light-surface border border-light-outline-variant hover:border-light-primary font-mono text-[11px] uppercase text-left transition-colors cursor-pointer flex items-center justify-between",
-                                "on_click": lambda e: fill_demo("student01", "student123", "student")
+                                "type": "button",
+                                "disabled": loading,
+                                "className": "px-3 py-2 bg-light-surface border border-light-outline-variant hover:border-light-primary font-mono text-[11px] uppercase text-left transition-colors cursor-pointer flex items-center justify-between shadow-sm",
+                                "on_click": lambda e: handle_1click_demo("student")
                             },
-                            html.span("Demo Student"),
-                            html.span({"className": "text-[10px] text-light-primary font-bold"}, "FILL →")
+                            html.div(
+                                {"className": "flex flex-col"},
+                                html.span({"className": "font-bold text-light-on-surface"}, "Demo Student"),
+                                html.span({"className": "text-[10px] text-light-on-surface-variant lowercase"}, "student01")
+                            ),
+                            html.span({"className": "text-[10px] font-bold text-light-primary px-2 py-0.5 bg-light-primary/10 rounded"}, "SIGN IN ⚡")
                         ),
                         html.button(
                             {
-                                "className": "px-3 py-1.5 bg-light-surface border border-light-outline-variant hover:border-light-primary font-mono text-[11px] uppercase text-left transition-colors cursor-pointer flex items-center justify-between",
-                                "on_click": lambda e: fill_demo("admin01", "admin123", "admin")
+                                "type": "button",
+                                "disabled": loading,
+                                "className": "px-3 py-2 bg-light-surface border border-light-outline-variant hover:border-light-primary font-mono text-[11px] uppercase text-left transition-colors cursor-pointer flex items-center justify-between shadow-sm",
+                                "on_click": lambda e: handle_1click_demo("admin")
                             },
-                            html.span("Demo Faculty"),
-                            html.span({"className": "text-[10px] text-light-primary font-bold"}, "FILL →")
+                            html.div(
+                                {"className": "flex flex-col"},
+                                html.span({"className": "font-bold text-light-on-surface"}, "Demo Faculty"),
+                                html.span({"className": "text-[10px] text-light-on-surface-variant lowercase"}, "admin01")
+                            ),
+                            html.span({"className": "text-[10px] font-bold text-light-primary px-2 py-0.5 bg-light-primary/10 rounded"}, "SIGN IN ⚡")
                         )
                     )
                 ) if is_debug else None,
@@ -343,6 +368,27 @@ def SignupPage(set_page, set_user, current_role='student', theme='dark', toggle_
     show_password, set_show_password = use_state(False)
     error, set_error = use_state("")
     loading, set_loading = use_state(False)
+
+    is_debug = getattr(settings, 'DEBUG', False)
+
+    def handle_1click_demo(demo_role):
+        set_error("")
+        set_loading(True)
+        try:
+            demo_user, demo_err = quick_demo_login(demo_role)
+            if demo_user:
+                set_user(demo_user)
+                profile = getattr(demo_user, 'profile', None)
+                if profile and profile.is_admin():
+                    set_page("admin_dashboard")
+                else:
+                    set_page("dashboard")
+            else:
+                set_error(demo_err or "Unable to initialize demo account.")
+        except Exception as err:
+            set_error(f"Demo access error: {str(err)}")
+        finally:
+            set_loading(False)
 
     def handle_signup(e=None):
         set_error("")
@@ -496,6 +542,47 @@ def SignupPage(set_page, set_user, current_role='student', theme='dark', toggle_
                         html.span({"className": "text-sm font-bold"}, "Faculty / Admin")
                     )
                 ),
+
+                # 1-Click Demo Buttons (Only when DEBUG is True)
+                html.div(
+                    {"className": "p-3.5 bg-light-surface-container-low border border-light-outline-variant flex flex-col gap-2.5"},
+                    html.div(
+                        {"className": "flex items-center justify-between font-mono text-[11px] uppercase text-light-on-surface-variant"},
+                        html.span({"className": "font-semibold flex items-center gap-1.5"}, html.span({"className": "material-symbols-outlined text-sm text-light-primary"}, "bolt"), "1-Click Demo Credentials (DEBUG Active)"),
+                        html.span({"className": "text-[10px] text-emerald-600 dark:text-emerald-400 font-bold"}, "● Auto Sign In")
+                    ),
+                    html.div(
+                        {"className": "grid grid-cols-2 gap-2"},
+                        html.button(
+                            {
+                                "type": "button",
+                                "disabled": loading,
+                                "className": "px-3 py-2 bg-light-surface border border-light-outline-variant hover:border-light-primary font-mono text-[11px] uppercase text-left transition-colors cursor-pointer flex items-center justify-between shadow-sm",
+                                "on_click": lambda e: handle_1click_demo("student")
+                            },
+                            html.div(
+                                {"className": "flex flex-col"},
+                                html.span({"className": "font-bold text-light-on-surface"}, "Demo Student"),
+                                html.span({"className": "text-[10px] text-light-on-surface-variant lowercase"}, "student01")
+                            ),
+                            html.span({"className": "text-[10px] font-bold text-light-primary px-2 py-0.5 bg-light-primary/10 rounded"}, "SIGN IN ⚡")
+                        ),
+                        html.button(
+                            {
+                                "type": "button",
+                                "disabled": loading,
+                                "className": "px-3 py-2 bg-light-surface border border-light-outline-variant hover:border-light-primary font-mono text-[11px] uppercase text-left transition-colors cursor-pointer flex items-center justify-between shadow-sm",
+                                "on_click": lambda e: handle_1click_demo("admin")
+                            },
+                            html.div(
+                                {"className": "flex flex-col"},
+                                html.span({"className": "font-bold text-light-on-surface"}, "Demo Faculty"),
+                                html.span({"className": "text-[10px] text-light-on-surface-variant lowercase"}, "admin01")
+                            ),
+                            html.span({"className": "text-[10px] font-bold text-light-primary px-2 py-0.5 bg-light-primary/10 rounded"}, "SIGN IN ⚡")
+                        )
+                    )
+                ) if is_debug else None,
 
                 # Error Alert
                 html.div(

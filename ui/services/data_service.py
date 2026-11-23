@@ -31,6 +31,149 @@ def is_debug_mode():
     """Returns True if Django DEBUG is active (used by UI for demo shortcuts)."""
     return getattr(settings, 'DEBUG', False)
 
+def quick_demo_login(role='student'):
+    """
+    1-Click Demo Access for development / DEBUG mode.
+    Auto-provisions the demo account (with realistic semester results and telemetry)
+    if it does not yet exist, and logs in immediately without manual credential entry.
+    """
+    username = 'student01' if role == 'student' else 'admin01'
+    password = 'student123' if role == 'student' else 'admin123'
+
+    user = User.objects.filter(username=username).first()
+    if not user:
+        with transaction.atomic():
+            if role == 'student':
+                user = User.objects.create_user(
+                    username='student01',
+                    password='student123',
+                    email='student01@edugrade.ai',
+                    first_name='Kavitha',
+                    last_name='Ramesh',
+                    is_staff=False
+                )
+                profile = UserProfile.objects.create(
+                    user=user,
+                    role='student',
+                    roll_number='717622CS041',
+                    department='Computer Science & Engineering',
+                    current_semester=6,
+                    current_cgpa=8.42,
+                    target_cgpa=9.00,
+                    credits_earned=88,
+                    total_credits=160,
+                    backlogs_count=0,
+                    is_placement_eligible=True
+                )
+                sample_courses = [
+                    (1, "CS101", "Problem Solving & Python Programming", 4, "A+", 9.0),
+                    (1, "MA101", "Matrices and Calculus", 4, "A", 8.0),
+                    (1, "PH101", "Engineering Physics", 3, "A", 8.0),
+                    (1, "CY101", "Engineering Chemistry", 3, "B+", 7.0),
+                    (1, "GE101", "Engineering Graphics", 4, "A", 8.0),
+                    (1, "GE102", "Python Programming Lab", 2, "O", 10.0),
+                    (1, "BS101", "Physics & Chemistry Lab", 2, "O", 10.0),
+
+                    (2, "CS201", "Data Structures", 4, "A+", 9.0),
+                    (2, "MA201", "Statistics and Linear Algebra", 4, "A", 8.0),
+                    (2, "CS202", "Digital Principles & System Design", 3, "A", 8.0),
+                    (2, "CS203", "Programming in C", 3, "A+", 9.0),
+                    (2, "GE201", "Environmental Science", 3, "B+", 7.0),
+                    (2, "CS204", "Data Structures Lab", 2, "O", 10.0),
+                    (2, "CS205", "C Programming Lab", 2, "O", 10.0),
+
+                    (3, "CS301", "Design and Analysis of Algorithms", 4, "A+", 9.0),
+                    (3, "CS302", "Database Management Systems", 4, "O", 10.0),
+                    (3, "CS303", "Operating Systems", 3, "A", 8.0),
+                    (3, "MA301", "Discrete Mathematics", 4, "B+", 7.0),
+                    (3, "CS304", "Software Engineering", 3, "A", 8.0),
+                    (3, "CS305", "DBMS Laboratory", 2, "O", 10.0),
+                    (3, "CS306", "Operating Systems Lab", 2, "A+", 9.0),
+
+                    (4, "CS401", "Computer Networks", 4, "A", 8.0),
+                    (4, "CS402", "Object Oriented Analysis & Design", 3, "A", 8.0),
+                    (4, "CS403", "Theory of Computation", 4, "B+", 7.0),
+                    (4, "CS404", "Artificial Intelligence & ML", 4, "O", 10.0),
+                    (4, "CS405", "Web Technology", 3, "A+", 9.0),
+                    (4, "CS406", "Networks & Web Lab", 2, "O", 10.0),
+                    (4, "CS407", "AI & ML Laboratory", 2, "O", 10.0),
+                ]
+                sem_totals = {}
+                for s_num, code, name, cr, gr, gp in sample_courses:
+                    if s_num not in sem_totals:
+                        sem_totals[s_num] = {'points': 0.0, 'credits': 0}
+                    sem_totals[s_num]['points'] += float(gp) * cr
+                    sem_totals[s_num]['credits'] += cr
+
+                for s_num, totals in sem_totals.items():
+                    sgpa = round(totals['points'] / totals['credits'], 2) if totals['credits'] > 0 else 8.0
+                    sem_rec, _ = SemesterRecord.objects.get_or_create(
+                        student=profile,
+                        semester_number=s_num,
+                        defaults={'sgpa': sgpa, 'credits_earned': totals['credits'], 'is_published': True}
+                    )
+                    for sem_n, code, name, cr, gp_grade, gp in sample_courses:
+                        if sem_n == s_num:
+                            CourseResult.objects.create(
+                                student=profile,
+                                semester_record=sem_rec,
+                                semester_number=s_num,
+                                course_code=code,
+                                course_name=name,
+                                credits=cr,
+                                grade=gp_grade,
+                                grade_point=gp,
+                                is_published=True
+                            )
+                SubjectInsight.objects.get_or_create(
+                    student=profile,
+                    subject_name="Database Management Systems",
+                    defaults={'grade_point': 10.0, 'status_label': 'Strong'}
+                )
+                SubjectInsight.objects.get_or_create(
+                    student=profile,
+                    subject_name="Artificial Intelligence & ML",
+                    defaults={'grade_point': 10.0, 'status_label': 'Strong'}
+                )
+                SubjectInsight.objects.get_or_create(
+                    student=profile,
+                    subject_name="Data Structures",
+                    defaults={'grade_point': 9.0, 'status_label': 'Strong'}
+                )
+                SubjectInsight.objects.get_or_create(
+                    student=profile,
+                    subject_name="Theory of Computation",
+                    defaults={'grade_point': 7.0, 'status_label': 'Good'}
+                )
+            else:
+                user = User.objects.create_user(
+                    username='admin01',
+                    password='admin123',
+                    email='admin01@edugrade.ai',
+                    first_name='Dr. Arumugam',
+                    last_name='K.',
+                    is_staff=True
+                )
+                UserProfile.objects.create(
+                    user=user,
+                    role='admin',
+                    roll_number='FAC-CSE01',
+                    department='Computer Science & Engineering',
+                    current_semester=1,
+                    current_cgpa=0.0,
+                    target_cgpa=9.0,
+                    credits_earned=0,
+                    total_credits=160
+                )
+    else:
+        if not user.check_password(password):
+            user.set_password(password)
+            user.save()
+
+    reset_login_attempts(username)
+    auth_user = authenticate(username=username, password=password)
+    return (auth_user or user), None
+
 def authenticate_user(username, password):
     """Authenticates username and password with attempt limiting. Returns (user, error_message)."""
     clean_username = (username or '').strip()
