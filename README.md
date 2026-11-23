@@ -244,7 +244,7 @@ All modern API endpoints are registered in `core/urls.py` under `/api/` and enfo
 | `/api/planner/cgpa/` | `POST` | No / Optional | Public/Student | Target CGPA simulator returning required upcoming SGPA and feasibility |
 | `/api/twin/simulate/` | `POST` | Yes | Student | Digital Twin Monte Carlo trajectory simulation (runs, expected CGPA, P10-P90) |
 | `/api/twin/next-moves/` | `GET` | Yes | Student | Impact ranking of arrear clearing on CGPA and placement eligibility |
-| `/api/tools/marks-target/` | `POST` | No / Optional | Public/Student | Reverse marks calculator for required external exam score |
+| `/api/tools/marks-target/` | `POST` | Yes (any role) | Student/Admin | Reverse marks calculator for required external exam score |
 | `/api/skills/` | `GET` | Yes | Student | Credit-weighted skill mastery scores and company placement fit |
 | `/api/journey/` | `GET` | Yes | Student | Chronological academic milestone journey and earned/locked badges |
 | `/api/placements/eligibility/` | `GET` | Yes | Student | Evaluates eligibility across all corporate placement drives |

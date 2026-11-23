@@ -2,12 +2,17 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 from rest_framework.test import APIClient
 from rest_framework import status
+from core.models import UserProfile
 from core.services.academic_service import required_marks, evaluate_expected_marks
 
 class MarksTargetCalculatorTests(TestCase):
     def setUp(self):
         self.client = APIClient()
-        self.user = User.objects.create_user(username='marks_user', password='password123')
+        self.student_user = User.objects.create_user(username='student_marks', password='password123')
+        self.student_profile = UserProfile.objects.create(user=self.student_user, role='student')
+
+        self.faculty_user = User.objects.create_user(username='faculty_marks', password='password123', is_staff=True)
+        self.faculty_profile = UserProfile.objects.create(user=self.faculty_user, role='admin')
 
     def test_example_1_internal_36_target_A_plus(self):
         # internal 36, target A+ -> needed total 81 -> paper 75
@@ -53,15 +58,54 @@ class MarksTargetCalculatorTests(TestCase):
         self.assertFalse(res["passed_external"])
         self.assertIn("minimum passing threshold", res["message"])
 
-    def test_api_marks_target_endpoint_both_modes(self):
-        self.client.force_authenticate(user=self.user)
+    def test_anonymous_request_rejected_on_both_modes(self):
+        # Anonymous client (not authenticated)
+        anon_client = APIClient()
 
-        # Mode A: Target Grade
-        resp_a = self.client.post('/api/tools/marks-target/', {'internal': 36, 'target_grade': 'A+'})
-        self.assertEqual(resp_a.status_code, status.HTTP_200_OK)
-        self.assertEqual(resp_a.data["required_paper"], 75)
+        # Mode A: Target mode
+        resp_a = anon_client.post('/api/tools/marks-target/', {'internal': 36, 'target_grade': 'A+'})
+        self.assertIn(resp_a.status_code, [status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN])
 
-        # Mode B: Expected Marks
-        resp_b = self.client.post('/api/tools/marks-target/', {'internal': 36, 'paper_marks': 75, 'mode': 'expected'})
-        self.assertEqual(resp_b.status_code, status.HTTP_200_OK)
-        self.assertEqual(resp_b.data["grade"], "A+")
+        # Mode B: Expected mode
+        resp_b = anon_client.post('/api/tools/marks-target/', {'internal': 36, 'paper_marks': 75, 'mode': 'expected'})
+        self.assertIn(resp_b.status_code, [status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN])
+
+    def test_student_and_faculty_both_succeed_with_valid_input(self):
+        # Student user
+        self.client.force_authenticate(user=self.student_user)
+        resp_s_target = self.client.post('/api/tools/marks-target/', {'internal': 36, 'target_grade': 'A+'})
+        self.assertEqual(resp_s_target.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp_s_target.data["required_paper"], 75)
+
+        resp_s_exp = self.client.post('/api/tools/marks-target/', {'internal': 36, 'paper_marks': 75, 'mode': 'expected'})
+        self.assertEqual(resp_s_exp.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp_s_exp.data["grade"], "A+")
+
+        # Faculty user
+        self.client.force_authenticate(user=self.faculty_user)
+        resp_f_target = self.client.post('/api/tools/marks-target/', {'internal': 36, 'target_grade': 'A+'})
+        self.assertEqual(resp_f_target.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp_f_target.data["required_paper"], 75)
+
+        resp_f_exp = self.client.post('/api/tools/marks-target/', {'internal': 36, 'paper_marks': 75, 'mode': 'expected'})
+        self.assertEqual(resp_f_exp.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp_f_exp.data["grade"], "A+")
+
+    def test_invalid_input_returns_400(self):
+        self.client.force_authenticate(user=self.student_user)
+
+        # Missing internal
+        resp_missing = self.client.post('/api/tools/marks-target/', {'target_grade': 'A+'})
+        self.assertEqual(resp_missing.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Invalid target grade
+        resp_inv_grade = self.client.post('/api/tools/marks-target/', {'internal': 36, 'target_grade': 'INVALID'})
+        self.assertEqual(resp_inv_grade.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Internal out of range (>40)
+        resp_out_range = self.client.post('/api/tools/marks-target/', {'internal': 45, 'target_grade': 'A+'})
+        self.assertEqual(resp_out_range.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Expected mode with missing paper_marks
+        resp_no_paper = self.client.post('/api/tools/marks-target/', {'internal': 36, 'mode': 'expected'})
+        self.assertEqual(resp_no_paper.status_code, status.HTTP_400_BAD_REQUEST)
