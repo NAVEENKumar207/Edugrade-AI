@@ -8,9 +8,8 @@ from reactpy import component, html
 from ui.components.icons import icon_sun, icon_moon
 
 @component
-def ThemeToggle(theme="dark", toggle_theme=None, compact=True, style=None):
+def ThemeToggle(theme="light", toggle_theme=None, compact=True, style=None):
     base_style = {
-        "display": "inline-flex",
         "alignItems": "center",
         "justifyContent": "center",
         "cursor": "pointer",
@@ -27,9 +26,11 @@ def ThemeToggle(theme="dark", toggle_theme=None, compact=True, style=None):
     if compact:
         return html.button(
             {
+                "type": "button",
                 "className": "theme-toggle-btn compact",
                 "title": "Switch Light / Dark Theme",
                 "aria-label": "Switch Light / Dark Theme",
+                "data-theme-toggle": "true",
                 "style": base_style,
                 "on_click": handle_click,
             },
@@ -37,7 +38,6 @@ def ThemeToggle(theme="dark", toggle_theme=None, compact=True, style=None):
                 {
                     "className": "theme-icon-wrapper theme-icon-sun",
                     "style": {
-                        "display": "flex",
                         "alignItems": "center",
                         "justifyContent": "center",
                         "transition": "transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)",
@@ -49,7 +49,6 @@ def ThemeToggle(theme="dark", toggle_theme=None, compact=True, style=None):
                 {
                     "className": "theme-icon-wrapper theme-icon-moon",
                     "style": {
-                        "display": "flex",
                         "alignItems": "center",
                         "justifyContent": "center",
                         "transition": "transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)",
@@ -62,23 +61,25 @@ def ThemeToggle(theme="dark", toggle_theme=None, compact=True, style=None):
     # Expanded / Pill Toggle
     return html.button(
         {
+            "type": "button",
             "className": "theme-toggle-btn pill",
             "title": "Switch Light / Dark Theme",
             "aria-label": "Switch Light / Dark Theme",
+            "data-theme-toggle": "true",
             "style": base_style,
             "on_click": handle_click,
         },
         html.span(
             {
                 "className": "theme-toggle-icon theme-icon-sun",
-                "style": {"display": "flex", "alignItems": "center", "marginRight": "0.45rem"}
+                "style": {"alignItems": "center", "marginRight": "0.45rem"}
             },
             icon_sun(16, "#F59E0B")
         ),
         html.span(
             {
                 "className": "theme-toggle-icon theme-icon-moon",
-                "style": {"display": "flex", "alignItems": "center", "marginRight": "0.45rem"}
+                "style": {"alignItems": "center", "marginRight": "0.45rem"}
             },
             icon_moon(16, "#6366F1")
         ),

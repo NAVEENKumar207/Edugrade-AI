@@ -155,20 +155,40 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 7. Global Theme Toggle Initialization
     const initTheme = () => {
-        const savedTheme = localStorage.getItem('edugrade_theme') || 'dark';
+        const savedTheme = localStorage.getItem('edugrade_theme') || 'light';
         document.documentElement.setAttribute('data-theme', savedTheme);
+        if (savedTheme === 'dark') {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
         if (document.body) {
             document.body.setAttribute('data-theme', savedTheme);
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark');
+            } else {
+                document.body.classList.remove('dark');
+            }
         }
         updateThemeToggleIcons(savedTheme);
     };
 
     const toggleTheme = () => {
-        const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+        const currentTheme = document.documentElement.getAttribute('data-theme') || (document.documentElement.classList.contains('dark') ? 'dark' : 'light');
         const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
         document.documentElement.setAttribute('data-theme', newTheme);
+        if (newTheme === 'dark') {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
         if (document.body) {
             document.body.setAttribute('data-theme', newTheme);
+            if (newTheme === 'dark') {
+                document.body.classList.add('dark');
+            } else {
+                document.body.classList.remove('dark');
+            }
         }
         try {
             localStorage.setItem('edugrade_theme', newTheme);

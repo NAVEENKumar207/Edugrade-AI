@@ -26,6 +26,83 @@
         }
     </style>
 
+    <!-- Semantic Theme Color Tokens (Dynamic CSS Custom Properties for Light & Dark) -->
+    <style id="theme-color-variables">
+        :root, [data-theme="light"], .theme-light {
+            --color-primary: 200 30 6;
+            --color-on-primary: 255 255 255;
+            --color-primary-container: 255 51 22;
+            --color-on-primary-container: 27 4 1;
+            --color-secondary: 27 4 1;
+            --color-on-secondary: 255 255 255;
+            --color-secondary-container: 230 229 229;
+            --color-on-secondary-container: 27 4 1;
+            --color-tertiary: 135 45 0;
+            --color-on-tertiary: 255 255 255;
+            --color-tertiary-container: 255 223 215;
+            --color-on-tertiary-container: 27 4 1;
+            --color-error: 186 26 26;
+            --color-on-error: 255 255 255;
+            --color-error-container: 255 218 214;
+            --color-on-error-container: 147 0 10;
+            --color-background: 255 255 255;
+            --color-on-background: 27 4 1;
+            --color-surface: 255 255 255;
+            --color-surface-dim: 212 210 210;
+            --color-surface-bright: 255 255 255;
+            --color-surface-container-lowest: 255 255 255;
+            --color-surface-container-low: 242 241 241;
+            --color-surface-container: 234 233 233;
+            --color-surface-container-high: 224 223 223;
+            --color-surface-container-highest: 212 210 210;
+            --color-on-surface: 27 4 1;
+            --color-surface-variant: 234 233 233;
+            --color-on-surface-variant: 74 57 55;
+            --color-outline: 110 90 87;
+            --color-outline-variant: 212 208 207;
+            --color-inverse-surface: 17 17 17;
+            --color-inverse-on-surface: 255 255 255;
+            --color-inverse-primary: 255 51 22;
+        }
+
+        html.dark, html[data-theme="dark"], body.dark, body[data-theme="dark"], [data-theme="dark"], .theme-dark, .dark {
+            --color-primary: 255 107 84;
+            --color-on-primary: 27 4 1;
+            --color-primary-container: 255 51 22;
+            --color-on-primary-container: 27 4 1;
+            --color-secondary: 234 233 233;
+            --color-on-secondary: 27 4 1;
+            --color-secondary-container: 42 36 35;
+            --color-on-secondary-container: 255 255 255;
+            --color-tertiary: 255 181 154;
+            --color-on-tertiary: 27 4 1;
+            --color-tertiary-container: 135 45 0;
+            --color-on-tertiary-container: 255 255 255;
+            --color-error: 255 180 171;
+            --color-on-error: 105 0 5;
+            --color-error-container: 147 0 10;
+            --color-on-error-container: 255 218 214;
+            --color-background: 17 17 17;
+            --color-on-background: 255 255 255;
+            --color-surface: 17 17 17;
+            --color-surface-dim: 10 10 10;
+            --color-surface-bright: 42 36 35;
+            --color-surface-container-lowest: 17 17 17;
+            --color-surface-container-low: 27 4 1;
+            --color-surface-container: 36 25 23;
+            --color-surface-container-high: 46 34 32;
+            --color-surface-container-highest: 58 45 43;
+            --color-on-surface: 255 255 255;
+            --color-surface-variant: 46 34 32;
+            --color-on-surface-variant: 212 208 207;
+            --color-outline: 158 149 148;
+            --color-outline-variant: 58 45 43;
+            --color-inverse-surface: 255 255 255;
+            --color-inverse-on-surface: 27 4 1;
+            --color-inverse-primary: 200 30 6;
+        }
+    </style>
+
     <!-- Tailwind CSS with Forms & Container Queries plugins -->
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script id="tailwind-config">
@@ -39,40 +116,40 @@
                         'on-success': '#FFFFFF',
                         'warning': '#9A4A00',
                         'on-warning': '#FFFFFF',
-                        'light-primary': '#C81E06',
-                        'light-on-primary': '#FFFFFF',
-                        'light-primary-container': '#FF3316',
-                        'light-on-primary-container': '#1B0401',
-                        'light-secondary': '#1B0401',
-                        'light-on-secondary': '#FFFFFF',
-                        'light-secondary-container': '#E6E5E5',
-                        'light-on-secondary-container': '#1B0401',
-                        'light-tertiary': '#872D00',
-                        'light-on-tertiary': '#FFFFFF',
-                        'light-tertiary-container': '#FFDFD7',
-                        'light-on-tertiary-container': '#1B0401',
-                        'light-error': '#BA1A1A',
-                        'light-on-error': '#FFFFFF',
-                        'light-error-container': '#FFDAD6',
-                        'light-on-error-container': '#93000A',
-                        'light-background': '#FFFFFF',
-                        'light-on-background': '#1B0401',
-                        'light-surface': '#FFFFFF',
-                        'light-surface-dim': '#D4D2D2',
-                        'light-surface-bright': '#FFFFFF',
-                        'light-surface-container-lowest': '#FFFFFF',
-                        'light-surface-container-low': '#F2F1F1',
-                        'light-surface-container': '#EAE9E9',
-                        'light-surface-container-high': '#E0DFDF',
-                        'light-surface-container-highest': '#D4D2D2',
-                        'light-on-surface': '#1B0401',
-                        'light-surface-variant': '#EAE9E9',
-                        'light-on-surface-variant': '#4A3937',
-                        'light-outline': '#6E5A57',
-                        'light-outline-variant': '#D4D0CF',
-                        'light-inverse-surface': '#111111',
-                        'light-inverse-on-surface': '#FFFFFF',
-                        'light-inverse-primary': '#FF3316',
+                        'light-primary': 'rgb(var(--color-primary) / <alpha-value>)',
+                        'light-on-primary': 'rgb(var(--color-on-primary) / <alpha-value>)',
+                        'light-primary-container': 'rgb(var(--color-primary-container) / <alpha-value>)',
+                        'light-on-primary-container': 'rgb(var(--color-on-primary-container) / <alpha-value>)',
+                        'light-secondary': 'rgb(var(--color-secondary) / <alpha-value>)',
+                        'light-on-secondary': 'rgb(var(--color-on-secondary) / <alpha-value>)',
+                        'light-secondary-container': 'rgb(var(--color-secondary-container) / <alpha-value>)',
+                        'light-on-secondary-container': 'rgb(var(--color-on-secondary-container) / <alpha-value>)',
+                        'light-tertiary': 'rgb(var(--color-tertiary) / <alpha-value>)',
+                        'light-on-tertiary': 'rgb(var(--color-on-tertiary) / <alpha-value>)',
+                        'light-tertiary-container': 'rgb(var(--color-tertiary-container) / <alpha-value>)',
+                        'light-on-tertiary-container': 'rgb(var(--color-on-tertiary-container) / <alpha-value>)',
+                        'light-error': 'rgb(var(--color-error) / <alpha-value>)',
+                        'light-on-error': 'rgb(var(--color-on-error) / <alpha-value>)',
+                        'light-error-container': 'rgb(var(--color-error-container) / <alpha-value>)',
+                        'light-on-error-container': 'rgb(var(--color-on-error-container) / <alpha-value>)',
+                        'light-background': 'rgb(var(--color-background) / <alpha-value>)',
+                        'light-on-background': 'rgb(var(--color-on-background) / <alpha-value>)',
+                        'light-surface': 'rgb(var(--color-surface) / <alpha-value>)',
+                        'light-surface-dim': 'rgb(var(--color-surface-dim) / <alpha-value>)',
+                        'light-surface-bright': 'rgb(var(--color-surface-bright) / <alpha-value>)',
+                        'light-surface-container-lowest': 'rgb(var(--color-surface-container-lowest) / <alpha-value>)',
+                        'light-surface-container-low': 'rgb(var(--color-surface-container-low) / <alpha-value>)',
+                        'light-surface-container': 'rgb(var(--color-surface-container) / <alpha-value>)',
+                        'light-surface-container-high': 'rgb(var(--color-surface-container-high) / <alpha-value>)',
+                        'light-surface-container-highest': 'rgb(var(--color-surface-container-highest) / <alpha-value>)',
+                        'light-on-surface': 'rgb(var(--color-on-surface) / <alpha-value>)',
+                        'light-surface-variant': 'rgb(var(--color-surface-variant) / <alpha-value>)',
+                        'light-on-surface-variant': 'rgb(var(--color-on-surface-variant) / <alpha-value>)',
+                        'light-outline': 'rgb(var(--color-outline) / <alpha-value>)',
+                        'light-outline-variant': 'rgb(var(--color-outline-variant) / <alpha-value>)',
+                        'light-inverse-surface': 'rgb(var(--color-inverse-surface) / <alpha-value>)',
+                        'light-inverse-on-surface': 'rgb(var(--color-inverse-on-surface) / <alpha-value>)',
+                        'light-inverse-primary': 'rgb(var(--color-inverse-primary) / <alpha-value>)',
                         'dark-primary': '#FF6B54',
                         'dark-on-primary': '#1B0401',
                         'dark-primary-container': '#FF3316',
@@ -173,7 +250,11 @@
             try {
                 var saved = localStorage.getItem('edugrade_theme') || 'light';
                 document.documentElement.setAttribute('data-theme', saved);
-                document.documentElement.className = saved === 'dark' ? 'dark' : '';
+                if (saved === 'dark') {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
             } catch (e) {}
         })();
 
@@ -193,16 +274,25 @@
                     document.body.classList.remove('dark');
                 }
             }
+            var rootEl = document.getElementById('app-root');
+            if (rootEl) {
+                rootEl.setAttribute('data-theme', newTheme);
+                if (newTheme === 'dark') {
+                    rootEl.classList.add('dark');
+                } else {
+                    rootEl.classList.remove('dark');
+                }
+            }
             try {
                 localStorage.setItem('edugrade_theme', newTheme);
             } catch (e) {}
         }
 
-        // 3. Instant UI Toggle Interceptor
+        // 3. Instant UI Toggle Interceptor (Delegated globally)
         document.addEventListener('click', function(e) {
-            var btn = e.target.closest('.theme-toggle-btn');
+            var btn = e.target.closest('.theme-toggle-btn, .legacy-theme-toggle, [data-theme-toggle], #theme-toggle, #theme-toggle-top');
             if (btn) {
-                var current = document.documentElement.getAttribute('data-theme') || 'light';
+                var current = document.documentElement.getAttribute('data-theme') || (document.documentElement.classList.contains('dark') ? 'dark' : 'light');
                 var next = current === 'dark' ? 'light' : 'dark';
                 setGlobalTheme(next);
             }

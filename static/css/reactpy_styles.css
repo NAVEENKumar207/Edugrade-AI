@@ -8,6 +8,42 @@
 :root,
 [data-theme="light"],
 .theme-light {
+  /* Dynamic Tailwind Semantic Color RGB Channels */
+  --color-primary: 200 30 6;
+  --color-on-primary: 255 255 255;
+  --color-primary-container: 255 51 22;
+  --color-on-primary-container: 27 4 1;
+  --color-secondary: 27 4 1;
+  --color-on-secondary: 255 255 255;
+  --color-secondary-container: 230 229 229;
+  --color-on-secondary-container: 27 4 1;
+  --color-tertiary: 135 45 0;
+  --color-on-tertiary: 255 255 255;
+  --color-tertiary-container: 255 223 215;
+  --color-on-tertiary-container: 27 4 1;
+  --color-error: 186 26 26;
+  --color-on-error: 255 255 255;
+  --color-error-container: 255 218 214;
+  --color-on-error-container: 147 0 10;
+  --color-background: 255 255 255;
+  --color-on-background: 27 4 1;
+  --color-surface: 255 255 255;
+  --color-surface-dim: 212 210 210;
+  --color-surface-bright: 255 255 255;
+  --color-surface-container-lowest: 255 255 255;
+  --color-surface-container-low: 242 241 241;
+  --color-surface-container: 234 233 233;
+  --color-surface-container-high: 224 223 223;
+  --color-surface-container-highest: 212 210 210;
+  --color-on-surface: 27 4 1;
+  --color-surface-variant: 234 233 233;
+  --color-on-surface-variant: 74 57 55;
+  --color-outline: 110 90 87;
+  --color-outline-variant: 212 208 207;
+  --color-inverse-surface: 17 17 17;
+  --color-inverse-on-surface: 255 255 255;
+  --color-inverse-primary: 255 51 22;
+
   /* Concrete Gray & Crisp Architectural Canvas */
   --bg-app: #F2F1F1;
   --bg-primary: #FFFFFF;
@@ -79,7 +115,45 @@
 
 [data-theme="dark"],
 .theme-dark,
-.dark {
+.dark,
+html.dark,
+html[data-theme="dark"] {
+  /* Dynamic Tailwind Semantic Color RGB Channels (Dark Mode) */
+  --color-primary: 255 107 84;
+  --color-on-primary: 27 4 1;
+  --color-primary-container: 255 51 22;
+  --color-on-primary-container: 27 4 1;
+  --color-secondary: 234 233 233;
+  --color-on-secondary: 27 4 1;
+  --color-secondary-container: 42 36 35;
+  --color-on-secondary-container: 255 255 255;
+  --color-tertiary: 255 181 154;
+  --color-on-tertiary: 27 4 1;
+  --color-tertiary-container: 135 45 0;
+  --color-on-tertiary-container: 255 255 255;
+  --color-error: 255 180 171;
+  --color-on-error: 105 0 5;
+  --color-error-container: 147 0 10;
+  --color-on-error-container: 255 218 214;
+  --color-background: 17 17 17;
+  --color-on-background: 255 255 255;
+  --color-surface: 17 17 17;
+  --color-surface-dim: 10 10 10;
+  --color-surface-bright: 42 36 35;
+  --color-surface-container-lowest: 17 17 17;
+  --color-surface-container-low: 27 4 1;
+  --color-surface-container: 36 25 23;
+  --color-surface-container-high: 46 34 32;
+  --color-surface-container-highest: 58 45 43;
+  --color-on-surface: 255 255 255;
+  --color-surface-variant: 46 34 32;
+  --color-on-surface-variant: 212 208 207;
+  --color-outline: 158 149 148;
+  --color-outline-variant: 58 45 43;
+  --color-inverse-surface: 255 255 255;
+  --color-inverse-on-surface: 27 4 1;
+  --color-inverse-primary: 200 30 6;
+
   /* Matte Carbon & Deep Architectural Canvas */
   --bg-app: #111111;
   --bg-primary: #111111;
@@ -498,58 +572,87 @@ tr:hover td {
 }
 
 /* Instant CSS-Driven Dual Icon Visibility */
+html.dark .theme-icon-sun,
 html[data-theme="dark"] .theme-icon-sun,
+body.dark .theme-icon-sun,
+body[data-theme="dark"] .theme-icon-sun,
 [data-theme="dark"] .theme-icon-sun,
-html:not([data-theme="light"]) .theme-icon-sun {
+.dark .theme-icon-sun {
   display: inline-flex !important;
 }
 
+html.dark .theme-icon-moon,
 html[data-theme="dark"] .theme-icon-moon,
+body.dark .theme-icon-moon,
+body[data-theme="dark"] .theme-icon-moon,
 [data-theme="dark"] .theme-icon-moon,
-html:not([data-theme="light"]) .theme-icon-moon {
+.dark .theme-icon-moon {
   display: none !important;
 }
 
+html.dark .theme-text-light,
 html[data-theme="dark"] .theme-text-light,
+body.dark .theme-text-light,
+body[data-theme="dark"] .theme-text-light,
 [data-theme="dark"] .theme-text-light,
-html:not([data-theme="light"]) .theme-text-light {
+.dark .theme-text-light {
   display: inline !important;
 }
 
+html.dark .theme-text-dark,
 html[data-theme="dark"] .theme-text-dark,
+body.dark .theme-text-dark,
+body[data-theme="dark"] .theme-text-dark,
 [data-theme="dark"] .theme-text-dark,
-html:not([data-theme="light"]) .theme-text-dark {
+.dark .theme-text-dark {
   display: none !important;
 }
 
+/* Light Mode Defaults */
+html:not(.dark) .theme-icon-sun,
 html[data-theme="light"] .theme-icon-sun,
+body[data-theme="light"] .theme-icon-sun,
 [data-theme="light"] .theme-icon-sun {
   display: none !important;
 }
 
+html:not(.dark) .theme-icon-moon,
 html[data-theme="light"] .theme-icon-moon,
+body[data-theme="light"] .theme-icon-moon,
 [data-theme="light"] .theme-icon-moon {
   display: inline-flex !important;
 }
 
+html:not(.dark) .theme-text-light,
 html[data-theme="light"] .theme-text-light,
+body[data-theme="light"] .theme-text-light,
 [data-theme="light"] .theme-text-light {
   display: none !important;
 }
 
+html:not(.dark) .theme-text-dark,
 html[data-theme="light"] .theme-text-dark,
+body[data-theme="light"] .theme-text-dark,
 [data-theme="light"] .theme-text-dark {
   display: inline !important;
 }
 
 /* Micro-interaction Hover Rotations */
+html.dark .theme-toggle-btn:hover .theme-icon-sun,
 html[data-theme="dark"] .theme-toggle-btn:hover .theme-icon-sun,
-html:not([data-theme="light"]) .theme-toggle-btn:hover .theme-icon-sun {
+[data-theme="dark"] .theme-toggle-btn:hover .theme-icon-sun,
+.dark .theme-toggle-btn:hover .theme-icon-sun {
   transform: rotate(40deg) scale(1.15);
 }
 
+html:not(.dark) .theme-toggle-btn:hover .theme-icon-moon,
 html[data-theme="light"] .theme-toggle-btn:hover .theme-icon-moon {
   transform: rotate(-25deg) scale(1.15);
+}
+
+/* Global Smooth Transitions for Theme Switching */
+body, #app-root, aside, header, nav, main, footer, .card, .stat-card, input, select, textarea, button, table, th, td {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.15s ease;
 }
 
 @media (max-width: 900px) {

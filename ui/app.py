@@ -25,7 +25,7 @@ def EduGradeApp():
     current_page, set_current_page = use_state("landing")
     current_user, set_current_user = use_state(None)
     auth_role, set_auth_role = use_state("student")
-    theme, set_theme = use_state("dark")
+    theme, set_theme = use_state("light")
 
     def toggle_theme():
         set_theme("light" if theme == "dark" else "dark")
@@ -91,7 +91,8 @@ def EduGradeApp():
         return html.div(
             {
                 "id": "app-root",
-                "className": "app-root",
+                "className": f"app-root theme-{theme} {'dark' if theme == 'dark' else ''}",
+                "data-theme": theme,
                 "style": {"minHeight": "100vh", "backgroundColor": "var(--bg-app)"}
             },
             page_content
@@ -132,7 +133,8 @@ def EduGradeApp():
     return html.div(
         {
             "id": "app-root",
-            "className": "app-root",
+            "className": f"app-root theme-{theme} {'dark' if theme == 'dark' else ''}",
+            "data-theme": theme,
             "style": {"minHeight": "100vh", "backgroundColor": "var(--bg-app)"}
         },
         AppLayout(

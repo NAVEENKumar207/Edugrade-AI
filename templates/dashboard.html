@@ -9,8 +9,13 @@
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <script>
         (function() {
-            var saved = localStorage.getItem('edugrade_theme') || 'dark';
+            var saved = localStorage.getItem('edugrade_theme') || 'light';
             document.documentElement.setAttribute('data-theme', saved);
+            if (saved === 'dark') {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
         })();
     </script>
 </head>

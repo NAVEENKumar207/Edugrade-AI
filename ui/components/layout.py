@@ -249,6 +249,7 @@ def AppLayout(user, current_page, set_page, logout_action, children, theme="ligh
                 # Status badges & metrics
                 html.div(
                     {"className": "flex items-center gap-gutter-sm"},
+                    ThemeToggle(theme=theme, toggle_theme=toggle_theme, compact=True) if toggle_theme else None,
                     (
                         html.span(
                             {"className": "inline-flex items-center gap-gutter-xs px-3 py-1.5 rounded-full bg-light-primary text-white font-mono text-mono-sm uppercase whitespace-nowrap shrink-0 font-bold"},
