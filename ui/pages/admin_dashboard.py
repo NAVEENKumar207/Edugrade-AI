@@ -128,11 +128,19 @@ def AdminDashboard(user):
     # Student Directory Table Rows
     student_rows = []
     for s in (students or []):
-        r_num = s.get("roll_number", "N/A")
-        s_name = s.get("name", "Student")
-        dept_name = s.get("department", "CSE")
-        s_cgpa = float(s.get("current_cgpa", 0.0))
-        s_arr = int(s.get("backlogs_count", 0))
+        if isinstance(s, dict):
+            r_num = s.get("roll_number", "N/A") or "N/A"
+            s_name = s.get("name", "Student")
+            dept_name = s.get("department", "CSE")
+            s_cgpa = float(s.get("current_cgpa", 0.0) or 0.0)
+            s_arr = int(s.get("backlogs_count", 0) or 0)
+        else:
+            r_num = getattr(s, "roll_number", "N/A") or "N/A"
+            u = getattr(s, "user", None)
+            s_name = f"{u.first_name} {u.last_name}".strip() or u.username if u else "Student"
+            dept_name = getattr(s, "department", "CSE") or "CSE"
+            s_cgpa = float(getattr(s, "current_cgpa", 0.0) or 0.0)
+            s_arr = int(getattr(s, "backlogs_count", 0) or 0)
 
         def make_open_upload(roll):
             def handle_click(e):
@@ -174,8 +182,8 @@ def AdminDashboard(user):
         html.div(
             {"class_name": "flex flex-wrap items-center justify-between gap-gutter-md pb-gutter-md border-b border-light-outline-variant"},
             html.div(
-                html.h1({"class_name": "font-headline text-headline-md text-light-on-surface uppercase tracking-tight"}, "Faculty Oversight"),
-                html.p({"class_name": "font-mono text-mono-sm text-light-on-surface-variant uppercase"}, "Cohort performance and audit trail.")
+                html.h1({"class_name": "font-headline text-headline-md text-light-on-surface uppercase tracking-tight"}, "Faculty & Institutional Oversight"),
+                html.p({"class_name": "font-mono text-mono-sm text-light-on-surface-variant uppercase"}, "Cohort Academic Performance • Atomic Ingestion • Verification Trail")
             ),
             html.div(
                 {"class_name": "flex items-center gap-gutter-sm flex-wrap"},
@@ -186,7 +194,7 @@ def AdminDashboard(user):
                         "class_name": "inline-flex items-center gap-2 px-gutter-md py-2 border border-light-secondary text-light-secondary font-mono text-mono-sm uppercase hover:bg-light-secondary hover:text-light-on-secondary transition-colors duration-state-change whitespace-nowrap cursor-pointer font-bold"
                     },
                     html.span({"class_name": "material-symbols-outlined text-[18px]"}, "upload_file"),
-                    html.span("Upload CSV")
+                    html.span("Bulk CSV Ingest")
                 ),
                 html.button(
                     {
@@ -195,7 +203,7 @@ def AdminDashboard(user):
                         "class_name": "inline-flex items-center gap-2 px-gutter-md py-2 bg-light-primary text-light-on-primary font-mono text-mono-sm uppercase hover:bg-light-primary-container hover:text-light-on-primary-container transition-colors duration-state-change whitespace-nowrap cursor-pointer font-bold"
                     },
                     html.span({"class_name": "material-symbols-outlined text-[18px]"}, "add"),
-                    html.span("Enter Grade")
+                    html.span("Enter Student Grade")
                 )
             )
         ),
