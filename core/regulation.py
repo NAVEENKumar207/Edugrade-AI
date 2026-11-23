@@ -13,14 +13,26 @@ GRADE_BOUNDARIES = {"O": 91, "A+": 81, "A": 71, "B+": 61, "B": 56, "C": 50}
 
 def marks_to_grade(total: float) -> str:
     """
-    Returns letter grade for a given total out of 100 according to GRADE_BOUNDARIES.
-    Returns 'U' if total is below MIN_TOTAL_TO_PASS.
+    Returns letter grade for a given total out of 100 according to lower bounds of GRADE_BOUNDARIES.
+    Checks from the highest grade down and returns the first grade whose low bound is <= total;
+    below MIN_TOTAL_TO_PASS the grade is 'U'.
+    Totals below 0 or above 100 are validation errors (raises ValueError).
     """
-    if total is None or total < MIN_TOTAL_TO_PASS:
+    if total is None:
+        raise ValueError("Total marks cannot be None.")
+    try:
+        val = float(total)
+    except (TypeError, ValueError):
+        raise ValueError(f"Total marks must be a valid number, got {total}.")
+
+    if val < 0.0 or val > 100.0:
+        raise ValueError(f"Total marks must be between 0 and 100, got {val}.")
+
+    if val < MIN_TOTAL_TO_PASS:
         return "U"
-    
+
     # Sort boundaries descending: O (91), A+ (81), A (71), B+ (61), B (56), C (50)
     for grade, min_score in sorted(GRADE_BOUNDARIES.items(), key=lambda item: item[1], reverse=True):
-        if total >= min_score:
+        if val >= min_score:
             return grade
     return "U"
