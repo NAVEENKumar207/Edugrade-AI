@@ -12,20 +12,24 @@ from django.utils import timezone
 from core.models import UserProfile, SemesterRecord, TranscriptIssue
 
 def mask_name(full_name: str) -> str:
-    """Masks name: first letter + stars (e.g., 'Kavitha' -> 'K******')."""
+    """
+    Masks name: first letter + exactly 4 stars ('A****') for every name, whatever its length.
+    If the name is empty or already masked with stars, returns '****'.
+    """
     cleaned = (full_name or "").strip()
-    if not cleaned:
-        return "S****"
-    return cleaned[0].upper() + ("*" * max(3, len(cleaned) - 1))
+    if not cleaned or cleaned.startswith('*'):
+        return "****"
+    return f"{cleaned[0].upper()}****"
 
 def mask_roll(roll_number: str) -> str:
-    """Masks roll number: keeps only the last 3 characters visible."""
+    """
+    Masks roll number: exactly 6 stars + the last 3 characters ('******101').
+    If the roll number has fewer than 3 characters, returns '*********' (9 stars).
+    """
     cleaned = (roll_number or "").strip()
-    if not cleaned:
-        return "***"
-    if len(cleaned) <= 3:
-        return cleaned
-    return ("*" * (len(cleaned) - 3)) + cleaned[-3:]
+    if not cleaned or len(cleaned) < 3:
+        return "*********"
+    return f"******{cleaned[-3:]}"
 
 def get_transcript_signing_key() -> str:
     """Retrieves signing key falling back to SECRET_KEY."""
@@ -141,12 +145,15 @@ def verify_transcript_token(token: str) -> dict:
         }
 
     snap = issue.snapshot or {}
+    display_masked_name = mask_name(snap.get("masked_name", ""))
+    display_masked_roll = mask_roll(snap.get("masked_roll", ""))
+
     return {
         "is_valid": True,
         "status": "VALID",
         "issue_date": snap.get("issue_date") or issue.issued_at.strftime("%Y-%m-%d"),
-        "masked_name": snap.get("masked_name", "S****"),
-        "masked_roll": snap.get("masked_roll", "***"),
+        "masked_name": display_masked_name,
+        "masked_roll": display_masked_roll,
         "department": snap.get("department", "Engineering"),
         "cgpa": float(snap.get("cgpa", 0.0)),
         "credits_earned": int(snap.get("credits_earned", 0)),
