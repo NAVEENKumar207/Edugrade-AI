@@ -393,6 +393,27 @@ a {
 
 /* ================= Inputs ================= */
 
+input:not([type="checkbox"]):not([type="radio"]),
+select,
+textarea {
+  background-color: var(--bg-input) !important;
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] input:not([type="checkbox"]):not([type="radio"]),
+.dark input:not([type="checkbox"]):not([type="radio"]),
+html.dark input:not([type="checkbox"]):not([type="radio"]) {
+  background-color: var(--bg-input) !important;
+  color: #FFFFFF !important;
+}
+
+[data-theme="light"] input:not([type="checkbox"]):not([type="radio"]),
+.theme-light input:not([type="checkbox"]):not([type="radio"]),
+html:not(.dark) input:not([type="checkbox"]):not([type="radio"]) {
+  background-color: var(--bg-input) !important;
+  color: #1B0401 !important;
+}
+
 .input {
   width: 100%;
   padding: 0.75rem 1rem;
