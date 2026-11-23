@@ -298,10 +298,34 @@
             }
         }, true);
 
-        // 4. Ensure initial body reflects saved theme
+        // 4. Ensure initial body reflects saved theme & keep synced with ReactPy root
         document.addEventListener('DOMContentLoaded', function() {
             var saved = localStorage.getItem('edugrade_theme') || 'light';
             setGlobalTheme(saved);
+
+            var observer = new MutationObserver(function() {
+                var appRoot = document.getElementById('app-root');
+                if (appRoot) {
+                    var isDark = appRoot.classList.contains('dark') || appRoot.getAttribute('data-theme') === 'dark';
+                    var currentDark = document.documentElement.classList.contains('dark');
+                    if (isDark !== currentDark) {
+                        setGlobalTheme(isDark ? 'dark' : 'light');
+                    }
+                }
+            });
+            var appRoot = document.getElementById('app-root');
+            if (appRoot) {
+                observer.observe(appRoot, { attributes: true, attributeFilter: ['class', 'data-theme'] });
+            } else {
+                var bodyObserver = new MutationObserver(function() {
+                    var el = document.getElementById('app-root');
+                    if (el) {
+                        bodyObserver.disconnect();
+                        observer.observe(el, { attributes: true, attributeFilter: ['class', 'data-theme'] });
+                    }
+                });
+                bodyObserver.observe(document.body, { childList: true, subtree: true });
+            }
         });
 
         // 5. Bulk CSV File Picker Auto-Reader

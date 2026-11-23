@@ -393,25 +393,29 @@ a {
 
 /* ================= Inputs ================= */
 
-input:not([type="checkbox"]):not([type="radio"]),
+input:not([type="range"]):not([type="checkbox"]):not([type="radio"]):not([type="button"]):not([type="submit"]),
 select,
 textarea {
-  background-color: var(--bg-input) !important;
-  color: var(--text-primary) !important;
+  background-color: var(--bg-input);
+  color: var(--text-primary);
 }
 
-[data-theme="dark"] input:not([type="checkbox"]):not([type="radio"]),
-.dark input:not([type="checkbox"]):not([type="radio"]),
-html.dark input:not([type="checkbox"]):not([type="radio"]) {
-  background-color: var(--bg-input) !important;
-  color: #FFFFFF !important;
+.dark input:not([type="range"]):not([type="checkbox"]):not([type="radio"]):not([type="button"]):not([type="submit"]),
+.theme-dark input:not([type="range"]):not([type="checkbox"]):not([type="radio"]):not([type="button"]):not([type="submit"]),
+[data-theme="dark"] input:not([type="range"]):not([type="checkbox"]):not([type="radio"]):not([type="button"]):not([type="submit"]) {
+  background-color: var(--bg-input);
+  color: #FFFFFF;
 }
 
-[data-theme="light"] input:not([type="checkbox"]):not([type="radio"]),
-.theme-light input:not([type="checkbox"]):not([type="radio"]),
-html:not(.dark) input:not([type="checkbox"]):not([type="radio"]) {
-  background-color: var(--bg-input) !important;
-  color: #1B0401 !important;
+.theme-light input:not([type="range"]):not([type="checkbox"]):not([type="radio"]):not([type="button"]):not([type="submit"]),
+[data-theme="light"] input:not([type="range"]):not([type="checkbox"]):not([type="radio"]):not([type="button"]):not([type="submit"]) {
+  background-color: var(--bg-input);
+  color: #1B0401;
+}
+
+input[type="range"] {
+  background: transparent !important;
+  accent-color: var(--primary);
 }
 
 .input {

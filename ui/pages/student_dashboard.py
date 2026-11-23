@@ -119,7 +119,7 @@ def StudentDashboard(user, set_page):
     remediation_courses = [c for c in recent_courses if c.grade in ['B+', 'B', 'C', 'U', 'RA']][:3]
 
     return html.div(
-        {"class_name": "flex-1 flex flex-col gap-section overflow-y-auto"},
+        {"class_name": "flex-1 flex flex-col gap-section overflow-y-auto text-light-on-surface"},
         
         # Identity Banner
         html.section(
@@ -128,7 +128,7 @@ def StudentDashboard(user, set_page):
                 {"class_name": "flex flex-col gap-1"},
                 html.div(
                     {"class_name": "flex items-center gap-gutter-md flex-wrap"},
-                    html.h2({"class_name": "font-headline text-headline-lg tracking-tight uppercase"}, student.get("name", "STUDENT RECORD")),
+                    html.h2({"class_name": "font-headline text-headline-lg tracking-tight uppercase text-light-on-surface font-bold"}, student.get("name", "STUDENT RECORD")),
                     html.span({"class_name": "px-2.5 py-0.5 bg-light-secondary text-light-on-secondary font-mono text-mono-sm font-bold"}, student.get("roll_number", "21CS001")),
                     html.span({"class_name": "px-2.5 py-0.5 bg-light-surface-container-high text-light-on-surface font-mono text-mono-sm font-bold"}, f"SEM {student.get('current_semester', 6)}")
                 ),

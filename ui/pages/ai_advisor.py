@@ -272,7 +272,8 @@ def AiAdvisorPage(user):
                                 "on_change": lambda e: set_input_text(e.get("target", {}).get("value", "")),
                                 "on_key_down": lambda e: handle_send(input_text) if e.get("key") == "Enter" else None,
                                 "disabled": loading,
-                                "class_name": "flex-1 border border-light-outline-variant bg-light-surface-container-lowest px-3 py-2.5 font-body text-body-md text-light-on-surface focus:border-light-primary focus:ring-1 focus:ring-light-primary focus:outline-none"
+                                "class_name": "flex-1 border border-light-outline-variant bg-light-surface-container-lowest px-3 py-2.5 font-body text-body-md text-light-on-surface focus:border-light-primary focus:ring-1 focus:ring-light-primary focus:outline-none",
+                                "style": {"backgroundColor": "var(--bg-input)", "color": "var(--text-primary)"}
                             }
                         ),
                         html.button(

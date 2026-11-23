@@ -471,19 +471,20 @@ def AdminDashboard(user):
                         {"class_name": "grid grid-cols-2 gap-gutter-md"},
                         html.div(
                             {"class_name": "flex flex-col gap-1"},
-                            html.label({"class_name": "font-mono text-mono-sm font-bold uppercase"}, "Roll Number"),
+                            html.label({"class_name": "font-mono text-mono-sm font-bold uppercase text-light-on-surface"}, "Roll Number"),
                             html.input(
                                 {
                                     "type": "text",
                                     "value": up_roll,
                                     "on_change": lambda e: set_up_roll(e.get("target", {}).get("value", "")),
-                                    "class_name": "border border-light-outline-variant p-2 font-mono text-mono-md"
+                                    "class_name": "border border-light-outline-variant bg-light-surface-container-lowest p-2 font-mono text-mono-md text-light-on-surface",
+                                    "style": {"backgroundColor": "var(--bg-input)", "color": "var(--text-primary)"}
                                 }
                             )
                         ),
                         html.div(
                             {"class_name": "flex flex-col gap-1"},
-                            html.label({"class_name": "font-mono text-mono-sm font-bold uppercase"}, "Semester Number"),
+                            html.label({"class_name": "font-mono text-mono-sm font-bold uppercase text-light-on-surface"}, "Semester Number"),
                             html.input(
                                 {
                                     "type": "number",
@@ -491,7 +492,8 @@ def AdminDashboard(user):
                                     "max": "8",
                                     "value": up_sem,
                                     "on_change": lambda e: set_up_sem(e.get("target", {}).get("value", "1")),
-                                    "class_name": "border border-light-outline-variant p-2 font-mono text-mono-md"
+                                    "class_name": "border border-light-outline-variant bg-light-surface-container-lowest p-2 font-mono text-mono-md text-light-on-surface",
+                                    "style": {"backgroundColor": "var(--bg-input)", "color": "var(--text-primary)"}
                                 }
                             )
                         )
@@ -501,25 +503,27 @@ def AdminDashboard(user):
                         {"class_name": "grid grid-cols-2 gap-gutter-md"},
                         html.div(
                             {"class_name": "flex flex-col gap-1"},
-                            html.label({"class_name": "font-mono text-mono-sm font-bold uppercase"}, "Course Code"),
+                            html.label({"class_name": "font-mono text-mono-sm font-bold uppercase text-light-on-surface"}, "Course Code"),
                             html.input(
                                 {
                                     "type": "text",
                                     "value": up_code,
                                     "on_change": lambda e: set_up_code(e.get("target", {}).get("value", "")),
-                                    "class_name": "border border-light-outline-variant p-2 font-mono text-mono-md"
+                                    "class_name": "border border-light-outline-variant bg-light-surface-container-lowest p-2 font-mono text-mono-md text-light-on-surface",
+                                    "style": {"backgroundColor": "var(--bg-input)", "color": "var(--text-primary)"}
                                 }
                             )
                         ),
                         html.div(
                             {"class_name": "flex flex-col gap-1"},
-                            html.label({"class_name": "font-mono text-mono-sm font-bold uppercase"}, "Course Title"),
+                            html.label({"class_name": "font-mono text-mono-sm font-bold uppercase text-light-on-surface"}, "Course Title"),
                             html.input(
                                 {
                                     "type": "text",
                                     "value": up_name,
                                     "on_change": lambda e: set_up_name(e.get("target", {}).get("value", "")),
-                                    "class_name": "border border-light-outline-variant p-2 font-body text-body-md"
+                                    "class_name": "border border-light-outline-variant bg-light-surface-container-lowest p-2 font-body text-body-md text-light-on-surface",
+                                    "style": {"backgroundColor": "var(--bg-input)", "color": "var(--text-primary)"}
                                 }
                             )
                         )
@@ -529,39 +533,42 @@ def AdminDashboard(user):
                         {"class_name": "grid grid-cols-3 gap-gutter-md"},
                         html.div(
                             {"class_name": "flex flex-col gap-1"},
-                            html.label({"class_name": "font-mono text-mono-sm font-bold uppercase"}, "Credits"),
+                            html.label({"class_name": "font-mono text-mono-sm font-bold uppercase text-light-on-surface"}, "Credits"),
                             html.input(
                                 {
                                     "type": "number",
                                     "step": "0.5",
                                     "value": up_credits,
                                     "on_change": lambda e: set_up_credits(e.get("target", {}).get("value", "3")),
-                                    "class_name": "border border-light-outline-variant p-2 font-mono text-mono-md"
+                                    "class_name": "border border-light-outline-variant bg-light-surface-container-lowest p-2 font-mono text-mono-md text-light-on-surface",
+                                    "style": {"backgroundColor": "var(--bg-input)", "color": "var(--text-primary)"}
                                 }
                             )
                         ),
                         html.div(
                             {"class_name": "flex flex-col gap-1"},
-                            html.label({"class_name": "font-mono text-mono-sm font-bold uppercase"}, "Letter Grade"),
+                            html.label({"class_name": "font-mono text-mono-sm font-bold uppercase text-light-on-surface"}, "Letter Grade"),
                             html.select(
                                 {
                                     "value": up_grade,
                                     "on_change": lambda e: set_up_grade(e.get("target", {}).get("value", "O")),
-                                    "class_name": "border border-light-outline-variant p-2 font-mono text-mono-md"
+                                    "class_name": "border border-light-outline-variant bg-light-surface-container-lowest p-2 font-mono text-mono-md text-light-on-surface",
+                                    "style": {"backgroundColor": "var(--bg-input)", "color": "var(--text-primary)"}
                                 },
                                 [html.option({"key": g, "value": g}, g) for g in ["O", "A+", "A", "B+", "B", "C", "U", "RA", "SA", "W"]]
                             )
                         ),
                         html.div(
                             {"class_name": "flex flex-col gap-1"},
-                            html.label({"class_name": "font-mono text-mono-sm font-bold uppercase"}, "Grade Points"),
+                            html.label({"class_name": "font-mono text-mono-sm font-bold uppercase text-light-on-surface"}, "Grade Points"),
                             html.input(
                                 {
                                     "type": "number",
                                     "step": "1",
                                     "value": up_gp,
                                     "on_change": lambda e: set_up_gp(e.get("target", {}).get("value", "10")),
-                                    "class_name": "border border-light-outline-variant p-2 font-mono text-mono-md"
+                                    "class_name": "border border-light-outline-variant bg-light-surface-container-lowest p-2 font-mono text-mono-md text-light-on-surface",
+                                    "style": {"backgroundColor": "var(--bg-input)", "color": "var(--text-primary)"}
                                 }
                             )
                         )

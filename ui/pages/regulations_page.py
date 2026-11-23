@@ -148,16 +148,16 @@ def RegulationsPage():
         )
 
     return html.div(
-        {"class_name": "flex-1 p-gutter-lg max-w-[1440px] w-full mx-auto flex flex-col gap-gutter-lg overflow-y-auto"},
+        {"class_name": "flex-1 p-gutter-lg max-w-[1440px] w-full mx-auto flex flex-col gap-gutter-lg overflow-y-auto text-light-on-surface"},
         
         # Header
         html.div(
             {"class_name": "flex flex-wrap items-center justify-between gap-gutter-md pb-gutter-md border-b border-light-outline-variant"},
             html.div(
-                html.h1({"class_name": "font-headline text-headline-md text-light-on-surface uppercase tracking-tight"}, "Curriculum & Academic Regulations"),
-                html.p({"class_name": "font-mono text-mono-sm text-light-on-surface-variant uppercase"}, "UGC 10-Point CBCS Scale • Degree Classifications • B.E. Syllabus")
+                html.h1({"class_name": "font-headline text-headline-md text-light-on-surface uppercase tracking-tight font-bold"}, "Curriculum & Academic Regulations"),
+                html.p({"class_name": "font-mono text-mono-sm text-light-on-surface-variant uppercase mt-1"}, "UGC 10-Point CBCS Scale • Degree Classifications • B.E. Syllabus")
             ),
-            html.span({"class_name": "font-mono text-mono-sm font-bold bg-light-surface-container-highest px-3 py-1"}, "REGULATION 2021 CBCS")
+            html.span({"class_name": "font-mono text-mono-sm font-bold bg-light-surface-container-highest text-light-on-surface px-3 py-1 border border-light-outline-variant"}, "REGULATION 2021 CBCS")
         ),
 
         # Top 2-Column: 10-Point Scale & Degree Classification

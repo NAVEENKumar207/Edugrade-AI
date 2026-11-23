@@ -277,7 +277,8 @@ def LoginPage(set_page, set_user, current_role='student', theme='dark', toggle_t
                             html.input({
                                 "type": "text",
                                 "value": username,
-                                "className": "w-full pl-10 pr-3 py-2.5 bg-light-surface border border-light-outline-variant focus:border-light-primary focus:ring-0 font-mono text-mono-sm outline-none transition-colors",
+                                "className": "w-full pl-10 pr-3 py-2.5 bg-light-surface border border-light-outline-variant focus:border-light-primary focus:ring-0 font-mono text-mono-sm text-light-on-surface outline-none transition-colors",
+                                "style": {"backgroundColor": "var(--bg-input)", "color": "var(--text-primary)"},
                                 "placeholder": "e.g. 22CSE041 or student01" if role == "student" else "e.g. faculty.cse or admin01",
                                 "on_change": lambda e: set_username(e.get("target", {}).get("value", "") if isinstance(e, dict) else str(e))
                             })
@@ -304,7 +305,8 @@ def LoginPage(set_page, set_user, current_role='student', theme='dark', toggle_t
                             html.input({
                                 "type": "text" if show_password else "password",
                                 "value": password,
-                                "className": "w-full pl-10 pr-10 py-2.5 bg-light-surface border border-light-outline-variant focus:border-light-primary focus:ring-0 font-mono text-mono-sm outline-none transition-colors",
+                                "className": "w-full pl-10 pr-10 py-2.5 bg-light-surface border border-light-outline-variant focus:border-light-primary focus:ring-0 font-mono text-mono-sm text-light-on-surface outline-none transition-colors",
+                                "style": {"backgroundColor": "var(--bg-input)", "color": "var(--text-primary)"},
                                 "placeholder": "Enter institutional password",
                                 "on_change": lambda e: set_password(e.get("target", {}).get("value", "") if isinstance(e, dict) else str(e))
                             }),
@@ -604,7 +606,8 @@ def SignupPage(set_page, set_user, current_role='student', theme='dark', toggle_
                         html.input({
                             "type": "text",
                             "value": fullname,
-                            "className": "w-full px-3.5 py-2.5 bg-light-surface border border-light-outline-variant focus:border-light-primary focus:ring-0 font-mono text-mono-sm outline-none transition-colors",
+                            "className": "w-full px-3.5 py-2.5 bg-light-surface border border-light-outline-variant focus:border-light-primary focus:ring-0 font-mono text-mono-sm text-light-on-surface outline-none transition-colors",
+                            "style": {"backgroundColor": "var(--bg-input)", "color": "var(--text-primary)"},
                             "placeholder": "e.g. Anand Kumar",
                             "on_change": lambda e: set_fullname(e.get("target", {}).get("value", "") if isinstance(e, dict) else str(e))
                         })
@@ -616,7 +619,8 @@ def SignupPage(set_page, set_user, current_role='student', theme='dark', toggle_
                         html.input({
                             "type": "text",
                             "value": username,
-                            "className": "w-full px-3.5 py-2.5 bg-light-surface border border-light-outline-variant focus:border-light-primary focus:ring-0 font-mono text-mono-sm outline-none transition-colors",
+                            "className": "w-full px-3.5 py-2.5 bg-light-surface border border-light-outline-variant focus:border-light-primary focus:ring-0 font-mono text-mono-sm text-light-on-surface outline-none transition-colors",
+                            "style": {"backgroundColor": "var(--bg-input)", "color": "var(--text-primary)"},
                             "placeholder": "e.g. anand01",
                             "on_change": lambda e: set_username(e.get("target", {}).get("value", "") if isinstance(e, dict) else str(e))
                         })
@@ -628,7 +632,8 @@ def SignupPage(set_page, set_user, current_role='student', theme='dark', toggle_
                         html.input({
                             "type": "text",
                             "value": department,
-                            "className": "w-full px-3.5 py-2.5 bg-light-surface border border-light-outline-variant focus:border-light-primary focus:ring-0 font-mono text-mono-sm outline-none transition-colors",
+                            "className": "w-full px-3.5 py-2.5 bg-light-surface border border-light-outline-variant focus:border-light-primary focus:ring-0 font-mono text-mono-sm text-light-on-surface outline-none transition-colors",
+                            "style": {"backgroundColor": "var(--bg-input)", "color": "var(--text-primary)"},
                             "placeholder": "e.g. Computer Science and Engineering",
                             "on_change": lambda e: set_department(e.get("target", {}).get("value", "") if isinstance(e, dict) else str(e))
                         })
@@ -640,7 +645,8 @@ def SignupPage(set_page, set_user, current_role='student', theme='dark', toggle_
                         html.input({
                             "type": "text",
                             "value": roll_number,
-                            "className": "w-full px-3.5 py-2.5 bg-light-surface border border-light-outline-variant focus:border-light-primary focus:ring-0 font-mono text-mono-sm outline-none transition-colors",
+                            "className": "w-full px-3.5 py-2.5 bg-light-surface border border-light-outline-variant focus:border-light-primary focus:ring-0 font-mono text-mono-sm text-light-on-surface outline-none transition-colors",
+                            "style": {"backgroundColor": "var(--bg-input)", "color": "var(--text-primary)"},
                             "placeholder": "e.g. 22CSE041",
                             "on_change": lambda e: set_roll_number(e.get("target", {}).get("value", "") if isinstance(e, dict) else str(e))
                         })
@@ -652,7 +658,8 @@ def SignupPage(set_page, set_user, current_role='student', theme='dark', toggle_
                         html.input({
                             "type": "password",
                             "value": admin_key,
-                            "className": "w-full px-3.5 py-2.5 bg-light-surface border border-light-outline-variant focus:border-light-primary focus:ring-0 font-mono text-mono-sm outline-none transition-colors",
+                            "className": "w-full px-3.5 py-2.5 bg-light-surface border border-light-outline-variant focus:border-light-primary focus:ring-0 font-mono text-mono-sm text-light-on-surface outline-none transition-colors",
+                            "style": {"backgroundColor": "var(--bg-input)", "color": "var(--text-primary)"},
                             "placeholder": "Enter institutional ADMIN_SIGNUP_KEY",
                             "on_change": lambda e: set_admin_key(e.get("target", {}).get("value", "") if isinstance(e, dict) else str(e))
                         })
@@ -666,7 +673,8 @@ def SignupPage(set_page, set_user, current_role='student', theme='dark', toggle_
                             html.input({
                                 "type": "password",
                                 "value": password,
-                                "className": "w-full px-3.5 py-2.5 bg-light-surface border border-light-outline-variant focus:border-light-primary focus:ring-0 font-mono text-mono-sm outline-none transition-colors",
+                                "className": "w-full px-3.5 py-2.5 bg-light-surface border border-light-outline-variant focus:border-light-primary focus:ring-0 font-mono text-mono-sm text-light-on-surface outline-none transition-colors",
+                                "style": {"backgroundColor": "var(--bg-input)", "color": "var(--text-primary)"},
                                 "placeholder": "Min. 6 chars",
                                 "on_change": lambda e: set_password(e.get("target", {}).get("value", "") if isinstance(e, dict) else str(e))
                             })
@@ -677,7 +685,8 @@ def SignupPage(set_page, set_user, current_role='student', theme='dark', toggle_
                             html.input({
                                 "type": "password",
                                 "value": confirm_password,
-                                "className": "w-full px-3.5 py-2.5 bg-light-surface border border-light-outline-variant focus:border-light-primary focus:ring-0 font-mono text-mono-sm outline-none transition-colors",
+                                "className": "w-full px-3.5 py-2.5 bg-light-surface border border-light-outline-variant focus:border-light-primary focus:ring-0 font-mono text-mono-sm text-light-on-surface outline-none transition-colors",
+                                "style": {"backgroundColor": "var(--bg-input)", "color": "var(--text-primary)"},
                                 "placeholder": "Repeat password",
                                 "on_change": lambda e: set_confirm_password(e.get("target", {}).get("value", "") if isinstance(e, dict) else str(e))
                             })

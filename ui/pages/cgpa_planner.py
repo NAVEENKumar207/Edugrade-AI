@@ -108,21 +108,24 @@ def CgpaPlanner(user):
         scenario_rows.append(
             html.tr(
                 {"key": f"{fut_sgpa:.2f}"},
-                html.td({"class_name": "py-3 px-gutter-lg tabular-nums font-mono"}, f"{fut_sgpa:.2f}"),
-                html.td({"class_name": "py-3 px-gutter-md tabular-nums font-mono font-bold"}, f"{proj_cgpa:.2f}"),
+                html.td({"class_name": "py-3 px-gutter-lg tabular-nums font-mono text-light-on-surface font-medium"}, f"{fut_sgpa:.2f}"),
+                html.td({"class_name": "py-3 px-gutter-md tabular-nums font-mono font-bold text-light-on-surface"}, f"{proj_cgpa:.2f}"),
                 html.td({"class_name": f"py-3 px-gutter-lg text-right font-label text-label-md {status_cls}"}, status_text)
             )
         )
 
+    input_style = {"backgroundColor": "var(--bg-input)", "color": "var(--text-primary)"}
+    input_class = "w-full border-2 border-light-outline-variant bg-light-surface-container-lowest px-3 py-2.5 font-mono text-mono-md text-light-on-surface tabular-nums focus:border-light-primary focus:ring-1 focus:ring-light-primary focus:outline-none transition-colors"
+
     return html.div(
-        {"class_name": "flex-1 p-gutter-lg max-w-[1440px] w-full mx-auto flex flex-col gap-gutter-lg overflow-y-auto"},
+        {"class_name": "flex-1 p-gutter-lg max-w-[1440px] w-full mx-auto flex flex-col gap-gutter-lg overflow-y-auto text-light-on-surface"},
         
         # Header
         html.div(
             {"class_name": "flex flex-wrap items-center justify-between gap-gutter-md pb-gutter-md border-b border-light-outline-variant"},
             html.div(
-                html.h1({"class_name": "font-headline text-headline-md text-light-on-surface uppercase tracking-tight"}, "CGPA Planner & Simulator"),
-                html.p({"class_name": "font-mono text-mono-sm text-light-on-surface-variant uppercase"}, "Predictive Milestone Modeling • Remaining Credits Feasibility Engine")
+                html.h1({"class_name": "font-headline text-headline-md text-light-on-surface uppercase tracking-tight font-bold"}, "CGPA Planner & Simulator"),
+                html.p({"class_name": "font-mono text-mono-sm text-light-on-surface-variant uppercase mt-1"}, "Predictive Milestone Modeling • Remaining Credits Feasibility Engine")
             ),
             html.div(
                 {"class_name": "flex items-center gap-gutter-sm"},
@@ -140,11 +143,11 @@ def CgpaPlanner(user):
             
             # Left: Simulator Parameters (5 cols)
             html.article(
-                {"class_name": "xl:col-span-5 bg-light-surface-container-lowest border border-light-outline-variant p-gutter-lg flex flex-col gap-gutter-md"},
+                {"class_name": "xl:col-span-5 bg-light-surface-container-lowest border border-light-outline-variant p-gutter-lg flex flex-col gap-gutter-md shadow-sm"},
                 html.header(
                     {"class_name": "border-b border-light-outline-variant pb-gutter-sm"},
-                    html.h2({"class_name": "font-headline text-title-lg text-light-on-surface uppercase"}, "Simulation Parameters"),
-                    html.p({"class_name": "font-body text-body-sm text-light-on-surface-variant"}, "Adjust values or slide target CGPA to model mathematical feasibility")
+                    html.h2({"class_name": "font-headline text-title-lg text-light-on-surface uppercase font-bold"}, "Simulation Parameters"),
+                    html.p({"class_name": "font-body text-body-sm text-light-on-surface-variant mt-0.5"}, "Adjust values or slide target CGPA to model mathematical feasibility")
                 ),
 
                 html.form(
@@ -162,7 +165,8 @@ def CgpaPlanner(user):
                                 "max": "10",
                                 "value": str(current_cgpa),
                                 "on_change": lambda e: set_current_cgpa(e.get("target", {}).get("value", 0.0)),
-                                "class_name": "w-full border border-light-outline-variant bg-light-surface-container-lowest px-3 py-2.5 font-mono text-mono-md text-light-on-surface tabular-nums focus:border-light-primary focus:ring-1 focus:ring-light-primary focus:outline-none"
+                                "class_name": input_class,
+                                "style": input_style
                             }
                         )
                     ),
@@ -180,7 +184,8 @@ def CgpaPlanner(user):
                                     "max": "200",
                                     "value": str(completed_credits),
                                     "on_change": lambda e: set_completed_credits(e.get("target", {}).get("value", 0)),
-                                    "class_name": "w-full border border-light-outline-variant bg-light-surface-container-lowest px-3 py-2.5 font-mono text-mono-md text-light-on-surface tabular-nums focus:border-light-primary focus:ring-1 focus:ring-light-primary focus:outline-none"
+                                    "class_name": input_class,
+                                    "style": input_style
                                 }
                             )
                         ),
@@ -194,7 +199,8 @@ def CgpaPlanner(user):
                                     "max": "240",
                                     "value": str(total_credits),
                                     "on_change": lambda e: set_total_credits(e.get("target", {}).get("value", 160)),
-                                    "class_name": "w-full border border-light-outline-variant bg-light-surface-container-lowest px-3 py-2.5 font-mono text-mono-md text-light-on-surface tabular-nums focus:border-light-primary focus:ring-1 focus:ring-light-primary focus:outline-none"
+                                    "class_name": input_class,
+                                    "style": input_style
                                 }
                             )
                         )
@@ -211,7 +217,8 @@ def CgpaPlanner(user):
                                 "max": "8",
                                 "value": str(remaining_semesters),
                                 "on_change": lambda e: set_remaining_semesters(e.get("target", {}).get("value", 1)),
-                                "class_name": "w-full border border-light-outline-variant bg-light-surface-container-lowest px-3 py-2.5 font-mono text-mono-md text-light-on-surface tabular-nums focus:border-light-primary focus:ring-1 focus:ring-light-primary focus:outline-none"
+                                "class_name": input_class,
+                                "style": input_style
                             }
                         )
                     ),
@@ -232,7 +239,8 @@ def CgpaPlanner(user):
                                 "step": "0.05",
                                 "value": str(target_cgpa),
                                 "on_change": handle_target_change,
-                                "class_name": "w-full accent-light-primary cursor-pointer"
+                                "class_name": "w-full accent-light-primary cursor-pointer",
+                                "style": {"accentColor": "var(--primary)"}
                             }
                         ),
                         html.input(
@@ -243,7 +251,8 @@ def CgpaPlanner(user):
                                 "max": "10",
                                 "value": str(target_cgpa),
                                 "on_change": handle_target_change,
-                                "class_name": "w-full border border-light-outline-variant bg-light-surface-container-lowest px-3 py-2.5 font-mono text-mono-md text-light-on-surface tabular-nums focus:border-light-primary focus:ring-1 focus:ring-light-primary focus:outline-none"
+                                "class_name": input_class,
+                                "style": input_style
                             }
                         )
                     ),
