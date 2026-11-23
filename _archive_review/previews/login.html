@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Login | EduGrade AI</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body class="auth-page">
+
+
+    <div class="auth-container">
+
+
+        <div class="auth-brand">
+
+            <a href="index.html" class="logo">
+                <span>Edu</span>Grade AI
+            </a>
+
+            <h1>
+                Welcome back.
+            </h1>
+
+            <p>
+                Access student insights or manage college academic performance with intelligent AI analytics.
+            </p>
+
+        </div>
+
+
+        <div class="auth-card">
+
+            <!-- Role Selector Toggle -->
+            <div class="role-toggle">
+                <button type="button" class="role-tab active" data-role="student">
+                    🎓 Student Login
+                </button>
+                <button type="button" class="role-tab" data-role="admin">
+                    🛡️ Admin / Faculty
+                </button>
+            </div>
+
+            <h2 id="auth-role-title">Sign in</h2>
+
+            <p class="auth-subtitle" id="auth-role-subtitle">
+                Enter your student details to access your dashboard.
+            </p>
+
+
+            <form action="dashboard.html" method="GET" data-form-type="login">
+
+                <input type="hidden" name="role" id="selected-role" value="student">
+
+                <label>Email Address / Username</label>
+
+                <input
+                    type="text"
+                    name="username"
+                    id="identifier-input"
+                    placeholder="student@example.com or Roll No"
+                    required
+                >
+
+
+                <label>Password</label>
+
+                <input
+                    type="password"
+                    name="password"
+                    placeholder="Enter your password"
+                    required
+                >
+
+
+                <div class="form-options">
+
+                    <label class="checkbox">
+
+                        <input type="checkbox" name="remember">
+
+                        Remember me
+
+                    </label>
+
+                    <a href="#">
+                        Forgot password?
+                    </a>
+
+                </div>
+
+
+                <button type="submit" class="auth-button">
+                    Sign In →
+                </button>
+
+            </form>
+
+
+            <!-- Quick Demo Credentials Box -->
+            <div class="demo-box">
+                <div class="demo-title">⚡ Quick Demo Logins (Click to fill)</div>
+                <div class="demo-buttons">
+                    <button type="button" class="demo-btn" id="fill-student-demo" title="Auto-fill Student credentials">
+                        <span>🎓</span>
+                        <div>
+                            <strong>Student Demo</strong>
+                            <small>student / student123</small>
+                        </div>
+                    </button>
+                    <button type="button" class="demo-btn" id="fill-admin-demo" title="Auto-fill Admin credentials">
+                        <span>🛡️</span>
+                        <div>
+                            <strong>Admin Demo</strong>
+                            <small>admin / admin123</small>
+                        </div>
+                    </button>
+                </div>
+            </div>
+
+
+            <div class="divider">
+                <span>OR</span>
+            </div>
+
+
+            <p class="signup-text">
+
+                Don't have an account?
+
+                <a href="signup.html">
+                    Create one
+                </a>
+
+            </p>
+
+
+            <a href="index.html" class="back-home">
+                ← Back to home
+            </a>
+
+        </div>
+
+    </div>
+
+    <script src="js/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Target CGPA Planner | EduGrade AI</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body class="dashboard-page">
+
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <a href="dashboard.html" class="logo" style="text-decoration: none;">
+            <span>Edu</span>Grade
+        </a>
+
+
+        <nav>
+
+            <a href="dashboard.html">
+                <span>⌂</span>
+                Dashboard
+            </a>
+
+            <a href="upload.html">
+                <span>⚡</span>
+                Calculate SGPA
+            </a>
+
+            <a href="syllabus.html">
+                <span>📄</span>
+                Syllabus
+            </a>
+
+            <a href="results.html">
+                <span>📊</span>
+                Results
+            </a>
+
+            <a href="cgpa_planner.html" class="active">
+                <span>🎯</span>
+                CGPA Planner
+            </a>
+
+            <a href="placement.html">
+                <span>💼</span>
+                Placement
+            </a>
+
+            <a href="ai_advisor.html">
+                <span>🤖</span>
+                AI Advisor
+            </a>
+
+        </nav>
+
+
+        <div class="sidebar-bottom">
+
+            <a href="#">
+                ⚙ Settings
+            </a>
+
+            <a href="index.html">
+                ↪ Logout
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN CONTENT -->
+
+    <main class="dashboard-main">
+
+
+        <!-- TOPBAR -->
+
+        <header class="dashboard-header">
+
+            <div>
+
+                <h1>
+                    Target CGPA Planner 🎯
+                </h1>
+
+                <p>
+                    Simulate future semesters to discover exactly what SGPA you need to achieve your dream CGPA.
+                </p>
+
+            </div>
+
+
+            <div class="profile">
+
+                <div class="profile-avatar">
+                    A
+                </div>
+
+                <div>
+
+                    <strong>Alex Kumar</strong>
+
+                    <small>
+                        CSE • Semester 5
+                    </small>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- PLANNER HERO GRID -->
+
+        <div class="dashboard-grid">
+
+            <!-- INTERACTIVE SIMULATOR CARD -->
+            <div class="dashboard-card">
+
+                <div class="card-header">
+                    <div>
+                        <h2>Target CGPA Simulator</h2>
+                        <p>Adjust the slider to simulate target graduation score</p>
+                    </div>
+
+                    <div style="font-size: 32px; font-weight: 800; color: var(--primary);" id="planner-target-display">
+                        9.00
+                    </div>
+                </div>
+
+                <div style="margin: 30px 0;">
+                    <div style="display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); margin-bottom: 8px;">
+                        <span>Current CGPA: <strong>8.42</strong></span>
+                        <span>Maximum Possible: <strong>9.65</strong></span>
+                    </div>
+
+                    <input
+                        type="range"
+                        min="8.42"
+                        max="9.65"
+                        step="0.05"
+                        value="9.00"
+                        id="cgpa-range-slider"
+                        style="width: 100%; height: 8px; border-radius: 5px; cursor: pointer; accent-color: var(--primary);"
+                        oninput="updatePlannerCalculations(this.value)"
+                    >
+                </div>
+
+                <div style="background: #f8f9fe; border: 1px solid var(--border); border-radius: 12px; padding: 20px;">
+
+                    <h3 style="font-size: 15px; color: var(--dark); margin-bottom: 12px;">📊 Semester-by-Semester Forecast</h3>
+
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+
+                        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
+                            <span style="font-size: 13px; font-weight: 600;">Semester 6 (20 Credits)</span>
+                            <span style="font-size: 14px; font-weight: 700; color: var(--primary);" id="sem6-req">9.20 SGPA</span>
+                        </div>
+
+                        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
+                            <span style="font-size: 13px; font-weight: 600;">Semester 7 (18 Credits)</span>
+                            <span style="font-size: 14px; font-weight: 700; color: var(--primary);" id="sem7-req">9.20 SGPA</span>
+                        </div>
+
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 13px; font-weight: 600;">Semester 8 (10 Credits - Project)</span>
+                            <span style="font-size: 14px; font-weight: 700; color: var(--success);" id="sem8-req">9.50 SGPA</span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <button class="primary-button" style="width: 100%; border: none; cursor: pointer;" onclick="alert('Target CGPA Saved to your Student Profile!')">
+                        Save This Target Goal →
+                    </button>
+                </div>
+
+            </div>
+
+
+            <!-- AI FEASIBILITY & ADVISORY -->
+
+            <div class="dashboard-card ai-card">
+
+                <div class="ai-header">
+                    <div class="ai-icon">✨</div>
+                    <div>
+                        <h2>AI Feasibility Analysis</h2>
+                        <span>Real-time assessment</span>
+                    </div>
+                </div>
+
+                <div class="insight-content">
+                    <h3 id="feasibility-title" style="color: var(--success);">
+                        High Feasibility (88% Confidence)
+                    </h3>
+                    <p id="feasibility-desc">
+                        Achieving a 9.00 CGPA requires maintaining an average of 9.20 SGPA across your remaining 48 credits. 
+                        Your top performance in Programming and DBMS makes this goal well within reach.
+                    </p>
+                </div>
+
+                <div class="insight-box">
+                    <strong>💡 Strategy Checklist</strong>
+                    <ul style="margin: 8px 0 0 18px; font-size: 12px; color: var(--muted); line-height: 1.6;">
+                        <li>Aim for <strong>'O' (10)</strong> grade in Semester 6 & 7 Electives (6 Credits).</li>
+                        <li>Maintain minimum <strong>'A+' (9)</strong> in Core Systems subjects.</li>
+                        <li>Achieve <strong>'O' (10)</strong> on your Final Year Capstone Project (10 Credits).</li>
+                    </ul>
+                </div>
+
+                <a href="ai_advisor.html" class="outline-button" style="display: block; text-align: center; text-decoration: none;">
+                    Ask AI Advisor for Study Schedule →
+                </a>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <script src="js/script.js"></script>
+    <script>
+        function updatePlannerCalculations(targetVal) {
+            const val = parseFloat(targetVal);
+            document.getElementById('planner-target-display').textContent = val.toFixed(2);
+
+            // Current CGPA = 8.42 for 72 credits, remaining 48 credits, total 120 credits
+            // Required total points = 120 * val
+            // Current points = 72 * 8.42 = 606.24
+            // Remaining points = (120 * val) - 606.24
+            // Required Avg SGPA = Remaining points / 48
+            const remainingPoints = (120 * val) - (72 * 8.42);
+            const reqAvg = Math.min(10.0, Math.max(7.0, remainingPoints / 48)).toFixed(2);
+
+            document.getElementById('sem6-req').textContent = reqAvg + ' SGPA';
+            document.getElementById('sem7-req').textContent = reqAvg + ' SGPA';
+            document.getElementById('sem8-req').textContent = Math.min(10.0, parseFloat(reqAvg) + 0.3).toFixed(2) + ' SGPA';
+
+            const titleElem = document.getElementById('feasibility-title');
+            const descElem = document.getElementById('feasibility-desc');
+
+            if (reqAvg <= 9.0) {
+                titleElem.textContent = 'Very High Feasibility (95% Confidence)';
+                titleElem.style.color = '#16a06a';
+                descElem.textContent = `Target ${val.toFixed(2)} CGPA is easily achievable with consistent grades of ~${reqAvg} SGPA.`;
+            } else if (reqAvg <= 9.5) {
+                titleElem.textContent = 'Moderate Feasibility (82% Confidence)';
+                titleElem.style.color = '#f59e0b';
+                descElem.textContent = `Achieving ${val.toFixed(2)} CGPA requires ~${reqAvg} SGPA average. Focus heavily on 4-credit core subjects.`;
+            } else {
+                titleElem.textContent = 'Challenging Target (Needs Outstanding Grades)';
+                titleElem.style.color = '#ef4444';
+                descElem.textContent = `Reaching ${val.toFixed(2)} CGPA requires near-perfect ${reqAvg} SGPA across all remaining semesters.`;
+            }
+        }
+    </script>
+</body>
+</html>
+

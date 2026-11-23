@@ -164,15 +164,15 @@ def ResultsPage(user):
         html.div(
             {"class_name": "flex flex-wrap items-center justify-between gap-gutter-md pb-gutter-md border-b border-light-outline-variant"},
             html.div(
-                html.h1({"class_name": "font-headline text-headline-md text-light-on-surface uppercase tracking-tight"}, "Transcripts"),
-                html.p({"class_name": "font-mono text-mono-sm text-light-on-surface-variant uppercase"}, f"{data.get('student_name', 'Student')} • {data.get('roll_number', '21CS001')} • CBCS 2026")
+                html.h1({"class_name": "font-headline text-headline-md text-light-on-surface uppercase tracking-tight"}, "Transcripts & Results"),
+                html.p({"class_name": "font-mono text-mono-sm text-light-on-surface-variant uppercase"}, f"Student: {data.get('student_name', 'Student')} • Roll: {data.get('roll_number', '21CS001')} • Regulation: 2021 CBCS")
             ),
             html.div(
                 {"class_name": "flex items-center gap-gutter-sm flex-wrap"},
                 html.span(
                     {"class_name": "inline-flex items-center gap-gutter-xs px-3 py-1.5 rounded-full bg-light-secondary text-light-on-secondary font-mono text-mono-sm uppercase whitespace-nowrap"},
                     html.span({"class_name": "material-symbols-outlined text-[16px]"}, "verified"),
-                    html.span("Official")
+                    html.span("Official Record")
                 ),
                 html.a(
                     {
@@ -182,7 +182,7 @@ def ResultsPage(user):
                         "class_name": "inline-flex items-center gap-2 px-gutter-md py-2 bg-light-primary text-light-on-primary font-mono text-mono-sm font-bold uppercase hover:bg-light-primary-container hover:text-light-on-primary-container transition-colors duration-state-change whitespace-nowrap cursor-pointer"
                     },
                     html.span({"class_name": "material-symbols-outlined text-[18px]"}, "picture_as_pdf"),
-                    html.span("Download PDF")
+                    html.span("Export Official PDF")
                 )
             )
         ),
@@ -192,23 +192,23 @@ def ResultsPage(user):
             {"class_name": "grid grid-cols-2 xl:grid-cols-4 border border-light-outline-variant bg-light-surface-container-lowest"},
             html.article(
                 {"class_name": "bg-light-primary-container text-light-on-primary-container p-gutter-md border-b xl:border-b-0 border-r border-light-outline-variant"},
-                html.span({"class_name": "font-mono text-mono-sm uppercase font-bold"}, "CGPA"),
+                html.span({"class_name": "font-mono text-mono-sm uppercase font-bold"}, "01 / Cumulative CGPA"),
                 html.p({"class_name": "font-headline text-headline-lg tabular-nums mt-1 font-bold"}, f"{cgpa:.2f}")
             ),
             html.article(
                 {"class_name": "p-gutter-md border-b xl:border-b-0 xl:border-r border-light-outline-variant"},
-                html.span({"class_name": "font-mono text-mono-sm text-light-on-surface-variant uppercase font-bold"}, "Credits"),
+                html.span({"class_name": "font-mono text-mono-sm text-light-on-surface-variant uppercase font-bold"}, "02 / Credits Cleared"),
                 html.p({"class_name": "font-headline text-headline-lg text-light-on-surface tabular-nums mt-1 font-bold"}, f"{credits_earned} / {total_credits}")
             ),
             html.article(
                 {"class_name": "p-gutter-md border-r border-light-outline-variant"},
-                html.span({"class_name": "font-mono text-mono-sm text-light-on-surface-variant uppercase font-bold"}, "O-Grades"),
-                html.p({"class_name": "font-headline text-headline-lg text-light-on-surface tabular-nums mt-1 font-bold"}, f"{o_grades}")
+                html.span({"class_name": "font-mono text-mono-sm text-light-on-surface-variant uppercase font-bold"}, "03 / O-Grades Earned"),
+                html.p({"class_name": "font-headline text-headline-lg text-light-on-surface tabular-nums mt-1 font-bold"}, f"{o_grades} Courses")
             ),
             html.article(
                 {"class_name": "bg-light-secondary text-light-on-secondary p-gutter-md"},
-                html.span({"class_name": "font-mono text-mono-sm text-light-on-secondary/80 uppercase font-bold"}, "Arrears"),
-                html.p({"class_name": "font-headline text-headline-lg tabular-nums mt-1 font-bold"}, f"{arrears_count}")
+                html.span({"class_name": "font-mono text-mono-sm text-light-on-secondary/80 uppercase font-bold"}, "04 / Standing Arrears"),
+                html.p({"class_name": "font-headline text-headline-lg tabular-nums mt-1 font-bold"}, f"{arrears_count} Active")
             )
         ),
 

@@ -154,10 +154,10 @@ def RegulationsPage():
         html.div(
             {"class_name": "flex flex-wrap items-center justify-between gap-gutter-md pb-gutter-md border-b border-light-outline-variant"},
             html.div(
-                html.h1({"class_name": "font-headline text-headline-md text-light-on-surface uppercase tracking-tight"}, "Regulations"),
-                html.p({"class_name": "font-mono text-mono-sm text-light-on-surface-variant uppercase"}, "UGC 10-Point Scale • Classifications • Syllabus")
+                html.h1({"class_name": "font-headline text-headline-md text-light-on-surface uppercase tracking-tight"}, "Curriculum & Academic Regulations"),
+                html.p({"class_name": "font-mono text-mono-sm text-light-on-surface-variant uppercase"}, "UGC 10-Point CBCS Scale • Degree Classifications • B.E. Syllabus")
             ),
-            html.span({"class_name": "font-mono text-mono-sm font-bold bg-light-surface-container-highest px-3 py-1"}, "CBCS 2026")
+            html.span({"class_name": "font-mono text-mono-sm font-bold bg-light-surface-container-highest px-3 py-1"}, "REGULATION 2021 CBCS")
         ),
 
         # Top 2-Column: 10-Point Scale & Degree Classification
@@ -169,8 +169,8 @@ def RegulationsPage():
                 {"class_name": "xl:col-span-7 bg-light-surface-container-lowest border border-light-outline-variant overflow-hidden"},
                 html.header(
                     {"class_name": "px-gutter-lg py-gutter-md bg-light-surface-container-low border-b border-light-outline-variant"},
-                    html.h2({"class_name": "font-headline text-title-lg text-light-on-surface uppercase"}, "Grade Scale"),
-                    html.p({"class_name": "font-mono text-mono-sm text-light-on-surface-variant uppercase"}, "Deterministic grade point mapping.")
+                    html.h2({"class_name": "font-headline text-title-lg text-light-on-surface uppercase"}, "UGC 10-Point CBCS Grade Scale"),
+                    html.p({"class_name": "font-mono text-mono-sm text-light-on-surface-variant uppercase"}, "Deterministic Grade Point to Mark Mapping")
                 ),
 
                 html.div(
@@ -209,8 +209,8 @@ def RegulationsPage():
             html.article(
                 {"class_name": "xl:col-span-5 bg-light-surface-container-lowest border border-light-outline-variant p-gutter-lg flex flex-col gap-gutter-md"},
                 html.header(
-                    html.h2({"class_name": "font-headline text-title-lg text-light-on-surface uppercase"}, "Classifications"),
-                    html.p({"class_name": "font-body text-body-sm text-light-on-surface-variant"}, "Graduation classification standards.")
+                    html.h2({"class_name": "font-headline text-title-lg text-light-on-surface uppercase"}, "Degree Classification Rules"),
+                    html.p({"class_name": "font-body text-body-sm text-light-on-surface-variant"}, "Statutory graduation classification standards")
                 ),
 
                 html.div(

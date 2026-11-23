@@ -18,7 +18,6 @@ db.sqlite3
 db.sqlite3.*
 backups/
 _backup_*/
-_archive_review/
 *.backup.sqlite3
 *.bak
 

@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Academic Upload & SGPA/CGPA Calculation | EduGrade AI</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body class="dashboard-page">
+
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <a href="dashboard.html" class="logo" style="text-decoration: none;">
+            <span>Edu</span>Grade
+        </a>
+
+
+        <nav>
+
+            <a href="dashboard.html">
+                <span>⌂</span>
+                Dashboard
+            </a>
+
+            <a href="upload.html" class="active">
+                <span>⚡</span>
+                Calculate SGPA
+            </a>
+
+            <a href="syllabus.html">
+                <span>📄</span>
+                Syllabus
+            </a>
+
+            <a href="results.html">
+                <span>📊</span>
+                Results
+            </a>
+
+            <a href="cgpa_planner.html">
+                <span>🎯</span>
+                CGPA Planner
+            </a>
+
+            <a href="placement.html">
+                <span>💼</span>
+                Placement
+            </a>
+
+            <a href="ai_advisor.html">
+                <span>🤖</span>
+                AI Advisor
+            </a>
+
+        </nav>
+
+
+        <div class="sidebar-bottom">
+
+            <a href="#">
+                ⚙ Settings
+            </a>
+
+            <a href="index.html">
+                ↪ Logout
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN CONTENT -->
+
+    <main class="dashboard-main">
+
+
+        <!-- TOPBAR -->
+
+        <header class="dashboard-header">
+
+            <div>
+
+                <h1>
+                    Academic Data & Calculation Flow ⚡
+                </h1>
+
+                <p>
+                    College Details → Syllabus Upload → Result Extraction → Live SGPA & CGPA.
+                </p>
+
+            </div>
+
+
+            <div class="profile">
+
+                <div class="profile-avatar">
+                    A
+                </div>
+
+                <div>
+
+                    <strong>Alex Kumar</strong>
+
+                    <small>
+                        CSE • Semester 5
+                    </small>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- MULTI-STEP WIZARD -->
+
+        <div class="wizard-container">
+
+            <!-- STEP INDICATORS -->
+            <div class="wizard-steps">
+
+                <div class="step-item active" id="step-ind-1">
+                    <div class="step-circle">1</div>
+                    <span>College Details</span>
+                </div>
+
+                <div class="step-item" id="step-ind-2">
+                    <div class="step-circle">2</div>
+                    <span>Upload Documents</span>
+                </div>
+
+                <div class="step-item" id="step-ind-3">
+                    <div class="step-circle">3</div>
+                    <span>Subject Grades</span>
+                </div>
+
+                <div class="step-item" id="step-ind-4">
+                    <div class="step-circle">4</div>
+                    <span>SGPA & CGPA Result</span>
+                </div>
+
+            </div>
+
+
+            <!-- STEP 1: COLLEGE & REGULATION DETAILS -->
+
+            <div class="wizard-step-content active" id="wizard-step-1">
+
+                <div class="card-header" style="margin-bottom: 20px;">
+                    <div>
+                        <h2>Step 1: University & Academic Profile</h2>
+                        <p>Specify your university system so AI applies accurate credit weightages.</p>
+                    </div>
+                </div>
+
+                <form id="form-step-1" onsubmit="event.preventDefault(); goToStep(2);">
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 18px;">
+
+                        <div>
+                            <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px;">University / Institution Name</label>
+                            <input type="text" value="Anna University / Autonomous Affiliated" style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px;" required>
+                        </div>
+
+                        <div>
+                            <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px;">Regulation / Curriculum Scheme</label>
+                            <select style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px;">
+                                <option value="R2021">Regulation 2021 (CBCS Scheme)</option>
+                                <option value="R2017">Regulation 2017</option>
+                                <option value="AUTONOMOUS">Autonomous College Custom Regulation</option>
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; margin-bottom: 25px;">
+
+                        <div>
+                            <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px;">Department / Stream</label>
+                            <select style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px;">
+                                <option>Computer Science & Engineering</option>
+                                <option>Information Technology</option>
+                                <option>AI & Data Science</option>
+                                <option>Electronics & Communication</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px;">Semester To Calculate</label>
+                            <select id="calc-semester-select" style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px;">
+                                <option value="5" selected>Semester 5 (Current)</option>
+                                <option value="6">Semester 6</option>
+                                <option value="4">Semester 4</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px;">Previous Cumulative CGPA</label>
+                            <input type="number" step="0.01" value="8.38" id="prev-cgpa-input" style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px;">
+                        </div>
+
+                    </div>
+
+                    <div style="display: flex; justify-content: flex-end;">
+                        <button type="submit" class="primary-button" style="cursor: pointer; border: none;">
+                            Proceed to Document Upload →
+                        </button>
+                    </div>
+
+                </form>
+
+            </div>
+
+
+            <!-- STEP 2: SMART DOCUMENT UPLOAD -->
+
+            <div class="wizard-step-content" id="wizard-step-2">
+
+                <div class="card-header" style="margin-bottom: 10px;">
+                    <div>
+                        <h2>Step 2: Smart Document Upload (AI OCR & Parser)</h2>
+                        <p>Upload your semester syllabus or results sheet. EduGrade AI will extract your subjects automatically.</p>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+
+                    <!-- Syllabus Dropzone -->
+                    <div>
+                        <h3 style="font-size: 14px; margin-bottom: 8px; color: var(--dark);">📄 1. Semester Syllabus Document</h3>
+                        <div class="dropzone" id="syllabus-dropzone" onclick="simulateFileUpload('syllabus')">
+                            <div class="dropzone-icon">📄</div>
+                            <h4>Drag & Drop Syllabus PDF</h4>
+                            <p>or click to browse files (PDF, DOCX, TXT)</p>
+                            <div class="file-preview" id="syllabus-preview" style="display: none;">
+                                <span>✓ Anna_Univ_CSE_Sem5_Syllabus.pdf (Extracted 6 Subjects)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Result / Marksheet Dropzone -->
+                    <div>
+                        <h3 style="font-size: 14px; margin-bottom: 8px; color: var(--dark);">📊 2. Semester Results / Grade Card</h3>
+                        <div class="dropzone" id="result-dropzone" onclick="simulateFileUpload('result')">
+                            <div class="dropzone-icon">📊</div>
+                            <h4>Drag & Drop Result Sheet / PDF</h4>
+                            <p>or click to browse grade card (PDF, JPG, PNG)</p>
+                            <div class="file-preview" id="result-preview" style="display: none;">
+                                <span>✓ Sem5_Provisional_Result_Nov2025.pdf (Grades Detected)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div style="background: #f7f6ff; border-radius: 9px; padding: 15px; margin: 20px 0; font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 20px;">✨</span>
+                    <div>
+                        <strong style="color: var(--primary);">AI Automatic Extraction Enabled:</strong>
+                        Clicking either box above will automatically detect subjects, course credits, and letter grades.
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <button type="button" class="secondary-button" onclick="goToStep(1)">
+                        ← Back
+                    </button>
+
+                    <button type="button" class="primary-button" onclick="goToStep(3)">
+                        Extract & Verify Grades →
+                    </button>
+                </div>
+
+            </div>
+
+
+            <!-- STEP 3: SUBJECT GRADES & CREDITS TABLE -->
+
+            <div class="wizard-step-content" id="wizard-step-3">
+
+                <div class="card-header" style="margin-bottom: 20px;">
+                    <div>
+                        <h2>Step 3: Verify Subjects & Letter Grades</h2>
+                        <p>Confirm the detected credits and letter grades for Semester 5.</p>
+                    </div>
+
+                    <button type="button" class="admin-btn" onclick="addNewSubjectRow()">
+                        + Add Custom Subject
+                    </button>
+                </div>
+
+
+                <div class="table-container">
+
+                    <table class="custom-table" id="subject-grades-table">
+
+                        <thead>
+                            <tr>
+                                <th>Subject Code</th>
+                                <th>Subject Title</th>
+                                <th>Credits (C)</th>
+                                <th>Grade Received</th>
+                                <th>Grade Point (GP)</th>
+                                <th>Credit Points (C × GP)</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="grades-tbody">
+
+                            <tr data-credits="4">
+                                <td><strong>CS3501</strong></td>
+                                <td>Compiler Design & LLVM</td>
+                                <td>4</td>
+                                <td>
+                                    <select class="grade-select" onchange="calculateLiveSGPA()">
+                                        <option value="10">O (Outstanding - 10)</option>
+                                        <option value="9" selected>A+ (Excellent - 9)</option>
+                                        <option value="8">A (Very Good - 8)</option>
+                                        <option value="7">B+ (Good - 7)</option>
+                                        <option value="6">B (Above Average - 6)</option>
+                                        <option value="0">RA (Re-Appear - 0)</option>
+                                    </select>
+                                </td>
+                                <td class="gp-display">9</td>
+                                <td class="cp-display"><strong>36</strong></td>
+                            </tr>
+
+                            <tr data-credits="3">
+                                <td><strong>CS3591</strong></td>
+                                <td>Computer Networks</td>
+                                <td>3</td>
+                                <td>
+                                    <select class="grade-select" onchange="calculateLiveSGPA()">
+                                        <option value="10">O (Outstanding - 10)</option>
+                                        <option value="9">A+ (Excellent - 9)</option>
+                                        <option value="8" selected>A (Very Good - 8)</option>
+                                        <option value="7">B+ (Good - 7)</option>
+                                        <option value="6">B (Above Average - 6)</option>
+                                        <option value="0">RA (Re-Appear - 0)</option>
+                                    </select>
+                                </td>
+                                <td class="gp-display">8</td>
+                                <td class="cp-display"><strong>24</strong></td>
+                            </tr>
+
+                            <tr data-credits="4">
+                                <td><strong>CS3551</strong></td>
+                                <td>Database Management Systems</td>
+                                <td>4</td>
+                                <td>
+                                    <select class="grade-select" onchange="calculateLiveSGPA()">
+                                        <option value="10">O (Outstanding - 10)</option>
+                                        <option value="9" selected>A+ (Excellent - 9)</option>
+                                        <option value="8">A (Very Good - 8)</option>
+                                        <option value="7">B+ (Good - 7)</option>
+                                        <option value="6">B (Above Average - 6)</option>
+                                        <option value="0">RA (Re-Appear - 0)</option>
+                                    </select>
+                                </td>
+                                <td class="gp-display">9</td>
+                                <td class="cp-display"><strong>36</strong></td>
+                            </tr>
+
+                            <tr data-credits="3">
+                                <td><strong>CS3502</strong></td>
+                                <td>Operating Systems Architecture</td>
+                                <td>3</td>
+                                <td>
+                                    <select class="grade-select" onchange="calculateLiveSGPA()">
+                                        <option value="10">O (Outstanding - 10)</option>
+                                        <option value="9">A+ (Excellent - 9)</option>
+                                        <option value="8">A (Very Good - 8)</option>
+                                        <option value="7" selected>B+ (Good - 7)</option>
+                                        <option value="6">B (Above Average - 6)</option>
+                                        <option value="0">RA (Re-Appear - 0)</option>
+                                    </select>
+                                </td>
+                                <td class="gp-display">7</td>
+                                <td class="cp-display"><strong>21</strong></td>
+                            </tr>
+
+                            <tr data-credits="2">
+                                <td><strong>CS3511</strong></td>
+                                <td>Networks & DBMS Laboratory</td>
+                                <td>2</td>
+                                <td>
+                                    <select class="grade-select" onchange="calculateLiveSGPA()">
+                                        <option value="10" selected>O (Outstanding - 10)</option>
+                                        <option value="9">A+ (Excellent - 9)</option>
+                                        <option value="8">A (Very Good - 8)</option>
+                                        <option value="7">B+ (Good - 7)</option>
+                                        <option value="6">B (Above Average - 6)</option>
+                                        <option value="0">RA (Re-Appear - 0)</option>
+                                    </select>
+                                </td>
+                                <td class="gp-display">10</td>
+                                <td class="cp-display"><strong>20</strong></td>
+                            </tr>
+
+                            <tr data-credits="2">
+                                <td><strong>GE3552</strong></td>
+                                <td>Professional Communication</td>
+                                <td>2</td>
+                                <td>
+                                    <select class="grade-select" onchange="calculateLiveSGPA()">
+                                        <option value="10" selected>O (Outstanding - 10)</option>
+                                        <option value="9">A+ (Excellent - 9)</option>
+                                        <option value="8">A (Very Good - 8)</option>
+                                        <option value="7">B+ (Good - 7)</option>
+                                        <option value="6">B (Above Average - 6)</option>
+                                        <option value="0">RA (Re-Appear - 0)</option>
+                                    </select>
+                                </td>
+                                <td class="gp-display">10</td>
+                                <td class="cp-display"><strong>20</strong></td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 25px;">
+                    <button type="button" class="secondary-button" onclick="goToStep(2)">
+                        ← Back
+                    </button>
+
+                    <button type="button" class="primary-button" onclick="finalizeCalculation()">
+                        Calculate SGPA & Update CGPA →
+                    </button>
+                </div>
+
+            </div>
+
+
+            <!-- STEP 4: FINAL RESULTS & ACTIONABLE INSIGHTS -->
+
+            <div class="wizard-step-content" id="wizard-step-4">
+
+                <!-- RESULT BANNER -->
+                <div class="calculation-hero">
+                    <div>
+                        <h3>🎉 Semester 5 Calculation Complete</h3>
+                        <div class="score-display" id="final-sgpa-badge">8.61</div>
+                        <p>Total Credits Calculated: <strong>16 Credits</strong> • No Standing Arrears</p>
+                    </div>
+
+                    <div style="text-align: right; background: rgba(255,255,255,0.15); padding: 18px 24px; border-radius: 12px;">
+                        <small style="opacity: 0.9;">Updated Overall CGPA</small>
+                        <h2 style="font-size: 36px; margin: 4px 0;" id="final-cgpa-badge">8.42</h2>
+                        <span class="badge-tag badge-success">↑ +0.34 Growth</span>
+                    </div>
+                </div>
+
+                <!-- 3 CARDS SUMMARY -->
+                <div class="stats-grid">
+
+                    <div class="stat-card">
+                        <div class="stat-top">
+                            <span>Target CGPA Status</span>
+                            <div class="stat-icon">🎯</div>
+                        </div>
+                        <h2>9.00</h2>
+                        <p class="positive">On Track (Needs ~9.2 SGPA next sem)</p>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-top">
+                            <span>Placement Eligibility</span>
+                            <div class="stat-icon">💼</div>
+                        </div>
+                        <h2 class="eligible">Eligible</h2>
+                        <p>12 top tier company criteria met</p>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-top">
+                            <span>Strength Area</span>
+                            <div class="stat-icon">💡</div>
+                        </div>
+                        <h2>DBMS & Coding</h2>
+                        <p class="positive">Grade: O & A+ (Top 5%)</p>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-top">
+                            <span>Focus Recommended</span>
+                            <div class="stat-icon">⚠️</div>
+                        </div>
+                        <h2>Operating Systems</h2>
+                        <p>Can gain +0.4 SGPA by grade upgrade</p>
+                    </div>
+
+                </div>
+
+                <!-- ACTION BUTTONS -->
+                <div style="display: flex; gap: 15px; margin-top: 25px;">
+                    <a href="dashboard.html" class="primary-button" style="text-align: center;">
+                        Return to Main Dashboard →
+                    </a>
+
+                    <a href="placement.html" class="secondary-button">
+                        Check Placement Eligibility →
+                    </a>
+
+                    <a href="ai_advisor.html" class="secondary-button">
+                        Consult AI Academic Advisor →
+                    </a>
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <script src="js/script.js"></script>
+    <script>
+        // Wizard step switcher
+        function goToStep(stepNumber) {
+            document.querySelectorAll('.wizard-step-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.step-item').forEach(el => el.classList.remove('active'));
+
+            const targetStep = document.getElementById('wizard-step-' + stepNumber);
+            const targetInd = document.getElementById('step-ind-' + stepNumber);
+
+            if (targetStep) targetStep.classList.add('active');
+            if (targetInd) targetInd.classList.add('active');
+
+            // Mark previous steps as completed
+            for (let i = 1; i < stepNumber; i++) {
+                const ind = document.getElementById('step-ind-' + i);
+                if (ind) ind.classList.add('completed');
+            }
+
+            if (stepNumber === 3) {
+                calculateLiveSGPA();
+            }
+        }
+
+        // File upload simulation
+        function simulateFileUpload(type) {
+            if (type === 'syllabus') {
+                const prev = document.getElementById('syllabus-preview');
+                if (prev) prev.style.display = 'flex';
+                alert('✨ AI Parser: Successfully extracted 6 subjects and credit weights from Syllabus!');
+            } else {
+                const prev = document.getElementById('result-preview');
+                if (prev) prev.style.display = 'flex';
+                alert('✨ AI OCR: Successfully scanned grades from Result Sheet provisional transcript!');
+            }
+        }
+
+        // Live SGPA Calculation
+        function calculateLiveSGPA() {
+            const rows = document.querySelectorAll('#grades-tbody tr');
+            let totalCredits = 0;
+            let totalCreditPoints = 0;
+
+            rows.forEach(row => {
+                const credits = parseFloat(row.getAttribute('data-credits') || 3);
+                const select = row.querySelector('.grade-select');
+                const gp = parseFloat(select.value);
+                const cp = credits * gp;
+
+                const gpElem = row.querySelector('.gp-display');
+                const cpElem = row.querySelector('.cp-display');
+
+                if (gpElem) gpElem.textContent = gp;
+                if (cpElem) cpElem.innerHTML = '<strong>' + cp + '</strong>';
+
+                totalCredits += credits;
+                totalCreditPoints += cp;
+            });
+
+            const sgpa = (totalCreditPoints / totalCredits).toFixed(2);
+            return { sgpa, totalCredits };
+        }
+
+        function finalizeCalculation() {
+            const { sgpa, totalCredits } = calculateLiveSGPA();
+            const prevCgpa = parseFloat(document.getElementById('prev-cgpa-input')?.value || 8.38);
+            
+            // Weighted updated CGPA (Previous 4 sems approx 80 credits + current sem 16 credits)
+            const updatedCgpa = (((prevCgpa * 80) + (parseFloat(sgpa) * totalCredits)) / (80 + totalCredits)).toFixed(2);
+
+            const sgpaBadge = document.getElementById('final-sgpa-badge');
+            const cgpaBadge = document.getElementById('final-cgpa-badge');
+
+            if (sgpaBadge) sgpaBadge.textContent = sgpa;
+            if (cgpaBadge) cgpaBadge.textContent = updatedCgpa;
+
+            goToStep(4);
+        }
+
+        function addNewSubjectRow() {
+            const subCode = prompt('Enter Subject Code:', 'CS3503');
+            const subName = prompt('Enter Subject Name:', 'Cloud Computing & DevOps');
+            const credits = prompt('Enter Subject Credits (e.g. 3 or 4):', '3');
+
+            if (subCode && subName && credits) {
+                const tbody = document.getElementById('grades-tbody');
+                const tr = document.createElement('tr');
+                tr.setAttribute('data-credits', credits);
+                tr.innerHTML = `
+                    <td><strong>${subCode}</strong></td>
+                    <td>${subName}</td>
+                    <td>${credits}</td>
+                    <td>
+                        <select class="grade-select" onchange="calculateLiveSGPA()">
+                            <option value="10">O (Outstanding - 10)</option>
+                            <option value="9" selected>A+ (Excellent - 9)</option>
+                            <option value="8">A (Very Good - 8)</option>
+                            <option value="7">B+ (Good - 7)</option>
+                            <option value="6">B (Above Average - 6)</option>
+                            <option value="0">RA (Re-Appear - 0)</option>
+                        </select>
+                    </td>
+                    <td class="gp-display">9</td>
+                    <td class="cp-display"><strong>${credits * 9}</strong></td>
+                `;
+                tbody.appendChild(tr);
+                calculateLiveSGPA();
+            }
+        }
+    </script>
+</body>
+</html>
+

@@ -77,10 +77,10 @@ def ProfilePage(user):
         html.header(
             {"class_name": "pb-gutter-md border-b border-light-outline-variant flex items-center justify-between gap-gutter-md"},
             html.div(
-                html.h1({"class_name": "font-headline text-headline-md tracking-tight uppercase"}, "Profile"),
-                html.p({"class_name": "font-mono text-mono-sm text-light-on-surface-variant uppercase"}, f"{profile.role.upper() if profile else 'STUDENT'} • CBCS 2026")
+                html.h1({"class_name": "font-headline text-headline-md tracking-tight uppercase"}, "Institutional Profile & Credentials"),
+                html.p({"class_name": "font-mono text-mono-sm text-light-on-surface-variant uppercase"}, f"Identity • {profile.role.upper() if profile else 'STUDENT'} Standing • Security")
             ),
-            html.span({"class_name": "font-mono text-mono-sm font-bold bg-light-surface-container-highest px-3 py-1"}, "CBCS 2026")
+            html.span({"class_name": "font-mono text-mono-sm font-bold bg-light-surface-container-highest px-3 py-1"}, "2021 CBCS REGULATION")
         ),
 
         # Profile Info & Academic Summary Bento
@@ -211,7 +211,7 @@ def ProfilePage(user):
                         "on_click": handle_save_profile,
                         "class_name": "self-start px-gutter-lg py-2.5 bg-light-secondary text-light-on-secondary font-headline font-bold text-label-md hover:bg-light-primary hover:text-light-on-primary transition-colors duration-state-change uppercase cursor-pointer"
                     },
-                    "Save Profile"
+                    "SAVE PROFILE DETAILS"
                 )
             )
         ),
@@ -282,7 +282,7 @@ def ProfilePage(user):
                         "on_click": handle_change_password,
                         "class_name": "self-start px-gutter-lg py-2.5 bg-light-primary text-light-on-primary font-headline font-bold text-label-md hover:bg-light-primary-container hover:text-light-on-primary-container transition-colors duration-state-change uppercase cursor-pointer"
                     },
-                    "Update Password"
+                    "UPDATE PASSWORD"
                 )
             )
         )

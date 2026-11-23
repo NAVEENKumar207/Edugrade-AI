@@ -56,7 +56,7 @@ def PlacementPage(user):
 
     # Filter tab buttons
     tabs = [
-        ("all", f"All ({total_count})"),
+        ("all", f"All Drives ({total_count})"),
         ("eligible", f"Eligible ({eligible_count})"),
         ("ineligible", f"Action Needed ({ineligible_count})")
     ]
@@ -184,8 +184,8 @@ def PlacementPage(user):
         html.div(
             {"class_name": "flex flex-wrap items-center justify-between gap-gutter-md pb-gutter-md border-b border-light-outline-variant"},
             html.div(
-                html.h1({"class_name": "font-headline text-headline-md text-light-on-surface uppercase tracking-tight"}, "Placements"),
-                html.p({"class_name": "font-mono text-mono-sm text-light-on-surface-variant uppercase"}, f"{current_cgpa:.2f} CGPA • {backlogs_count} Arrears • {total_count} Drives")
+                html.h1({"class_name": "font-headline text-headline-md text-light-on-surface uppercase tracking-tight"}, "Placement Eligibility Matrix"),
+                html.p({"class_name": "font-mono text-mono-sm text-light-on-surface-variant uppercase"}, f"{current_cgpa:.2f} CGPA • {backlogs_count} Active Arrears • {total_count} Corporate Recruitment Drives")
             ),
             html.div(
                 {"class_name": "flex items-center gap-gutter-sm"},
@@ -205,14 +205,14 @@ def PlacementPage(user):
                 html.div(
                     {"class_name": "flex items-center gap-2"},
                     html.span({"class_name": "material-symbols-outlined text-light-primary text-[22px]"}, "psychology"),
-                    html.h2({"class_name": "font-headline text-title-md text-light-on-surface font-bold uppercase"}, "Skill Map")
+                    html.h2({"class_name": "font-headline text-title-md text-light-on-surface font-bold uppercase"}, "Academic Skill Map & Mastery Scores")
                 ),
-                html.span({"class_name": "text-label-xs font-mono text-light-on-surface-variant"}, "Derived from completed coursework")
+                html.span({"class_name": "text-label-xs font-mono text-light-on-surface-variant"}, "Credit-weighted scores derived from completed course results")
             ),
             (
                 html.div(
                     {"class_name": "p-6 text-center text-light-on-surface-variant font-mono text-body-sm border border-dashed border-light-outline-variant rounded-radius-md"},
-                    "No skill mapping available yet."
+                    "No skill mapping available yet. Complete coursework in DSA, DBMS, Web, or Systems to generate skill scores."
                 )
                 if not skills_dict else
                 html.div(
@@ -250,7 +250,7 @@ def PlacementPage(user):
                             html.div(
                                 {"class_name": "flex justify-between text-label-xs font-mono text-light-on-surface-variant mt-1"},
                                 html.span(f"{sk_info['total_credits']} Credits"),
-                                html.span(f"Avg GP: {sk_info['avg_grade_point']:.1f}")
+                                html.span(f"Avg GP: {sk_info['avg_grade_point']:.1f} / 10.0")
                             )
                         )
                         for sk_name, sk_info in skills_dict.items()

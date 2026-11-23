@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Create Account | EduGrade AI</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body class="auth-page">
+
+
+    <div class="auth-container">
+
+
+        <div class="auth-brand">
+
+            <a href="index.html" class="logo">
+                <span>Edu</span>Grade AI
+            </a>
+
+            <h1>
+                Start your journey.
+            </h1>
+
+            <p>
+                Build your student academic profile or register as faculty administrator to manage university performance.
+            </p>
+
+        </div>
+
+
+        <div class="auth-card">
+
+            <!-- Role Selector Toggle -->
+            <div class="role-toggle">
+                <button type="button" class="role-tab active" data-role="student">
+                    🎓 Student
+                </button>
+                <button type="button" class="role-tab" data-role="admin">
+                    🛡️ Admin / Faculty
+                </button>
+            </div>
+
+            <h2 id="auth-role-title">Create account</h2>
+
+            <p class="auth-subtitle" id="auth-role-subtitle">
+                Set up your student profile to get started.
+            </p>
+
+
+            <form action="dashboard.html" method="GET" data-form-type="signup">
+
+                <input type="hidden" name="role" id="selected-role" value="student">
+
+                <label>Full Name</label>
+
+                <input
+                    type="text"
+                    name="fullname"
+                    placeholder="e.g. Alex Kumar"
+                    required
+                >
+
+
+                <label>Email Address / Username</label>
+
+                <input
+                    type="email"
+                    name="username"
+                    placeholder="you@example.com"
+                    required
+                >
+
+                <label>Department</label>
+                <select name="department" required>
+                    <option value="Computer Science & Engineering">Computer Science & Engineering (CSE)</option>
+                    <option value="Information Technology">Information Technology (IT)</option>
+                    <option value="Electronics & Communication">Electronics & Communication (ECE)</option>
+                    <option value="Mechanical Engineering">Mechanical Engineering (ME)</option>
+                    <option value="Artificial Intelligence & Data Science">AI & Data Science (AIDS)</option>
+                </select>
+
+                <!-- Student specific fields -->
+                <div class="student-only">
+                    <label>Roll Number / Reg Number</label>
+                    <input
+                        type="text"
+                        name="roll_number"
+                        placeholder="e.g. 71762104012"
+                    >
+
+                    <label style="margin-top: 8px;">Current Semester</label>
+                    <select name="semester">
+                        <option value="1">Semester 1</option>
+                        <option value="2">Semester 2</option>
+                        <option value="3">Semester 3</option>
+                        <option value="4">Semester 4</option>
+                        <option value="5" selected>Semester 5</option>
+                        <option value="6">Semester 6</option>
+                        <option value="7">Semester 7</option>
+                        <option value="8">Semester 8</option>
+                    </select>
+                </div>
+
+                <!-- Admin specific fields -->
+                <div class="admin-only" style="display: none;">
+                    <label>Faculty / Staff ID</label>
+                    <input
+                        type="text"
+                        name="admin_id"
+                        placeholder="e.g. FAC-CSE-104"
+                    >
+
+                    <label style="margin-top: 8px;">Admin Authorization Key</label>
+                    <input
+                        type="password"
+                        name="admin_key"
+                        placeholder="Enter admin authorization key"
+                    >
+                </div>
+
+
+                <label>Password</label>
+
+                <input
+                    type="password"
+                    name="password"
+                    placeholder="Create a secure password"
+                    required
+                >
+
+
+                <label>Confirm Password</label>
+
+                <input
+                    type="password"
+                    name="confirm_password"
+                    placeholder="Confirm your password"
+                    required
+                >
+
+
+                <label class="checkbox terms">
+
+                    <input type="checkbox" required>
+
+                    I agree to the Terms & Privacy Policy.
+
+                </label>
+
+
+                <button type="submit" class="auth-button">
+                    Create Account →
+                </button>
+
+
+            </form>
+
+
+            <p class="signup-text">
+
+                Already have an account?
+
+                <a href="login.html">
+                    Sign in
+                </a>
+
+            </p>
+
+
+            <a href="index.html" class="back-home">
+                ← Back to home
+            </a>
+
+        </div>
+
+    </div>
+
+    <script src="js/script.js"></script>
+</body>
+</html>

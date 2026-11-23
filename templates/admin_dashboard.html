@@ -78,8 +78,8 @@
         <!-- TOPBAR -->
         <header class="dashboard-header">
             <div>
-                <h1>Faculty Dashboard</h1>
-                <p>Cohort metrics and academic directory.</p>
+                <h1>Welcome, {{ user.first_name|default:user.username }} 🛡️</h1>
+                <p>Faculty Academic Management & AI Student Intelligence Portal.</p>
             </div>
 
             <div style="display: flex; align-items: center; gap: 1rem;">

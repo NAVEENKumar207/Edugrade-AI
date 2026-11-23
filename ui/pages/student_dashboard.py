@@ -134,7 +134,7 @@ def StudentDashboard(user, set_page):
                 ),
                 html.p(
                     {"class_name": "text-body-md text-light-on-surface-variant font-mono mt-1"},
-                    f"{student.get('department', 'Computer Science')} • CBCS 2026 • Target: {student.get('target_cgpa', 8.5):.2f}"
+                    f"{student.get('department', 'Computer Science & Engineering')} | Regulation: 2021 CBCS | Target CGPA: {student.get('target_cgpa', 8.5):.2f}"
                 )
             ),
             html.div(
@@ -146,7 +146,7 @@ def StudentDashboard(user, set_page):
                         "class_name": "inline-flex items-center gap-2 px-gutter-md py-2 border-2 border-light-secondary text-light-secondary font-headline font-bold text-label-md hover:bg-light-secondary hover:text-light-on-secondary transition-colors duration-state-change uppercase cursor-pointer"
                     },
                     html.span({"class_name": "material-symbols-outlined text-[18px]"}, "calculate"),
-                    html.span("Simulate Target")
+                    html.span("SIMULATE TARGET")
                 ),
                 html.button(
                     {
@@ -155,7 +155,7 @@ def StudentDashboard(user, set_page):
                         "class_name": "inline-flex items-center gap-2 px-gutter-md py-2 bg-light-primary text-light-on-primary font-headline font-bold text-label-md hover:bg-light-primary-container hover:text-light-on-primary-container transition-colors duration-state-change uppercase cursor-pointer"
                     },
                     html.span({"class_name": "material-symbols-outlined text-[18px]"}, "psychology"),
-                    html.span("Ask Advisor")
+                    html.span("ASK AI ADVISOR")
                 )
             )
         ),
@@ -170,10 +170,10 @@ def StudentDashboard(user, set_page):
                 html.div(
                     {"class_name": "flex items-center gap-2 overflow-hidden"},
                     html.span({"class_name": "material-symbols-outlined text-light-primary text-[20px] shrink-0"}, "trending_up"),
-                    html.span({"class_name": "text-label-sm font-mono text-light-primary font-bold uppercase shrink-0"}, "Next Best Move:"),
+                    html.span({"class_name": "text-label-sm font-mono text-light-primary font-bold uppercase shrink-0"}, "Your Next Best Move:"),
                     html.span({"class_name": "text-body-sm text-light-on-surface truncate font-medium"}, top_move_sentence)
                 ),
-                html.span({"class_name": "text-label-xs font-mono text-light-primary shrink-0 flex items-center gap-1 font-bold"}, "Future Lab →")
+                html.span({"class_name": "text-label-xs font-mono text-light-primary shrink-0 flex items-center gap-1 font-bold"}, "OPEN FUTURE LAB →")
             )
             if top_move_sentence else None
         ),
@@ -185,7 +185,7 @@ def StudentDashboard(user, set_page):
                 html.div(
                     {"class_name": "flex items-center gap-2"},
                     html.span({"class_name": "material-symbols-outlined text-light-primary text-[20px]"}, "military_tech"),
-                    html.strong({"class_name": "text-label-sm font-mono uppercase text-light-on-surface"}, "Badges:"),
+                    html.strong({"class_name": "text-label-sm font-mono uppercase text-light-on-surface"}, "Earned Badges:"),
                 ),
                 html.div(
                     {"class_name": "flex items-center gap-2 flex-wrap"},
@@ -203,7 +203,7 @@ def StudentDashboard(user, set_page):
                         "on_click": lambda e: set_page("journey"),
                         "class_name": "text-label-xs font-mono text-light-primary font-bold hover:underline cursor-pointer"
                     },
-                    "Journey →"
+                    "View Journey Timeline →"
                 )
             )
             if earned_badges else None
@@ -219,8 +219,8 @@ def StudentDashboard(user, set_page):
                 html.header(
                     {"class_name": "flex items-start justify-between gap-gutter-sm"},
                     html.div(
-                        html.h3({"class_name": "font-mono text-mono-sm uppercase font-bold"}, "Current CGPA"),
-                        html.p({"class_name": "font-body text-body-sm text-light-on-primary-container"}, "10-point scale")
+                        html.h3({"class_name": "font-mono text-mono-sm uppercase font-bold"}, "01 / Current CGPA"),
+                        html.p({"class_name": "font-body text-body-sm text-light-on-primary-container"}, "10-point UGC scale")
                     ),
                     html.span({"class_name": "material-symbols-outlined text-[20px]"}, "analytics")
                 ),
@@ -240,15 +240,15 @@ def StudentDashboard(user, set_page):
                 html.header(
                     {"class_name": "flex items-start justify-between gap-gutter-sm"},
                     html.div(
-                        html.h3({"class_name": "font-mono text-mono-sm text-light-on-surface-variant uppercase font-bold"}, "Latest SGPA"),
-                        html.p({"class_name": "font-body text-body-sm text-light-on-surface-variant"}, f"Semester {latest_sem_num}")
+                        html.h3({"class_name": "font-mono text-mono-sm text-light-on-surface-variant uppercase font-bold"}, "02 / Latest SGPA"),
+                        html.p({"class_name": "font-body text-body-sm text-light-on-surface-variant"}, f"Semester {latest_sem_num} Results")
                     ),
                     html.span({"class_name": "material-symbols-outlined text-[20px] text-light-primary"}, "trending_up")
                 ),
                 html.div(
                     {"class_name": "flex items-center justify-between gap-gutter-sm mt-3"},
                     html.p({"class_name": "font-headline text-display-lg text-light-on-surface tabular-nums"}, f"{student.get('latest_sgpa', 0.0):.2f}"),
-                    html.span({"class_name": "font-mono text-mono-sm text-light-on-surface-variant tabular-nums whitespace-nowrap"}, f"{credits_earned} Credits")
+                    html.span({"class_name": "font-mono text-mono-sm text-light-on-surface-variant tabular-nums whitespace-nowrap"}, f"{credits_earned} Cr Total")
                 )
             ),
 
@@ -258,8 +258,8 @@ def StudentDashboard(user, set_page):
                 html.header(
                     {"class_name": "flex items-start justify-between gap-gutter-sm"},
                     html.div(
-                        html.h3({"class_name": "font-mono text-mono-sm text-light-on-surface-variant uppercase font-bold"}, "Credits"),
-                        html.p({"class_name": "font-body text-body-sm text-light-on-surface-variant"}, f"{remaining_credits} remaining")
+                        html.h3({"class_name": "font-mono text-mono-sm text-light-on-surface-variant uppercase font-bold"}, "03 / Credits Earned"),
+                        html.p({"class_name": "font-body text-body-sm text-light-on-surface-variant"}, f"{remaining_credits} credits remaining")
                     ),
                     html.span({"class_name": "material-symbols-outlined text-[20px] text-light-on-surface"}, "task_alt")
                 ),
@@ -283,7 +283,7 @@ def StudentDashboard(user, set_page):
                 html.header(
                     {"class_name": "flex items-start justify-between gap-gutter-sm"},
                     html.div(
-                        html.h3({"class_name": "font-mono text-mono-sm uppercase text-light-on-secondary/80 font-bold"}, "Arrears"),
+                        html.h3({"class_name": "font-mono text-mono-sm uppercase text-light-on-secondary/80 font-bold"}, "04 / Standing Arrears"),
                         html.p({"class_name": "font-body text-body-sm text-light-on-secondary/75"}, "Active backlogs")
                     ),
                     html.span({"class_name": "material-symbols-outlined text-[20px]"}, "verified_user")
@@ -312,8 +312,8 @@ def StudentDashboard(user, set_page):
                 html.header(
                     {"class_name": "flex flex-wrap items-start justify-between gap-gutter-md"},
                     html.div(
-                        html.h3({"class_name": "font-headline text-title-lg text-light-on-surface uppercase"}, "SGPA Trajectory"),
-                        html.p({"class_name": "font-body text-body-sm text-light-on-surface-variant"}, "Click bar to inspect semester")
+                        html.h3({"class_name": "font-headline text-title-lg text-light-on-surface uppercase"}, "Semester SGPA Trajectory"),
+                        html.p({"class_name": "font-body text-body-sm text-light-on-surface-variant"}, "Click any semester bar to inspect credit weight & details")
                     ),
                     html.div(
                         {"class_name": "px-3 py-1.5 bg-light-surface-container-low border border-light-outline-variant flex items-center gap-gutter-sm"},
@@ -326,7 +326,7 @@ def StudentDashboard(user, set_page):
                 # Bars Container
                 html.div(
                     {"class_name": "flex gap-gutter-md items-end pt-gutter-md border-b border-light-outline-variant pb-gutter-sm overflow-x-auto min-h-[180px]"},
-                    bar_elements if bar_elements else [html.p({"class_name": "font-mono text-mono-sm text-light-outline p-4"}, "No records.")]
+                    bar_elements if bar_elements else [html.p({"class_name": "font-mono text-mono-sm text-light-outline p-4"}, "No semester records found.")]
                 ),
 
                 # Grade Distribution Pill Strip
@@ -345,7 +345,7 @@ def StudentDashboard(user, set_page):
                             "on_click": lambda e: set_page("results"),
                             "class_name": "inline-flex items-center gap-1 font-mono text-mono-sm uppercase text-light-primary hover:underline whitespace-nowrap shrink-0 cursor-pointer"
                         },
-                        html.span("Full Transcript"),
+                        html.span("View Full Transcript"),
                         html.span({"class_name": "material-symbols-outlined text-[16px]"}, "arrow_forward")
                     )
                 )
@@ -358,7 +358,7 @@ def StudentDashboard(user, set_page):
                     {"class_name": "flex items-start justify-between gap-gutter-sm"},
                     html.div(
                         html.h3({"class_name": "font-headline text-title-lg text-light-on-surface uppercase"}, "Placement Matrix"),
-                        html.p({"class_name": "font-body text-body-sm text-light-on-surface-variant"}, f"{total_companies} drives")
+                        html.p({"class_name": "font-body text-body-sm text-light-on-surface-variant"}, f"Audited against {total_companies} corporate recruitment drives")
                     ),
                     html.span({"class_name": "font-headline text-headline-md text-light-primary tabular-nums whitespace-nowrap shrink-0"}, f"{eligible_count} / {total_companies}")
                 ),
@@ -381,7 +381,7 @@ def StudentDashboard(user, set_page):
                                 "Eligible" if c.get("is_eligible") else f"{(float(c.get('min_cgpa', 0)) - float(student.get('current_cgpa', 0))):.2f} Short"
                             )
                         ) for idx, c in enumerate(top_3_companies)
-                    ] if top_3_companies else [html.p({"class_name": "font-mono text-mono-sm text-light-outline p-2"}, "No placement criteria.")]
+                    ] if top_3_companies else [html.p({"class_name": "font-mono text-mono-sm text-light-outline p-2"}, "No placement criteria available.")]
                 ),
 
                 html.footer(
@@ -393,7 +393,7 @@ def StudentDashboard(user, set_page):
                             "on_click": lambda e: set_page("placement"),
                             "class_name": "inline-flex items-center gap-gutter-xs font-mono text-mono-sm uppercase text-light-primary hover:underline whitespace-nowrap shrink-0 cursor-pointer"
                         },
-                        html.span(f"View All ({total_companies})"),
+                        html.span(f"Audit All {total_companies}"),
                         html.span({"class_name": "material-symbols-outlined text-[16px]"}, "arrow_forward")
                     )
                 )
@@ -410,8 +410,8 @@ def StudentDashboard(user, set_page):
                 html.header(
                     {"class_name": "flex items-center justify-between gap-gutter-sm"},
                     html.div(
-                        html.h3({"class_name": "font-headline text-title-lg text-light-on-surface uppercase"}, "Strengths"),
-                        html.p({"class_name": "font-body text-body-sm text-light-on-surface-variant"}, "Top credit-weighted grades")
+                        html.h3({"class_name": "font-headline text-title-lg text-light-on-surface uppercase"}, "Top Academic Strengths"),
+                        html.p({"class_name": "font-body text-body-sm text-light-on-surface-variant"}, "Highest credit-weighted grade contributions")
                     ),
                     html.span({"class_name": "material-symbols-outlined text-[22px] text-light-on-surface"}, "workspace_premium")
                 ),
@@ -426,7 +426,7 @@ def StudentDashboard(user, set_page):
                             ),
                             html.span({"class_name": "px-2.5 py-1 rounded-full bg-light-secondary text-light-on-secondary font-mono text-mono-sm tabular-nums whitespace-nowrap shrink-0"}, f"{c.grade} ({c.grade_point:.1f})")
                         ) for c in strong_courses
-                    ] if strong_courses else [html.p({"class_name": "font-mono text-mono-sm text-light-outline py-2"}, "No grades logged.")]
+                    ] if strong_courses else [html.p({"class_name": "font-mono text-mono-sm text-light-outline py-2"}, "All grades are currently being compiled.")]
                 )
             ),
 
@@ -438,8 +438,8 @@ def StudentDashboard(user, set_page):
                     html.header(
                         {"class_name": "flex items-center justify-between gap-gutter-sm"},
                         html.div(
-                            html.h3({"class_name": "font-headline text-title-lg text-light-on-surface uppercase"}, "Remediation"),
-                            html.p({"class_name": "font-body text-body-sm text-light-on-surface-variant"}, f"Courses below {student.get('current_cgpa', 8.5):.2f} CGPA")
+                            html.h3({"class_name": "font-headline text-title-lg text-light-on-surface uppercase"}, "Focus & Remediation"),
+                            html.p({"class_name": "font-body text-body-sm text-light-on-surface-variant"}, f"Courses below your {student.get('current_cgpa', 8.5):.2f} CGPA baseline")
                         ),
                         html.span({"class_name": "material-symbols-outlined text-[22px] text-light-primary"}, "target")
                     ),
@@ -454,19 +454,19 @@ def StudentDashboard(user, set_page):
                                 ),
                                 html.span({"class_name": "px-2.5 py-1 rounded-full bg-light-primary-container text-light-on-primary-container font-mono text-mono-sm tabular-nums whitespace-nowrap shrink-0 font-bold"}, f"{c.grade} ({c.grade_point:.1f})")
                             ) for c in remediation_courses
-                        ] if remediation_courses else [html.p({"class_name": "font-mono text-mono-sm text-success py-2"}, "No low-performing courses.")]
+                        ] if remediation_courses else [html.p({"class_name": "font-mono text-mono-sm text-success py-2"}, "Excellent! No low-performing courses detected.")]
                     )
                 ),
                 html.footer(
                     {"class_name": "pt-gutter-sm border-t border-light-outline-variant flex items-center justify-between gap-gutter-sm"},
-                    html.span({"class_name": "font-mono text-mono-sm text-light-on-surface-variant uppercase"}, "Study Plan"),
+                    html.span({"class_name": "font-mono text-mono-sm text-light-on-surface-variant uppercase"}, "EN / தமிழ் Study Plans"),
                     html.button(
                         {
                             "type": "button",
                             "on_click": lambda e: set_page("advisor"),
                             "class_name": "inline-flex items-center gap-gutter-xs font-mono text-mono-sm uppercase text-light-primary hover:underline whitespace-nowrap shrink-0 cursor-pointer"
                         },
-                        html.span("AI Plan"),
+                        html.span("Get AI Study Plan"),
                         html.span({"class_name": "material-symbols-outlined text-[16px]"}, "arrow_forward")
                     )
                 )
