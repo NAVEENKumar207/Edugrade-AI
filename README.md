@@ -27,7 +27,7 @@ EduGrade AI transforms traditional student record keeping into an active, forwar
 7. **QR-Verified Anti-Tamper Transcripts**:
    Cryptographically secured academic transcripts using HMAC-SHA256 digital signatures, embedded ReportLab QR codes, and a public verification gateway (`/verify/<token>/`) providing instant verification while strictly masking student PII.
 8. **Academic Journey, Badges & Early Warning**:
-   A chronological visual timeline celebrating student progress paired with 5 milestone badges (*Dean's List*, *First Step*, *Perfect Ten*, *Comeback Kid*, *Placement Ready*). For faculty, least-squares linear regression flags at-risk students with specific early warning diagnostic indicators.
+   A chronological visual timeline celebrating student progress paired with 7 milestone badges (*Zero Arrears*, *Comeback*, *Rising Star*, *Steady*, *Distinction*, *Full Credit Semester*, *Placement Ready*). For faculty, least-squares linear regression flags at-risk students with specific early warning diagnostic indicators.
 9. **Tamil Voice-Assisted AI Advisor**:
    A bilingual academic counseling interface supporting both English and Tamil. Uses the browser Web Speech API for voice dictation and speech synthesis, allowing students to speak and listen in their preferred language.
 

@@ -2,9 +2,10 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 from rest_framework.test import APIClient
 from rest_framework import status
-from core.models import UserProfile, SemesterRecord, CourseResult
+from core.models import UserProfile, SemesterRecord, CourseResult, CompanyPlacementCriteria
 from core.services.journey_service import (
-    get_journey, get_badges, predict_next_sgpa, evaluate_student_risk
+    get_journey, get_badges, predict_next_sgpa, evaluate_student_risk,
+    DISTINCTION_CGPA_THRESHOLD, STEADY_SGPA_VARIANCE_THRESHOLD, PLACEMENT_READY_THRESHOLD
 )
 
 class JourneyBadgesAndEarlyWarningTests(TestCase):
@@ -34,25 +35,116 @@ class JourneyBadgesAndEarlyWarningTests(TestCase):
         self.assertEqual(journey[1]["change"], "up")
         self.assertIn("surged", journey[1]["highlight"].lower())
 
-    def test_each_badge_earned_and_locked_cases(self):
-        badges_dict = get_badges(self.profile)
-        earned_ids = [b["id"] for b in badges_dict["earned_badges"]]
-        locked_ids = [b["id"] for b in badges_dict["locked_badges"]]
+    def test_student_with_no_data_all_seven_locked_no_crash(self):
+        sparse_user = User.objects.create_user(username='empty_student', password='password123')
+        sparse_profile = UserProfile.objects.create(user=sparse_user, role='student', current_cgpa=0.0, backlogs_count=0)
+        res = get_badges(sparse_profile)
+        self.assertEqual(len(res["all_badges"]), 7)
+        self.assertEqual(len(res["earned_badges"]), 0)
+        self.assertEqual(len(res["locked_badges"]), 7)
+        self.assertTrue(all(b["earned"] is False for b in res["all_badges"]))
 
-        # Zero arrears should be earned (0 backlogs, 3 semesters)
-        self.assertIn("zero_arrears", earned_ids)
-        # Distinction should be earned (CGPA 8.80 >= 8.5)
-        self.assertIn("distinction", earned_ids)
-        # Rising star earned (8.0 -> 8.5 -> 8.8)
-        self.assertIn("rising_star", earned_ids)
-        # Comeback locked (no arrear cleared)
-        self.assertIn("comeback", locked_ids)
+    def test_badge_1_zero_arrears_earned_and_locked(self):
+        # Earned: backlogs == 0 and at least 1 semester has results
+        b_dict = get_badges(self.profile)
+        self.assertTrue(any(b["id"] == "zero_arrears" and b["earned"] for b in b_dict["all_badges"]))
 
-        # Now simulate clearing an arrear
-        CourseResult.objects.create(student=self.profile, semester_number=1, course_code="CS99", course_name="C Prog", credits=3, grade="B", grade_point=6.0, arrear_cleared=True)
-        updated_badges = get_badges(self.profile)
-        updated_earned_ids = [b["id"] for b in updated_badges["earned_badges"]]
-        self.assertIn("comeback", updated_earned_ids)
+        # Locked if backlogs > 0
+        self.profile.backlogs_count = 1
+        self.profile.save()
+        b_dict = get_badges(self.profile)
+        self.assertTrue(any(b["id"] == "zero_arrears" and not b["earned"] for b in b_dict["all_badges"]))
+
+    def test_badge_2_comeback_earned_and_locked(self):
+        # Locked: no cleared arrears
+        b_dict = get_badges(self.profile)
+        self.assertTrue(any(b["id"] == "comeback" and not b["earned"] for b in b_dict["all_badges"]))
+
+        # Earned: at least 1 arrear has been cleared
+        CourseResult.objects.create(
+            student=self.profile, semester_number=1, course_code="CS99",
+            course_name="C Prog", credits=3, grade="B", grade_point=6.0, arrear_cleared=True
+        )
+        b_dict = get_badges(self.profile)
+        self.assertTrue(any(b["id"] == "comeback" and b["earned"] for b in b_dict["all_badges"]))
+
+    def test_badge_3_rising_star_earned_and_locked(self):
+        # Earned: 8.0 -> 8.5 -> 8.8 (increased across 2 consecutive semesters, 3 semesters)
+        b_dict = get_badges(self.profile)
+        self.assertTrue(any(b["id"] == "rising_star" and b["earned"] for b in b_dict["all_badges"]))
+
+        # Locked: if not increasing consecutively (e.g. 8.0 -> 8.5 -> 8.2)
+        self.sem3.sgpa = 8.20
+        self.sem3.save()
+        b_dict = get_badges(self.profile)
+        self.assertTrue(any(b["id"] == "rising_star" and not b["earned"] for b in b_dict["all_badges"]))
+
+    def test_badge_4_steady_earned_and_locked(self):
+        # Set 3 SGPAs within 0.5 of each other: 8.0, 8.2, 8.3 (max-min = 0.3 <= 0.5)
+        self.sem1.sgpa = 8.00
+        self.sem1.save()
+        self.sem2.sgpa = 8.20
+        self.sem2.save()
+        self.sem3.sgpa = 8.30
+        self.sem3.save()
+        b_dict = get_badges(self.profile)
+        self.assertTrue(any(b["id"] == "steady" and b["earned"] for b in b_dict["all_badges"]))
+
+        # Locked: if last 3 SGPAs exceed 0.5 difference (e.g. 7.0, 8.0, 8.5 -> max-min = 1.5)
+        self.sem1.sgpa = 7.00
+        self.sem1.save()
+        b_dict = get_badges(self.profile)
+        self.assertTrue(any(b["id"] == "steady" and not b["earned"] for b in b_dict["all_badges"]))
+
+    def test_badge_5_distinction_earned_and_locked(self):
+        # Earned: CGPA 8.80 >= 8.5
+        self.profile.current_cgpa = 8.80
+        self.profile.save()
+        b_dict = get_badges(self.profile)
+        self.assertTrue(any(b["id"] == "distinction" and b["earned"] for b in b_dict["all_badges"]))
+
+        # Locked: CGPA < 8.5 (e.g. 8.49)
+        self.profile.current_cgpa = 8.49
+        self.profile.save()
+        b_dict = get_badges(self.profile)
+        self.assertTrue(any(b["id"] == "distinction" and not b["earned"] for b in b_dict["all_badges"]))
+
+    def test_badge_6_full_credit_semester_earned_and_locked(self):
+        # Earned: sem1 and sem2 courses have no failing grades
+        b_dict = get_badges(self.profile)
+        self.assertTrue(any(b["id"] == "full_credit" and b["earned"] for b in b_dict["all_badges"]))
+
+        # Locked: if every semester has a failing grade
+        self.c1.grade = "U"
+        self.c1.save()
+        self.c2.grade = "RA"
+        self.c2.save()
+        b_dict = get_badges(self.profile)
+        self.assertTrue(any(b["id"] == "full_credit" and not b["earned"] for b in b_dict["all_badges"]))
+
+    def test_badge_7_placement_ready_earned_and_locked(self):
+        # With no companies, it is NOT earned
+        CompanyPlacementCriteria.objects.all().delete()
+        b_dict = get_badges(self.profile)
+        self.assertTrue(any(b["id"] == "placement_ready" and not b["earned"] for b in b_dict["all_badges"]))
+
+        # Create company criteria so readiness can be computed
+        CompanyPlacementCriteria.objects.create(
+            company_name="TechCorp", role_title="SE", min_cgpa=7.0, max_backlogs=0, package_lpa=8.0, is_active=True
+        )
+        # High CGPA (9.0) + 0 backlogs -> readiness: 45 (cgpa) + 30 (backlogs) + 20 (companies) = 95 >= 70
+        self.profile.current_cgpa = 9.00
+        self.profile.backlogs_count = 0
+        self.profile.save()
+        b_dict = get_badges(self.profile)
+        self.assertTrue(any(b["id"] == "placement_ready" and b["earned"] for b in b_dict["all_badges"]))
+
+        # Locked: low CGPA + backlogs -> readiness < 70
+        self.profile.current_cgpa = 5.00
+        self.profile.backlogs_count = 3
+        self.profile.save()
+        b_dict = get_badges(self.profile)
+        self.assertTrue(any(b["id"] == "placement_ready" and not b["earned"] for b in b_dict["all_badges"]))
 
     def test_least_squares_prediction_on_known_series(self):
         # Specific requirement: [8.0, 7.0, 6.0] predicts 5.0
@@ -67,6 +159,9 @@ class JourneyBadgesAndEarlyWarningTests(TestCase):
 
     def test_risk_levels_and_reasons(self):
         # Normal profile -> low risk
+        self.profile.current_cgpa = 8.50
+        self.profile.backlogs_count = 0
+        self.profile.save()
         r_low = evaluate_student_risk(self.profile)
         self.assertEqual(r_low["risk_level"], "low")
 

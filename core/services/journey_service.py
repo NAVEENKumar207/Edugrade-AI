@@ -16,6 +16,11 @@ RISK_HIGH_PREDICTED_SGPA = 5.5
 RISK_MEDIUM_SGPA_DROP = 1.0
 RISK_MEDIUM_BACKLOGS = 1
 
+# Milestone Badge Thresholds
+DISTINCTION_CGPA_THRESHOLD = 8.5
+STEADY_SGPA_VARIANCE_THRESHOLD = 0.5
+PLACEMENT_READY_THRESHOLD = 70
+
 def predict_next_sgpa(sgpas: list) -> float:
     """
     Computes simple least-squares trend line through given SGPAs (up to last 3),
@@ -193,11 +198,11 @@ def get_badges(student_profile) -> dict:
     b4_earned = False
     if sem_count >= 3:
         last3 = [float(s.sgpa) for s in sem_records[-3:]]
-        if max(last3) - min(last3) <= 0.5:
+        if max(last3) - min(last3) <= STEADY_SGPA_VARIANCE_THRESHOLD:
             b4_earned = True
 
     # 5. Distinction: CGPA >= 8.5
-    b5_earned = (cgpa >= 8.5 and sem_count >= 1)
+    b5_earned = (cgpa >= DISTINCTION_CGPA_THRESHOLD and sem_count >= 1)
 
     # 6. Full Credit Semester: at least one semester with no failed course and >0 courses
     b6_earned = False
@@ -206,15 +211,18 @@ def get_badges(student_profile) -> dict:
             b6_earned = True
             break
 
-    # 7. Placement Ready: readiness >= 70
-    readiness_res = placement_readiness(student_profile)
-    b7_earned = (int(readiness_res) >= 70)
+    # 7. Placement Ready: readiness >= 70 (with no companies it is not earned)
+    b7_earned = False
+    from core.models import CompanyPlacementCriteria
+    if CompanyPlacementCriteria.objects.filter(is_active=True).exists():
+        readiness_res = placement_readiness(student_profile)
+        b7_earned = (int(readiness_res) >= PLACEMENT_READY_THRESHOLD)
 
     definitions = [
         {
             "id": "zero_arrears",
             "name": "Zero Arrears",
-            "rule": "Maintain zero active backlogs with at least 1 published semester.",
+            "rule": "Active backlogs == 0 and at least 1 semester has results.",
             "earned": b1_earned,
             "icon": "shield-check",
             "badge_class": "badge-emerald"
@@ -222,7 +230,7 @@ def get_badges(student_profile) -> dict:
         {
             "id": "comeback",
             "name": "Comeback",
-            "rule": "Successfully clear at least one standing arrear.",
+            "rule": "At least 1 arrear has been cleared.",
             "earned": b2_earned,
             "icon": "arrow-path",
             "badge_class": "badge-amber"
@@ -230,7 +238,7 @@ def get_badges(student_profile) -> dict:
         {
             "id": "rising_star",
             "name": "Rising Star",
-            "rule": "Achieve SGPA improvement across two consecutive semesters.",
+            "rule": "SGPA increased in 2 consecutive semesters (needs 3 semesters).",
             "earned": b3_earned,
             "icon": "sparkles",
             "badge_class": "badge-primary"
@@ -238,7 +246,7 @@ def get_badges(student_profile) -> dict:
         {
             "id": "steady",
             "name": "Steady",
-            "rule": "Maintain consistent performance with your last 3 SGPAs within 0.5 points.",
+            "rule": "The last 3 SGPAs are all within 0.5 of each other (needs 3 semesters).",
             "earned": b4_earned,
             "icon": "scale",
             "badge_class": "badge-blue"
@@ -246,7 +254,7 @@ def get_badges(student_profile) -> dict:
         {
             "id": "distinction",
             "name": "Distinction",
-            "rule": "Attain a cumulative CGPA of 8.50 or higher.",
+            "rule": "CGPA is 8.5 or higher.",
             "earned": b5_earned,
             "icon": "trophy",
             "badge_class": "badge-gold"
@@ -254,7 +262,7 @@ def get_badges(student_profile) -> dict:
         {
             "id": "full_credit",
             "name": "Full Credit Semester",
-            "rule": "Complete all registered credits in a semester with zero failed subjects.",
+            "rule": "At least one semester where no course has a failing grade.",
             "earned": b6_earned,
             "icon": "academic-cap",
             "badge_class": "badge-emerald"
@@ -262,7 +270,7 @@ def get_badges(student_profile) -> dict:
         {
             "id": "placement_ready",
             "name": "Placement Ready",
-            "rule": "Achieve an overall placement readiness score of 70% or higher.",
+            "rule": "Placement readiness score is 70 or higher.",
             "earned": b7_earned,
             "icon": "briefcase",
             "badge_class": "badge-purple"
