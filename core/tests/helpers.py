@@ -37,7 +37,7 @@ def create_admin(username='admin1', roll_number='FAC-001', password='password123
     """Factory helper to create a staff/admin User and UserProfile for test compatibility."""
     user, _ = User.objects.get_or_create(
         username=username,
-        defaults={'first_name': kwargs.get('first_name', 'Admin'), 'last_name': kwargs.get('last_name', 'Faculty'), 'is_staff': True}
+        defaults={'first_name': kwargs.get('first_name', 'Admin'), 'last_name': kwargs.get('last_name', 'Staff'), 'is_staff': True}
     )
     user.is_staff = True
     user.save()

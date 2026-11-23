@@ -19,8 +19,8 @@ class TranscriptVerificationTests(TestCase):
         self.user = User.objects.create_user(
             username='verified_student',
             email='secret_student@example.com',
-            first_name='Kavitha',
-            last_name='',
+            first_name='Naveenkumar',
+            last_name='S',
             password='password123'
         )
         self.profile = UserProfile.objects.create(

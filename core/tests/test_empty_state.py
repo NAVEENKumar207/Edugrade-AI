@@ -1,6 +1,6 @@
 """
 Automated Integration Tests for Empty Database State Handling.
-Verifies that all student and faculty endpoints return HTTP 200 without
+Verifies that all student endpoints return HTTP 200 without
 500 crashes, division by zero, or NaN errors when no results/students exist.
 """
 

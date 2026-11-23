@@ -5,7 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Overview
 EduGrade AI is a **STUDENT-ONLY** Academic Digital Twin and Career Readiness Portal. It features a Django REST Backend and an interactive, real-time ReactPy Single-Page Application (SPA) running over WebSockets with `reactpy-django` and Django Channels.
 
-All faculty/admin registration, login, dashboards, drive managers, and admin REST endpoints have been removed. Django's built-in `/admin/` is strictly restricted to superusers. Students own and manage their academic data directly via single-result CRUD and bulk CSV import.
+All legacy staff registration, elevated portals, candidate recruitment dashboards, and privileged endpoints have been removed. Django's built-in `/admin/` is strictly restricted to superusers. Students own and manage their academic data directly via single-result CRUD and bulk CSV import.
 
 ## Common Commands
 
@@ -53,7 +53,7 @@ All faculty/admin registration, login, dashboards, drive managers, and admin RES
 - `static/`: Contains `css/reactpy_styles.css` (primary design system) and legacy `css/style.css`.
 
 ### Key Policies & Rules
-- **Student-Only Portal**: No faculty or admin roles exist. All users are students. Django admin (`/admin/`) is restricted strictly to active superusers.
+- **Student-Only Portal**: User account types have been unified. All users are students. Django admin (`/admin/`) is restricted strictly to active superusers.
 - **Regulation Constants**: `core/regulation.py` is the single source of truth for all regulation values (`INTERNAL_MAX`, `EXTERNAL_PAPER_MAX`, `EXTERNAL_WEIGHT`, `MIN_EXTERNAL_PERCENT`, `MIN_TOTAL_TO_PASS`, `GRADE_BOUNDARIES`). Never hardcode these anywhere else.
 - **Student-Owned Results Entry**: Students have full ownership to add, edit, and delete their individual course results, as well as import results in bulk via CSV.
 - **Student Isolation**: Students can only access and modify their own academic records. Cross-student data leakage is strictly blocked.

@@ -51,7 +51,7 @@ class NumberedCanvas(canvas.Canvas):
         self.line(40, 40, letter[0] - 40, 40)
 
         # Footer text
-        footer_left = "EduGrade AI Student Portal • CBCS Regulations • Self-reported academic data"
+        footer_left = "EduGrade AI Student Portal • SELF-REPORTED - NOT INSTITUTION VERIFIED • CBCS Regulations"
         footer_right = f"Page {self._pageNumber} of {page_count}"
         self.drawString(40, 28, footer_left)
         self.drawRightString(letter[0] - 40, 28, footer_right)
@@ -143,7 +143,30 @@ def generate_transcript_pdf(student_profile, semester_filter=None):
     # 1. Header Banner
     story.append(Paragraph("EduGrade AI — Official Academic Transcript", title_style))
     story.append(Paragraph("Choice Based Credit System (CBCS) • Autonomous Academic Performance Record", subtitle_style))
-    story.append(HRFlowable(width="100%", thickness=1.5, color=vermillion, spaceBefore=0, spaceAfter=14))
+    story.append(HRFlowable(width="100%", thickness=1.5, color=vermillion, spaceBefore=0, spaceAfter=8))
+
+    # Prominent Header Banner: Self-Reported Notice
+    header_disclaimer_style = ParagraphStyle(
+        'HeaderDisclaimer',
+        parent=styles['Normal'],
+        fontName='Helvetica-Bold',
+        fontSize=8.5,
+        leading=11,
+        textColor=colors.HexColor("#9A3412"),
+        alignment=1
+    )
+    disclaimer_table = Table([[
+        Paragraph("SELF-REPORTED - NOT INSTITUTION VERIFIED", header_disclaimer_style)
+    ]], colWidths=[532])
+    disclaimer_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, -1), colors.HexColor("#FFEDD5")),
+        ('BOX', (0, 0), (-1, -1), 1, vermillion),
+        ('TOPPADDING', (0, 0), (-1, -1), 4),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+    ]))
+    story.append(disclaimer_table)
+    story.append(Spacer(1, 8))
 
     # 2. Student Info Table
     user = student_profile.user

@@ -1,7 +1,7 @@
 """
 REST API Views for EduGrade AI Platform.
 Serves modern React frontend and API clients with strict authentication,
-role-based permissions, database transactions, and deterministic calculations.
+Database transactions and deterministic calculations.
 """
 
 import hmac
@@ -418,6 +418,11 @@ def api_results(request, course_id=None):
         with transaction.atomic():
             cr.save()
             recalculate_student_metrics(profile)
+            AcademicAuditLog.objects.create(
+                action_by=request.user,
+                action_type="COURSE_RESULT_UPDATED",
+                description=f"Course result {cr.course_code} updated by student {request.user.username}."
+            )
 
         return Response({
             'message': 'Course result updated successfully.',
@@ -464,18 +469,42 @@ def api_results(request, course_id=None):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def api_results_sample_csv(request):
-    """Returns downloadable sample CSV template for student results upload."""
+    """Returns downloadable sample CSV template for student results upload with injection hardening."""
     from django.http import HttpResponse
-    csv_content = (
-        "semester,course_code,course_name,credits,grade\r\n"
-        "1,HS8151,Communicative English,3,A\r\n"
-        "1,MA8151,Engineering Mathematics - I,4,A+\r\n"
-        "1,PH8151,Engineering Physics,3,A\r\n"
-        "1,CY8151,Engineering Chemistry,3,B+\r\n"
-        "1,GE8151,Problem Solving & Python Programming,3,O\r\n"
-    )
-    response = HttpResponse(csv_content, content_type='text/csv')
+    from .services.academic_service import sanitize_csv_cell
+    sample_rows = [
+        ["semester", "course_code", "course_name", "credits", "grade"],
+        [1, "HS8151", "Communicative English", 3, "A"],
+        [1, "MA8151", "Engineering Mathematics - I", 4, "A+"],
+        [1, "PH8151", "Engineering Physics", 3, "A"],
+        [1, "CY8151", "Engineering Chemistry", 3, "B+"],
+        [1, "GE8151", "Problem Solving & Python Programming", 3, "O"],
+    ]
+    import csv
+    import io
+    output = io.StringIO()
+    writer = csv.writer(output, quoting=csv.QUOTE_MINIMAL)
+    for r in sample_rows:
+        writer.writerow([sanitize_csv_cell(c) for c in r])
+    response = HttpResponse(output.getvalue(), content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="sample_grades_template.csv"'
+    return response
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def api_results_export_csv(request):
+    """Exports the authenticated student's results as a CSV file with formula injection protection."""
+    from django.http import HttpResponse
+    profile = getattr(request.user, 'profile', None)
+    if not profile:
+        return Response({'error': 'Profile not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    from .services.academic_service import export_student_grades_csv
+    csv_content = export_student_grades_csv(profile)
+    roll = profile.roll_number or 'student'
+    response = HttpResponse(csv_content, content_type='text/csv; charset=utf-8')
+    response['Content-Disposition'] = f'attachment; filename="student_grades_{roll}.csv"'
     return response
 
 
@@ -484,6 +513,7 @@ def api_results_sample_csv(request):
 def api_results_import(request):
     """
     Imports academic results from CSV for the authenticated student.
+    Enforces hardening: max 1 MB, max 500 rows, UTF-8 only, and strict grade/credit validation.
     Accepts file upload (file/csv_file) or raw text (csv_text).
     """
     profile = getattr(request.user, 'profile', None)
@@ -494,14 +524,25 @@ def api_results_import(request):
     if uploaded_file:
         if not uploaded_file.name.lower().endswith('.csv'):
             return Response({'error': 'Invalid file type. Please upload a .csv file.'}, status=status.HTTP_400_BAD_REQUEST)
-        if uploaded_file.size > 2 * 1024 * 1024:
-            return Response({'error': 'File size exceeds maximum limit of 2MB.'}, status=status.HTTP_400_BAD_REQUEST)
+        if uploaded_file.size > 1024 * 1024:
+            return Response({'error': 'File size exceeds maximum limit of 1MB.'}, status=status.HTTP_400_BAD_REQUEST)
         try:
-            csv_text = uploaded_file.read().decode('utf-8-sig')
+            raw_bytes = uploaded_file.read()
+            if len(raw_bytes) > 1024 * 1024:
+                return Response({'error': 'File size exceeds maximum limit of 1MB.'}, status=status.HTTP_400_BAD_REQUEST)
+            csv_text = raw_bytes.decode('utf-8-sig')
         except UnicodeDecodeError:
             return Response({'error': 'File must be UTF-8 encoded.'}, status=status.HTTP_400_BAD_REQUEST)
     else:
         csv_text = request.data.get('csv_text', '')
+        if not isinstance(csv_text, str):
+            csv_text = str(csv_text or '')
+        try:
+            raw_bytes = csv_text.encode('utf-8')
+            if len(raw_bytes) > 1024 * 1024:
+                return Response({'error': 'File size exceeds maximum limit of 1MB.'}, status=status.HTTP_400_BAD_REQUEST)
+        except UnicodeEncodeError:
+            return Response({'error': 'File must be UTF-8 encoded.'}, status=status.HTTP_400_BAD_REQUEST)
 
     from .services.academic_service import process_student_grades_csv
     result = process_student_grades_csv(student_profile=profile, action_user=request.user, csv_text=csv_text)
@@ -714,7 +755,7 @@ def api_transcript_pdf(request):
 def api_twin_simulate(request):
     """
     Monte Carlo academic future trajectory simulation.
-    Requires student role and validates target CGPA (0.00-10.00) and effort ('lower', 'same', 'higher').
+    Validates target CGPA (0.00-10.00) and effort ('lower', 'same', 'higher').
     """
     profile = getattr(request.user, 'profile', None)
     if not profile:

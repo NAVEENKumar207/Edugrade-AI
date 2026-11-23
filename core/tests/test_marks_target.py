@@ -11,8 +11,8 @@ class MarksTargetCalculatorTests(TestCase):
         self.student_user = User.objects.create_user(username='student_marks', password='password123')
         self.student_profile = UserProfile.objects.create(user=self.student_user)
 
-        self.faculty_user = User.objects.create_user(username='faculty_marks', password='password123', is_staff=True)
-        self.faculty_profile = UserProfile.objects.create(user=self.faculty_user)
+        self.staff_user = User.objects.create_user(username='staff_marks', password='password123', is_staff=True)
+        self.staff_profile = UserProfile.objects.create(user=self.staff_user)
 
     def test_example_1_internal_36_target_A_plus(self):
         # internal 36, target A+ -> needed total 81 -> paper 75
@@ -70,7 +70,7 @@ class MarksTargetCalculatorTests(TestCase):
         resp_b = anon_client.post('/api/tools/marks-target/', {'internal': 36, 'paper_marks': 75, 'mode': 'expected'})
         self.assertIn(resp_b.status_code, [status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN])
 
-    def test_student_and_faculty_both_succeed_with_valid_input(self):
+    def test_student_and_staff_both_succeed_with_valid_input(self):
         # Student user
         self.client.force_authenticate(user=self.student_user)
         resp_s_target = self.client.post('/api/tools/marks-target/', {'internal': 36, 'target_grade': 'A+'})
@@ -81,8 +81,8 @@ class MarksTargetCalculatorTests(TestCase):
         self.assertEqual(resp_s_exp.status_code, status.HTTP_200_OK)
         self.assertEqual(resp_s_exp.data["grade"], "A+")
 
-        # Faculty user
-        self.client.force_authenticate(user=self.faculty_user)
+        # Staff user
+        self.client.force_authenticate(user=self.staff_user)
         resp_f_target = self.client.post('/api/tools/marks-target/', {'internal': 36, 'target_grade': 'A+'})
         self.assertEqual(resp_f_target.status_code, status.HTTP_200_OK)
         self.assertEqual(resp_f_target.data["required_paper"], 75)

@@ -188,7 +188,9 @@ def run_all_tests():
         assert client.get('/api/admin/analytics/').status_code == 404
         assert client.get('/api/admin/grades/sample-csv/').status_code == 404
         assert client.post('/api/admin/grades/bulk-upload/').status_code == 404
-        print("[PASS] All removed faculty/admin REST endpoints return HTTP 404.")
+        assert client.get('/admin-dashboard/').status_code == 404
+        assert client.get('/admin_dashboard.html').status_code == 404
+        print("[PASS] All removed faculty/admin endpoints return HTTP 404.")
 
         # 5. Health API
         health_resp = client.get('/api/health/')
@@ -199,7 +201,6 @@ def run_all_tests():
         # 6. Test .html legacy alias routes
         print("\nTesting .html legacy alias routes...")
         assert client.get('/dashboard.html').status_code == 200
-        assert client.get('/admin_dashboard.html').status_code in [200, 302]
         assert client.get('/upload.html').status_code == 200
         assert client.get('/cgpa_planner.html').status_code == 200
         assert client.get('/placement.html').status_code == 200

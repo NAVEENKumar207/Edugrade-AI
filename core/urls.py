@@ -18,6 +18,7 @@ urlpatterns = [
     path('api/academics/results/<int:course_id>/', api_views.api_results, name='api_results_detail'),
     path('api/academics/results/import/', api_views.api_results_import, name='api_results_import'),
     path('api/academics/results/sample-csv/', api_views.api_results_sample_csv, name='api_results_sample_csv'),
+    path('api/academics/results/export-csv/', api_views.api_results_export_csv, name='api_results_export_csv'),
     path('api/planner/cgpa/', api_views.api_plan_cgpa, name='api_plan_cgpa'),
     path('api/placements/eligibility/', api_views.api_placement_eligibility, name='api_placement_eligibility'),
     path('api/advisor/chat/', api_views.api_advisor_chat, name='api_advisor_chat'),
@@ -47,7 +48,6 @@ urlpatterns = [
     path('signup/', views.signup_view, name='signup'),
     path('logout/', views.logout_view, name='logout'),
     path('dashboard/', views.dashboard_view, name='dashboard'),
-    path('admin-dashboard/', RedirectView.as_view(url='/dashboard/', permanent=False), name='admin_dashboard'),
     path('upload/', views.upload_view, name='upload'),
     path('syllabus/', views.syllabus_view, name='syllabus'),
     path('results/', views.results_view, name='results'),
@@ -60,8 +60,6 @@ urlpatterns = [
     path('login.html', views.login_view),
     path('signup.html', views.signup_view),
     path('dashboard.html', views.dashboard_view),
-    path('admin_dashboard.html', RedirectView.as_view(url='/dashboard/', permanent=False)),
-    path('admin-dashboard.html', RedirectView.as_view(url='/dashboard/', permanent=False)),
     path('upload.html', views.upload_view),
     path('syllabus.html', views.syllabus_view),
     path('results.html', views.results_view),
@@ -71,7 +69,5 @@ urlpatterns = [
 
     # Nested redirects
     path('login/dashboard.html', RedirectView.as_view(url='/dashboard/', permanent=False)),
-    path('login/admin_dashboard.html', RedirectView.as_view(url='/dashboard/', permanent=False)),
     path('signup/dashboard.html', RedirectView.as_view(url='/dashboard/', permanent=False)),
-    path('signup/admin_dashboard.html', RedirectView.as_view(url='/dashboard/', permanent=False)),
 ]

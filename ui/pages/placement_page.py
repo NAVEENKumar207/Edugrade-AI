@@ -87,7 +87,7 @@ def PlacementPage(user):
     for c in filtered_companies:
         is_el = c.get("is_eligible", False)
         c_name = c.get("company_name", "Company")
-        r_title = c.get("role_title", "Role")
+        r_title = c.get("role_title", "Position")
         pkg = float(c.get("package_lpa", 0.0))
         min_cgpa = float(c.get("min_cgpa", 7.0))
         max_arr = int(c.get("max_backlogs", 0))

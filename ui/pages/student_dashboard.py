@@ -463,7 +463,7 @@ def StudentDashboard(user, set_page):
                             {"key": str(idx), "class_name": "flex items-center justify-between gap-gutter-sm p-3 bg-light-surface-container-low border border-light-outline-variant"},
                             html.div(
                                 {"class_name": "min-w-0"},
-                                html.p({"class_name": "font-title text-title-md text-light-on-surface font-semibold truncate"}, f"{c.get('company_name', 'Company')} • {c.get('role_title', 'Role')}"),
+                                html.p({"class_name": "font-title text-title-md text-light-on-surface font-semibold truncate"}, f"{c.get('company_name', 'Company')} • {c.get('role_title', 'Position')}"),
                                 html.p({"class_name": "font-mono text-mono-sm text-light-on-surface-variant tabular-nums"}, f"Min {c.get('min_cgpa', 7.0):.2f} CGPA • {c.get('package_lpa', 0.0):.1f} LPA")
                             ),
                             html.span(

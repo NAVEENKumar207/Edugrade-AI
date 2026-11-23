@@ -53,19 +53,9 @@
 
         <div class="auth-card">
 
-            <!-- Role Selector Toggle -->
-            <div class="role-toggle">
-                <button type="button" class="role-tab active" data-role="student">
-                    🎓 Student Login
-                </button>
-                <button type="button" class="role-tab" data-role="admin">
-                    🛡️ Admin / Faculty
-                </button>
-            </div>
+            <h2>Sign in</h2>
 
-            <h2 id="auth-role-title">Sign in</h2>
-
-            <p class="auth-subtitle" id="auth-role-subtitle">
+            <p class="auth-subtitle">
                 Enter your student details to access your dashboard.
             </p>
 
@@ -81,8 +71,6 @@
 
             <form action="{% url 'login' %}" method="POST" data-form-type="login">
                 {% csrf_token %}
-
-                <input type="hidden" name="role" id="selected-role" value="student">
 
                 <label>Email Address / Username / ID</label>
 

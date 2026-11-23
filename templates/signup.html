@@ -45,7 +45,7 @@
             </h1>
 
             <p>
-                Build your student academic profile or register as faculty administrator to manage university performance.
+                Build your student academic profile to track CBCS progress and career readiness.
             </p>
 
         </div>
@@ -53,19 +53,9 @@
 
         <div class="auth-card">
 
-            <!-- Role Selector Toggle -->
-            <div class="role-toggle">
-                <button type="button" class="role-tab active" data-role="student">
-                    🎓 Student
-                </button>
-                <button type="button" class="role-tab" data-role="admin">
-                    🛡️ Admin / Faculty
-                </button>
-            </div>
+            <h2>Create account</h2>
 
-            <h2 id="auth-role-title">Create account</h2>
-
-            <p class="auth-subtitle" id="auth-role-subtitle">
+            <p class="auth-subtitle">
                 Set up your student profile to get started.
             </p>
 
@@ -81,8 +71,6 @@
 
             <form action="{% url 'signup' %}" method="POST" data-form-type="signup">
                 {% csrf_token %}
-
-                <input type="hidden" name="role" id="selected-role" value="student">
 
                 <label>Full Name</label>
 
@@ -121,7 +109,7 @@
                 </select>
 
                 <!-- Student specific fields -->
-                <div class="student-only">
+                <div>
                     <label>Roll Number / Reg Number</label>
                     <input
                         type="text"
@@ -140,23 +128,6 @@
                         <option value="7">Semester 7</option>
                         <option value="8">Semester 8</option>
                     </select>
-                </div>
-
-                <!-- Admin specific fields -->
-                <div class="admin-only" style="display: none;">
-                    <label>Faculty / Staff ID</label>
-                    <input
-                        type="text"
-                        name="admin_id"
-                        placeholder="e.g. FAC-CSE-104"
-                    >
-
-                    <label style="margin-top: 8px;">Admin Authorization Key</label>
-                    <input
-                        type="password"
-                        name="admin_key"
-                        placeholder="Enter admin authorization key"
-                    >
                 </div>
 
                 <label>Password</label>

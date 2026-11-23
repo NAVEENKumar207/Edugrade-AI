@@ -37,11 +37,7 @@
                 <span class="theme-icon">☀️</span> <span class="theme-text">Light Mode</span>
             </button>
             {% if user.is_authenticated %}
-                {% if user.profile.is_admin or user.is_staff or user.is_superuser %}
-                    <a href="{% url 'admin_dashboard' %}" class="login-link">Admin Portal</a>
-                {% else %}
-                    <a href="{% url 'dashboard' %}" class="login-link">Dashboard</a>
-                {% endif %}
+                <a href="{% url 'dashboard' %}" class="login-link">Dashboard</a>
                 <a href="{% url 'logout' %}" class="nav-button">Logout</a>
             {% else %}
                 <a href="{% url 'login' %}" class="login-link">Login</a>

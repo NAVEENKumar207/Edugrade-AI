@@ -10,7 +10,7 @@ from ui.components.theme_toggle import ThemeToggle
 from ui.services.data_service import authenticate_user, register_user, quick_demo_login
 
 @component
-def LoginPage(set_page, set_user, current_role='student', theme='dark', toggle_theme=None):
+def LoginPage(set_page, set_user, theme='dark', toggle_theme=None):
     username, set_username = use_state("")
     password, set_password = use_state("")
     show_password, set_show_password = use_state(False)
@@ -205,7 +205,7 @@ def LoginPage(set_page, set_user, current_role='student', theme='dark', toggle_t
                             html.div(
                                 {"className": "flex flex-col"},
                                 html.span({"className": "font-bold text-light-on-surface"}, "Demo Student"),
-                                html.span({"className": "text-[10px] text-light-on-surface-variant lowercase"}, "student01 • Kavitha Ramesh")
+                                html.span({"className": "text-[10px] text-light-on-surface-variant"}, "student01 • Naveenkumar S")
                             ),
                             html.span({"className": "text-[10px] font-bold text-light-primary px-2 py-0.5 bg-light-primary/10 rounded"}, "SIGN IN ⚡")
                         )
@@ -320,7 +320,7 @@ def LoginPage(set_page, set_user, current_role='student', theme='dark', toggle_t
     )
 
 @component
-def SignupPage(set_page, set_user, current_role='student', theme='dark', toggle_theme=None):
+def SignupPage(set_page, set_user, theme='dark', toggle_theme=None):
     fullname, set_fullname = use_state("")
     username, set_username = use_state("")
     institution_name, set_institution_name = use_state("Anna University / Affiliated Institution")
@@ -504,7 +504,7 @@ def SignupPage(set_page, set_user, current_role='student', theme='dark', toggle_
                             html.div(
                                 {"className": "flex flex-col"},
                                 html.span({"className": "font-bold text-light-on-surface"}, "Demo Student"),
-                                html.span({"className": "text-[10px] text-light-on-surface-variant lowercase"}, "student01 • Kavitha Ramesh")
+                                html.span({"className": "text-[10px] text-light-on-surface-variant"}, "student01 • Naveenkumar S")
                             ),
                             html.span({"className": "text-[10px] font-bold text-light-primary px-2 py-0.5 bg-light-primary/10 rounded"}, "SIGN IN ⚡")
                         )

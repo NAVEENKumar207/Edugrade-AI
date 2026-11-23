@@ -9,7 +9,7 @@ from ui.components.theme_toggle import ThemeToggle
 from ui.services.data_service import get_landing_stats
 
 @component
-def LandingPage(set_page, set_auth_role=None, theme="dark", toggle_theme=None):
+def LandingPage(set_page, theme="dark", toggle_theme=None):
     stats = get_landing_stats()
     selected_feature, set_selected_feature = use_state("twin")
 
@@ -140,7 +140,7 @@ def LandingPage(set_page, set_auth_role=None, theme="dark", toggle_theme=None):
                             html.button(
                                 {
                                     "className": "px-6 py-3.5 bg-light-primary text-white hover:bg-light-primary-container hover:text-light-secondary font-mono text-mono-sm uppercase font-semibold transition-colors flex items-center gap-2 cursor-pointer shadow-sm",
-                                    "on_click": lambda e: go_to_login("student")
+                                    "on_click": lambda e: set_page("login")
                                 },
                                 html.span("Launch CGPA Simulator"),
                                 html.span({"className": "material-symbols-outlined text-base"}, "arrow_forward")
@@ -148,7 +148,7 @@ def LandingPage(set_page, set_auth_role=None, theme="dark", toggle_theme=None):
                             html.button(
                                 {
                                     "className": "px-6 py-3.5 border border-light-outline-variant hover:border-light-secondary font-mono text-mono-sm uppercase transition-colors cursor-pointer",
-                                    "on_click": lambda e: go_to_login("student")
+                                    "on_click": lambda e: set_page("login")
                                 },
                                 "Audit Placement Eligibility"
                             )

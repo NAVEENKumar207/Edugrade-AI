@@ -36,7 +36,7 @@ class Command(BaseCommand):
         roll_number = options['roll_number']
 
         user, created = User.objects.get_or_create(username=username)
-        user.first_name = "Arunachalam"
+        user.first_name = "Naveenkumar"
         user.last_name = "S"
         user.email = f"{username}@edugrade.ai"
         user.set_password(password)

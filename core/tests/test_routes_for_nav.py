@@ -60,12 +60,11 @@ class RoutesForNavTestCase(TestCase):
             resp = self.client.get(url)
             self.assertEqual(resp.status_code, 200, f"Student route {r_name} ({url}) returned {resp.status_code}")
 
-    def test_legacy_admin_dashboard_redirects_to_student_dashboard(self):
-        """Accessing legacy /admin-dashboard/ redirects to /dashboard/."""
+    def test_deleted_admin_dashboard_returns_404(self):
+        """Accessing deleted /admin-dashboard/ returns 404 Not Found."""
         self.client.login(username='nav_test_student', password='testpassword123')
         resp = self.client.get('/admin-dashboard/')
-        self.assertIn(resp.status_code, [301, 302])
-        self.assertEqual(resp.url, '/dashboard/')
+        self.assertEqual(resp.status_code, 404)
 
     def test_reactpy_navigation_items_registered(self):
         """Ensures all student page IDs in AppLayout are mapped in EduGradeApp routing."""

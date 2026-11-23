@@ -125,10 +125,6 @@ def dashboard_view(request):
     }
     return render(request, 'dashboard.html', context)
 
-def admin_dashboard_view(request):
-    """Legacy route: redirect to student performance dashboard."""
-    return redirect('dashboard')
-
 
 # =======================================================
 # NEW WORKFLOW & FEATURE PAGES

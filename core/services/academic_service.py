@@ -688,9 +688,48 @@ def record_course_result(
     return cr, arrear_cleared
 
 
+def sanitize_csv_cell(value) -> str:
+    """
+    Sanitizes a cell value to prevent CSV formula injection (CWE-1236).
+    If a cell value starts with '=', '+', '-', or '@', prefix with a single quote.
+    """
+    if value is None:
+        return ""
+    s = str(value)
+    if s and s[0] in ('=', '+', '-', '@'):
+        return f"'{s}"
+    return s
+
+
+def export_student_grades_csv(student_profile) -> str:
+    """
+    Exports student course results to a CSV formatted string.
+    Every cell is sanitized to protect against formula injection (=, +, -, @).
+    """
+    import csv
+    import io
+    from core.models import CourseResult
+
+    output = io.StringIO()
+    writer = csv.writer(output, quoting=csv.QUOTE_MINIMAL)
+    writer.writerow(["semester", "course_code", "course_name", "credits", "grade"])
+
+    courses = CourseResult.objects.filter(student=student_profile).order_by('semester_number', 'course_code')
+    for c in courses:
+        writer.writerow([
+            sanitize_csv_cell(c.semester_number),
+            sanitize_csv_cell(c.course_code),
+            sanitize_csv_cell(c.course_name),
+            sanitize_csv_cell(c.credits),
+            sanitize_csv_cell(c.grade),
+        ])
+    return output.getvalue()
+
+
 def process_student_grades_csv(student_profile, action_user, csv_text: str):
     """
     Parses and processes CSV results upload for the authenticated student.
+    Enforces hardening: max 1 MB, max 500 rows, UTF-8 only, and strict grade/credit validation.
     Expected columns: semester, course_code, course_title (or course_name), credits, grade.
     Optional column: roll_number (if provided, must match student).
     """
@@ -698,6 +737,47 @@ def process_student_grades_csv(student_profile, action_user, csv_text: str):
     import io
     from django.db import transaction
     from core.models import AcademicAuditLog
+
+    if isinstance(csv_text, bytes):
+        if len(csv_text) > 1024 * 1024:
+            return {
+                "saved": 0,
+                "skipped": 0,
+                "errors": [],
+                "error": "File size exceeds maximum limit of 1MB.",
+                "status_code": 400
+            }
+        try:
+            csv_text = csv_text.decode('utf-8-sig')
+        except UnicodeDecodeError:
+            return {
+                "saved": 0,
+                "skipped": 0,
+                "errors": [],
+                "error": "File must be UTF-8 encoded.",
+                "status_code": 400
+            }
+    elif isinstance(csv_text, str):
+        try:
+            raw_bytes = csv_text.encode('utf-8')
+            if len(raw_bytes) > 1024 * 1024:
+                return {
+                    "saved": 0,
+                    "skipped": 0,
+                    "errors": [],
+                    "error": "File size exceeds maximum limit of 1MB.",
+                    "status_code": 400
+                }
+        except UnicodeEncodeError:
+            return {
+                "saved": 0,
+                "skipped": 0,
+                "errors": [],
+                "error": "File must be UTF-8 encoded.",
+                "status_code": 400
+            }
+    else:
+        csv_text = str(csv_text or "")
 
     if not csv_text or not csv_text.strip():
         return {
@@ -741,12 +821,12 @@ def process_student_grades_csv(student_profile, action_user, csv_text: str):
     rows = list(reader)
 
     non_empty_rows = [r for r in rows if any(cell.strip() for cell in r)]
-    if len(non_empty_rows) > 1000:
+    if len(non_empty_rows) > 500:
         return {
             "saved": 0,
             "skipped": 0,
             "errors": [],
-            "error": "File exceeds maximum limit of 1000 rows.",
+            "error": "File exceeds maximum limit of 500 rows.",
             "status_code": 400
         }
 
@@ -798,11 +878,11 @@ def process_student_grades_csv(student_profile, action_user, csv_text: str):
 
         try:
             credits_val = float(cred_raw)
-            if credits_val <= 0 or credits_val > 10:
+            if credits_val < 1 or credits_val > 10 or not credits_val.is_integer():
                 raise ValueError()
-            credits_num = int(credits_val) if credits_val.is_integer() else credits_val
+            credits_num = int(credits_val)
         except (ValueError, TypeError):
-            errors.append({"row": idx, "reason": f"Credits must be a number between 1 and 10 (got '{cred_raw}')."})
+            errors.append({"row": idx, "reason": f"Credits must be an integer between 1 and 10 (got '{cred_raw}')."})
             skipped += 1
             continue
 

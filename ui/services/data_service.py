@@ -55,8 +55,8 @@ def quick_demo_login(role='student'):
                 username='student01',
                 password='student123',
                 email='student01@edugrade.ai',
-                first_name='Kavitha',
-                last_name='Ramesh',
+                first_name='Naveenkumar',
+                last_name='S',
                 is_staff=False
             )
             profile = UserProfile.objects.create(
@@ -152,6 +152,10 @@ def quick_demo_login(role='student'):
             )
     else:
         username = user.username
+        if user.first_name in ('Kavitha', 'Arunachalam', ''):
+            user.first_name = 'Naveenkumar'
+            user.last_name = 'S'
+            user.save(update_fields=['first_name', 'last_name'])
         if not user.check_password(password):
             user.set_password(password)
             user.save()

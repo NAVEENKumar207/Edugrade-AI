@@ -17,11 +17,11 @@ class Command(BaseCommand):
 
         created_count = 0
         updated_count = 0
-        for name, role, min_cgpa, max_bl, pkg, skills in criteria_list:
+        for name, p_title, min_cgpa, max_bl, pkg, skills in criteria_list:
             obj, created = CompanyPlacementCriteria.objects.update_or_create(
                 company_name=name,
                 defaults={
-                    'role_title': role,
+                    'role_title': p_title,
                     'min_cgpa': min_cgpa,
                     'max_backlogs': max_bl,
                     'package_lpa': pkg,
