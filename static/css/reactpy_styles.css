@@ -1,138 +1,132 @@
 /* ==========================================================================
-   EduGrade AI — Enterprise Academic Intelligence Platform
-   Premium SaaS Design System (Obsidian Slate, Electric Cyan, Indigo Accents)
+   EduGrade AI — Industrial Academic Precision Design System
+   Swiss-Brutalist Architecture (Vermilion Signal, Espresso Ink, IBM Plex Mono)
    ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 
 :root,
-[data-theme="dark"],
-.theme-dark {
-  /* Dark Premium Palette (Obsidian Slate & Electric Cyan) */
-  --bg-app: #080C14;
-  --bg-primary: #080C14;
-  --bg-surface: #0E1422;
-  --bg-surface-elevated: #141B2D;
-  --bg-surface-hover: #1A233A;
-  --bg-card: #0F172A;
-  --bg-card-hover: #162036;
-  --bg-input: #101728;
-  --card-bg: linear-gradient(180deg, rgba(20, 27, 45, 0.85) 0%, rgba(14, 20, 34, 0.95) 100%);
-  --sidebar-bg: linear-gradient(180deg, #0B101D 0%, #070B14 100%);
-  --topbar-bg: rgba(11, 16, 29, 0.85);
-  --stat-card-bg: linear-gradient(145deg, rgba(22, 31, 52, 0.85) 0%, rgba(14, 20, 34, 0.95) 100%);
-  --table-bg: rgba(14, 20, 34, 0.6);
-  --th-bg: rgba(255, 255, 255, 0.03);
-  --tr-hover-bg: rgba(255, 255, 255, 0.02);
-
-  /* Borders & Dividers */
-  --border-subtle: rgba(255, 255, 255, 0.07);
-  --border-medium: rgba(255, 255, 255, 0.12);
-  --border-highlight: rgba(56, 189, 248, 0.3);
-
-  /* Brand Accents */
-  --primary: #38BDF8;
-  --primary-hover: #0EA5E9;
-  --accent-indigo: #6366F1;
-  --accent-cyan: #06B6D4;
-  --accent-purple: #8B5CF6;
-  --success: #10B981;
-  --success-subtle: rgba(16, 185, 129, 0.12);
-  --warning: #F59E0B;
-  --warning-subtle: rgba(245, 158, 11, 0.12);
-  --danger: #EF4444;
-  --danger-subtle: rgba(239, 68, 68, 0.12);
-
-  /* Typography Colors */
-  --text-primary: #F8FAFC;
-  --text-secondary: #94A3B8;
-  --text-muted: #64748B;
-  --text-accent: #38BDF8;
-  --brand-navy: #F8FAFC;
-  --brand-vermillion: #F87171;
-
-  /* Shadows & Glows */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 10px 25px -3px rgba(0, 0, 0, 0.5);
-  --shadow-glow-cyan: 0 0 25px rgba(56, 189, 248, 0.2);
-  --shadow-glow-indigo: 0 0 25px rgba(99, 102, 241, 0.2);
-
-  /* Theme Toggle */
-  --toggle-bg: rgba(255, 255, 255, 0.07);
-  --toggle-border: rgba(255, 255, 255, 0.14);
-  --toggle-hover-bg: rgba(255, 255, 255, 0.12);
-  --toggle-glow: 0 0 16px rgba(245, 158, 11, 0.3);
-
-  /* Radii */
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 18px;
-  --radius-xl: 24px;
-  --radius-full: 9999px;
-
-  /* Fonts */
-  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
-}
-
 [data-theme="light"],
 .theme-light {
-  /* Crisp Editorial Light Palette */
-  --bg-app: #F8FAFC;
+  /* Concrete Gray & Crisp Architectural Canvas */
+  --bg-app: #F2F1F1;
   --bg-primary: #FFFFFF;
   --bg-surface: #FFFFFF;
-  --bg-surface-elevated: #F1F5F9;
-  --bg-surface-hover: #E2E8F0;
+  --bg-surface-elevated: #F2F1F1;
+  --bg-surface-hover: #EAE9E9;
   --bg-card: #FFFFFF;
-  --bg-card-hover: #F8FAFC;
+  --bg-card-hover: #F2F1F1;
   --bg-input: #FFFFFF;
   --card-bg: #FFFFFF;
   --sidebar-bg: #FFFFFF;
-  --topbar-bg: rgba(255, 255, 255, 0.92);
+  --topbar-bg: #FFFFFF;
   --stat-card-bg: #FFFFFF;
   --table-bg: #FFFFFF;
-  --th-bg: #F8FAFC;
-  --tr-hover-bg: #F1F5F9;
+  --th-bg: #F2F1F1;
+  --tr-hover-bg: #F2F1F1;
 
-  /* Borders & Dividers */
-  --border-subtle: rgba(15, 23, 42, 0.08);
-  --border-medium: rgba(15, 23, 42, 0.14);
-  --border-highlight: rgba(2, 132, 199, 0.35);
+  /* Hairline 1px Grid Borders */
+  --border-subtle: #D4D0CF;
+  --border-medium: #6E5A57;
+  --border-highlight: #C81E06;
 
-  /* Brand Accents */
-  --primary: #0284C7;
-  --primary-hover: #0369A1;
-  --accent-indigo: #4F46E5;
-  --accent-cyan: #0891B2;
-  --accent-purple: #7C3AED;
-  --success: #059669;
-  --success-subtle: rgba(5, 150, 105, 0.12);
-  --warning: #D97706;
-  --warning-subtle: rgba(217, 119, 6, 0.12);
-  --danger: #DC2626;
-  --danger-subtle: rgba(220, 38, 38, 0.12);
+  /* Signal Vermilion & Deep Espresso */
+  --primary: #C81E06;
+  --primary-hover: #FF3316;
+  --primary-container: #FF3316;
+  --secondary: #1B0401;
+  --accent-vermilion: #C81E06;
+  --success: #006A63;
+  --success-subtle: rgba(0, 106, 99, 0.12);
+  --warning: #9A4A00;
+  --warning-subtle: rgba(154, 74, 0, 0.12);
+  --danger: #BA1A1A;
+  --danger-subtle: rgba(186, 26, 26, 0.12);
 
-  /* Typography Colors */
-  --text-primary: #0F172A;
-  --text-secondary: #475569;
-  --text-muted: #64748B;
-  --text-accent: #0284C7;
-  --brand-navy: #0F172A;
-  --brand-vermillion: #DC2626;
+  /* High-Contrast Typography */
+  --text-primary: #1B0401;
+  --text-secondary: #4A3937;
+  --text-muted: #6E5A57;
+  --text-accent: #C81E06;
+  --brand-navy: #1B0401;
+  --brand-vermillion: #C81E06;
 
-  /* Shadows & Glows */
-  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06);
-  --shadow-md: 0 4px 14px rgba(15, 23, 42, 0.07);
-  --shadow-lg: 0 10px 25px rgba(15, 23, 42, 0.1);
-  --shadow-glow-cyan: 0 0 25px rgba(2, 132, 199, 0.15);
-  --shadow-glow-indigo: 0 0 25px rgba(79, 70, 229, 0.15);
+  /* Shadows (Flat Contrast Blocks) */
+  --shadow-sm: none;
+  --shadow-md: none;
+  --shadow-lg: none;
+  --shadow-glow-cyan: none;
+  --shadow-glow-indigo: none;
 
   /* Theme Toggle */
-  --toggle-bg: rgba(15, 23, 42, 0.05);
-  --toggle-border: rgba(15, 23, 42, 0.12);
-  --toggle-hover-bg: rgba(15, 23, 42, 0.09);
-  --toggle-glow: 0 0 16px rgba(99, 102, 241, 0.2);
+  --toggle-bg: #EAE9E9;
+  --toggle-border: #D4D0CF;
+  --toggle-hover-bg: #D4D2D2;
+  --toggle-glow: none;
+
+  /* Razor-sharp 0px geometry */
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+  --radius-full: 9999px;
+
+  /* Typography */
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+}
+
+[data-theme="dark"],
+.theme-dark,
+.dark {
+  /* Matte Carbon & Deep Architectural Canvas */
+  --bg-app: #111111;
+  --bg-primary: #111111;
+  --bg-surface: #1B0401;
+  --bg-surface-elevated: #241917;
+  --bg-surface-hover: #2E2220;
+  --bg-card: #1B0401;
+  --bg-card-hover: #241917;
+  --bg-input: #1B0401;
+  --card-bg: #1B0401;
+  --sidebar-bg: #111111;
+  --topbar-bg: #111111;
+  --stat-card-bg: #1B0401;
+  --table-bg: #1B0401;
+  --th-bg: #241917;
+  --tr-hover-bg: #2E2220;
+
+  /* Dark Hairline Borders */
+  --border-subtle: #3A2D2B;
+  --border-medium: #6E5A57;
+  --border-highlight: #FF6B54;
+
+  /* Brand Accents */
+  --primary: #FF6B54;
+  --primary-hover: #FF3316;
+  --primary-container: #FF3316;
+  --secondary: #EAE9E9;
+  --accent-vermilion: #FF6B54;
+  --success: #006A63;
+  --success-subtle: rgba(0, 106, 99, 0.2);
+  --warning: #FFB59A;
+  --warning-subtle: rgba(255, 181, 154, 0.15);
+  --danger: #FFB4AB;
+  --danger-subtle: rgba(255, 180, 171, 0.15);
+
+  /* Typography Colors */
+  --text-primary: #FFFFFF;
+  --text-secondary: #D4D0CF;
+  --text-muted: #9E9594;
+  --text-accent: #FF6B54;
+  --brand-navy: #FFFFFF;
+  --brand-vermillion: #FF6B54;
+
+  /* Theme Toggle */
+  --toggle-bg: #2E2220;
+  --toggle-border: #3A2D2B;
+  --toggle-hover-bg: #3A2D2B;
 }
 
 * {

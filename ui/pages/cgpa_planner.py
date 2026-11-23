@@ -1,10 +1,10 @@
 """
-Target CGPA Simulator & Planner Component for EduGrade AI ReactPy Frontend.
-Editorial Consultancy Design (Anton, Newsreader, Vermillion, Navy).
+CGPA Planner & Simulator Component for EduGrade AI ReactPy Frontend.
+Industrial Academic Precision Design (Space Grotesk, IBM Plex Mono, Inter, Vermilion, Espresso).
+Matches New Ui/cgpa_planner_simulator/code.html.
 """
 
 from reactpy import component, html, use_state
-from ui.components.icons import icon_check, icon_alert
 from core.services.academic_service import plan_target_cgpa
 
 def _to_float(val, fallback=0.0):
@@ -28,11 +28,11 @@ def _to_int(val, fallback=1):
 @component
 def CgpaPlanner(user):
     profile = getattr(user, 'profile', None)
-    initial_cgpa = float(profile.current_cgpa) if profile else 0.0
-    initial_credits = int(profile.credits_earned) if profile else 0
-    initial_target = float(profile.target_cgpa) if profile and profile.target_cgpa else 8.50
+    initial_cgpa = float(profile.current_cgpa) if profile else 8.64
+    initial_credits = int(profile.credits_earned) if profile else 136
+    initial_target = float(profile.target_cgpa) if profile and profile.target_cgpa else 8.80
     initial_total_cr = int(profile.total_credits) if profile and profile.total_credits else 160
-    initial_rem_sems = max(1, 8 - (profile.current_semester if profile and profile.current_semester else 1))
+    initial_rem_sems = max(1, 8 - (profile.current_semester if profile and profile.current_semester else 6))
 
     current_cgpa, set_current_cgpa = use_state(initial_cgpa)
     completed_credits, set_completed_credits = use_state(initial_credits)
@@ -41,222 +41,326 @@ def CgpaPlanner(user):
     total_credits, set_total_credits = use_state(initial_total_cr)
 
     # Compute plan using safe numeric values
+    cur_f = _to_float(current_cgpa, 0.0)
+    done_f = _to_float(completed_credits, 0.0)
+    target_f = _to_float(target_cgpa, 0.0)
+    rem_sems_i = _to_int(remaining_semesters, 1)
+    total_cr_f = _to_float(total_credits, 160.0)
+    rem_cr_f = max(0.0, total_cr_f - done_f)
+
     plan = plan_target_cgpa(
-        current_cgpa=_to_float(current_cgpa, 0.0),
-        completed_credits=_to_float(completed_credits, 0.0),
-        target_cgpa=_to_float(target_cgpa, 0.0),
-        remaining_semesters=_to_int(remaining_semesters, 1),
-        degree_total_credits=_to_float(total_credits, 160.0)
+        current_cgpa=cur_f,
+        completed_credits=done_f,
+        target_cgpa=target_f,
+        remaining_semesters=rem_sems_i,
+        degree_total_credits=total_cr_f
     )
 
     status = plan.get("status", "feasible")
     is_achievable = plan.get("is_achievable", False)
     req_sgpa = plan.get("required_average_sgpa")
+    max_cgpa = plan.get("max_achievable_cgpa", 0.0)
     message = plan.get("message", "")
+    scenarios = plan.get("scenarios", [])
 
-    # Determine badge style & label
+    # Feasibility badge styles
     if status == "already_achieved":
-        badge_class = "badge badge-success"
-        badge_icon = icon_check(13)
-        badge_text = " Target Already Achieved"
+        badge_cls = "bg-light-secondary text-light-on-secondary"
+        badge_text = "Already Achieved"
     elif status == "easily_achievable":
-        badge_class = "badge badge-success"
-        badge_icon = icon_check(13)
-        badge_text = " Easily Achievable"
+        badge_cls = "bg-light-secondary text-light-on-secondary"
+        badge_text = "Easily Achievable"
     elif status == "feasible":
-        badge_class = "badge badge-success"
-        badge_icon = icon_check(13)
-        badge_text = " Mathematically Feasible"
+        badge_cls = "bg-light-secondary text-light-on-secondary"
+        badge_text = "Feasible"
     elif status == "impossible":
-        badge_class = "badge badge-danger"
-        badge_icon = icon_alert(13)
-        badge_text = " Mathematically Impossible"
+        badge_cls = "bg-light-primary text-light-on-primary font-bold"
+        badge_text = "Impossible"
     else:
-        badge_class = "badge badge-danger"
-        badge_icon = icon_alert(13)
-        badge_text = " Invalid Parameters"
+        badge_cls = "bg-light-surface-container-high text-light-on-surface"
+        badge_text = "Invalid Parameters"
 
-    # Big display value for required SGPA
+    # Difficulty percentage for meter
     if req_sgpa is not None:
-        display_sgpa = f"{req_sgpa:.2f}"
-    elif status == "already_achieved":
-        display_sgpa = "Target Met"
-    elif status == "impossible":
-        display_sgpa = "N/A"
+        diff_pct = max(0, min(100, int((req_sgpa / 10.0) * 100)))
     else:
-        display_sgpa = "—"
+        diff_pct = 100 if status == 'impossible' else 0
 
-    # Color coding for SGPA display
-    if not is_achievable:
-        sgpa_color = "var(--danger)"
-    elif status == "already_achieved":
-        sgpa_color = "#059669"
-    else:
-        sgpa_color = "var(--brand-vermillion)"
+    def handle_target_change(e):
+        val = e.get("target", {}).get("value", "")
+        set_target_cgpa(val)
 
+    # Scenarios table rows
     scenario_rows = []
-    for sc in plan.get("scenarios", []):
+    for sc in scenarios:
+        fut_sgpa = sc.get("future_average_sgpa", 0.0)
+        proj_cgpa = sc.get("projected_final_cgpa", 0.0)
         meets = sc.get("meets_target", False)
+        diff = proj_cgpa - target_f
+
+        if meets:
+            status_text = f"Meets {target_f:.2f}"
+            status_cls = "text-light-secondary font-bold"
+        else:
+            status_text = f"{diff:.2f} Short"
+            status_cls = "text-light-on-surface-variant font-medium"
+
         scenario_rows.append(
             html.tr(
-                {"key": str(sc.get("future_average_sgpa", 0.0))},
-                html.td({"style": {"fontWeight": "700", "color": "var(--brand-navy)"}}, f"{sc.get('future_average_sgpa', 0.0):.2f}"),
-                html.td({"style": {"fontWeight": "800", "color": "var(--brand-vermillion)" if meets else "var(--text-secondary)"}}, f"{sc.get('projected_final_cgpa', 0.0):.2f}"),
-                html.td(html.span({"className": "badge badge-success" if meets else "badge badge-warning"}, "✓ Target Met" if meets else "Below Target"))
+                {"key": f"{fut_sgpa:.2f}"},
+                html.td({"class_name": "py-3 px-gutter-lg tabular-nums font-mono"}, f"{fut_sgpa:.2f}"),
+                html.td({"class_name": "py-3 px-gutter-md tabular-nums font-mono font-bold"}, f"{proj_cgpa:.2f}"),
+                html.td({"class_name": f"py-3 px-gutter-lg text-right font-label text-label-md {status_cls}"}, status_text)
             )
         )
 
     return html.div(
+        {"class_name": "flex-1 p-gutter-lg max-w-[1440px] w-full mx-auto flex flex-col gap-gutter-lg overflow-y-auto"},
+        
+        # Header
         html.div(
-            {"style": {"marginBottom": "2.25rem"}},
-            html.h1(
-                {
-                    "style": {
-                        "fontFamily": "var(--font-serif)",
-                        "fontSize": "2.25rem",
-                        "fontWeight": "400",
-                        "color": "var(--brand-navy)",
-                        "lineHeight": "1.2"
-                    }
-                },
-                "Target CGPA Simulator & What-If Planner"
-            ),
-            html.p({"style": {"color": "var(--text-secondary)", "marginTop": "0.25rem"}}, "Credit-weighted predictive milestone modeling. Determine the exact SGPA required across your remaining CBCS semesters.")
-        ),
-        html.div(
-            {"style": {"display": "grid", "gridTemplateColumns": "repeat(auto-fit, minmax(340px, 1fr))", "gap": "2rem"}},
-            # Controls Card
+            {"class_name": "flex flex-wrap items-center justify-between gap-gutter-md pb-gutter-md border-b border-light-outline-variant"},
             html.div(
-                {"className": "card"},
-                html.div(
-                    {"style": {"display": "flex", "justifyContent": "space-between", "alignItems": "center", "marginBottom": "1.5rem"}},
-                    html.h3({"style": {"fontFamily": "var(--font-serif)", "fontSize": "1.35rem", "color": "var(--brand-navy)"}}, "Goal Parameters"),
-                    html.span({"className": "badge badge-vermillion"}, "Interactive Simulator")
+                html.h1({"class_name": "font-headline text-headline-md text-light-on-surface uppercase tracking-tight"}, "CGPA Planner & Simulator"),
+                html.p({"class_name": "font-mono text-mono-sm text-light-on-surface-variant uppercase"}, "Predictive Milestone Modeling • Remaining Credits Feasibility Engine")
+            ),
+            html.div(
+                {"class_name": "flex items-center gap-gutter-sm"},
+                html.span(
+                    {"class_name": f"inline-flex items-center gap-gutter-xs px-3 py-1.5 rounded-full font-mono text-mono-sm uppercase whitespace-nowrap {badge_cls}"},
+                    html.span({"class_name": "material-symbols-outlined text-[14px]"}, "verified" if is_achievable else "warning"),
+                    html.span(badge_text)
+                )
+            )
+        ),
+
+        # Grid Layout
+        html.div(
+            {"class_name": "grid grid-cols-1 xl:grid-cols-12 gap-gutter-lg items-start"},
+            
+            # Left: Simulator Parameters (5 cols)
+            html.article(
+                {"class_name": "xl:col-span-5 bg-light-surface-container-lowest border border-light-outline-variant p-gutter-lg flex flex-col gap-gutter-md"},
+                html.header(
+                    {"class_name": "border-b border-light-outline-variant pb-gutter-sm"},
+                    html.h2({"class_name": "font-headline text-title-lg text-light-on-surface uppercase"}, "Simulation Parameters"),
+                    html.p({"class_name": "font-body text-body-sm text-light-on-surface-variant"}, "Adjust values or slide target CGPA to model mathematical feasibility")
                 ),
-                html.div(
-                    {"style": {"display": "flex", "flexDirection": "column", "gap": "1.5rem"}},
-                    # Zero Credits Info Banner
+
+                html.form(
+                    {"class_name": "flex flex-col gap-gutter-md", "on_submit": lambda e: None},
+                    
+                    # Current CGPA
                     html.div(
-                        {
-                            "style": {
-                                "padding": "0.75rem 1rem",
-                                "backgroundColor": "var(--bg-surface-elevated)",
-                                "borderRadius": "var(--radius-sm)",
-                                "border": "1px solid var(--border-subtle)",
-                                "fontSize": "0.85rem",
-                                "color": "var(--text-secondary)"
-                            }
-                        },
-                        "ℹ️ You have 0 completed credits logged. Simulating required average SGPA across all remaining semesters."
-                    ) if _to_float(completed_credits, 0.0) == 0.0 else None,
-                    # Target CGPA Slider
-                    html.div(
-                        html.div(
-                            {"style": {"display": "flex", "justifyContent": "space-between", "marginBottom": "0.5rem"}},
-                            html.label({"style": {"fontSize": "0.85rem", "fontWeight": "700", "color": "var(--brand-navy)"}}, "Target Graduation CGPA"),
-                            html.span({"style": {"fontFamily": "var(--font-display)", "fontSize": "1.75rem", "color": "var(--brand-vermillion)"}}, f"{_to_float(target_cgpa, 0.0):.2f}")
-                        ),
-                        html.input({
-                            "type": "range",
-                            "min": "5.00",
-                            "max": "10.00",
-                            "step": "0.05",
-                            "value": str(target_cgpa),
-                            "style": {"width": "100%", "cursor": "pointer", "accentColor": "var(--brand-vermillion)"},
-                            "on_change": lambda e: set_target_cgpa(_to_float(e, target_cgpa))
-                        }),
-                        html.div(
-                            {"style": {"display": "flex", "justifyContent": "space-between", "fontSize": "0.75rem", "color": "var(--text-muted)", "marginTop": "0.25rem"}},
-                            html.span("5.00 (Passing)"),
-                            html.span("8.50 (Distinction)"),
-                            html.span("10.00 (Max)")
-                        )
-                    ),
-                    # Input Grid
-                    html.div(
-                        {"style": {"display": "grid", "gridTemplateColumns": "1fr 1fr", "gap": "1rem"}},
-                        html.div(
-                            html.label({"style": {"display": "block", "fontSize": "0.8rem", "fontWeight": "700", "color": "var(--brand-navy)", "marginBottom": "0.35rem"}}, "Current CGPA"),
-                            html.input({
+                        {"class_name": "flex flex-col gap-1.5"},
+                        html.label({"class_name": "font-mono text-mono-sm text-light-on-surface uppercase font-bold"}, "Current CGPA"),
+                        html.input(
+                            {
                                 "type": "number",
                                 "step": "0.01",
-                                "min": "0.00",
-                                "max": "10.00",
-                                "className": "input",
-                                "value": str(current_cgpa),
-                                "on_change": lambda e: set_current_cgpa(_to_float(e, current_cgpa))
-                            })
-                        ),
-                        html.div(
-                            html.label({"style": {"display": "block", "fontSize": "0.8rem", "fontWeight": "700", "color": "var(--brand-navy)", "marginBottom": "0.35rem"}}, "Completed Credits"),
-                            html.input({
-                                "type": "number",
                                 "min": "0",
-                                "className": "input",
-                                "value": str(completed_credits),
-                                "on_change": lambda e: set_completed_credits(_to_float(e, completed_credits))
-                            })
+                                "max": "10",
+                                "value": str(current_cgpa),
+                                "on_change": lambda e: set_current_cgpa(e.get("target", {}).get("value", 0.0)),
+                                "class_name": "w-full border border-light-outline-variant bg-light-surface-container-lowest px-3 py-2.5 font-mono text-mono-md text-light-on-surface tabular-nums focus:border-light-primary focus:ring-1 focus:ring-light-primary focus:outline-none"
+                            }
+                        )
+                    ),
+
+                    # Completed Credits & Remaining Credits
+                    html.div(
+                        {"class_name": "grid grid-cols-2 gap-gutter-md"},
+                        html.div(
+                            {"class_name": "flex flex-col gap-1.5"},
+                            html.label({"class_name": "font-mono text-mono-sm text-light-on-surface uppercase font-bold"}, "Earned Credits"),
+                            html.input(
+                                {
+                                    "type": "number",
+                                    "min": "0",
+                                    "max": "200",
+                                    "value": str(completed_credits),
+                                    "on_change": lambda e: set_completed_credits(e.get("target", {}).get("value", 0)),
+                                    "class_name": "w-full border border-light-outline-variant bg-light-surface-container-lowest px-3 py-2.5 font-mono text-mono-md text-light-on-surface tabular-nums focus:border-light-primary focus:ring-1 focus:ring-light-primary focus:outline-none"
+                                }
+                            )
                         ),
                         html.div(
-                            html.label({"style": {"display": "block", "fontSize": "0.8rem", "fontWeight": "700", "color": "var(--brand-navy)", "marginBottom": "0.35rem"}}, "Remaining Semesters"),
-                            html.input({
+                            {"class_name": "flex flex-col gap-1.5"},
+                            html.label({"class_name": "font-mono text-mono-sm text-light-on-surface uppercase font-bold"}, "Degree Total Credits"),
+                            html.input(
+                                {
+                                    "type": "number",
+                                    "min": "1",
+                                    "max": "240",
+                                    "value": str(total_credits),
+                                    "on_change": lambda e: set_total_credits(e.get("target", {}).get("value", 160)),
+                                    "class_name": "w-full border border-light-outline-variant bg-light-surface-container-lowest px-3 py-2.5 font-mono text-mono-md text-light-on-surface tabular-nums focus:border-light-primary focus:ring-1 focus:ring-light-primary focus:outline-none"
+                                }
+                            )
+                        )
+                    ),
+
+                    # Remaining Semesters
+                    html.div(
+                        {"class_name": "flex flex-col gap-1.5"},
+                        html.label({"class_name": "font-mono text-mono-sm text-light-on-surface uppercase font-bold"}, "Remaining Semesters"),
+                        html.input(
+                            {
                                 "type": "number",
                                 "min": "1",
                                 "max": "8",
-                                "className": "input",
                                 "value": str(remaining_semesters),
-                                "on_change": lambda e: set_remaining_semesters(_to_int(e, remaining_semesters))
-                            })
-                        ),
-                        html.div(
-                            html.label({"style": {"display": "block", "fontSize": "0.8rem", "fontWeight": "700", "color": "var(--brand-navy)", "marginBottom": "0.35rem"}}, "Degree Total Credits"),
-                            html.input({
-                                "type": "number",
-                                "min": "1",
-                                "className": "input",
-                                "value": str(total_credits),
-                                "on_change": lambda e: set_total_credits(_to_float(e, total_credits))
-                            })
+                                "on_change": lambda e: set_remaining_semesters(e.get("target", {}).get("value", 1)),
+                                "class_name": "w-full border border-light-outline-variant bg-light-surface-container-lowest px-3 py-2.5 font-mono text-mono-md text-light-on-surface tabular-nums focus:border-light-primary focus:ring-1 focus:ring-light-primary focus:outline-none"
+                            }
                         )
+                    ),
+
+                    # Target CGPA Range Slider & Numeric Input
+                    html.div(
+                        {"class_name": "flex flex-col gap-2"},
+                        html.div(
+                            {"class_name": "flex items-center justify-between"},
+                            html.label({"class_name": "font-mono text-mono-sm text-light-on-surface uppercase font-bold"}, "Target Graduation CGPA"),
+                            html.span({"class_name": "font-mono text-mono-sm text-light-primary font-bold tabular-nums"}, f"{target_f:.2f}")
+                        ),
+                        html.input(
+                            {
+                                "type": "range",
+                                "min": "6.0",
+                                "max": "10.0",
+                                "step": "0.05",
+                                "value": str(target_cgpa),
+                                "on_change": handle_target_change,
+                                "class_name": "w-full accent-light-primary cursor-pointer"
+                            }
+                        ),
+                        html.input(
+                            {
+                                "type": "number",
+                                "step": "0.01",
+                                "min": "0",
+                                "max": "10",
+                                "value": str(target_cgpa),
+                                "on_change": handle_target_change,
+                                "class_name": "w-full border border-light-outline-variant bg-light-surface-container-lowest px-3 py-2.5 font-mono text-mono-md text-light-on-surface tabular-nums focus:border-light-primary focus:ring-1 focus:ring-light-primary focus:outline-none"
+                            }
+                        )
+                    ),
+
+                    # Preset Quick Targets
+                    html.div(
+                        {"class_name": "flex flex-wrap gap-2 pt-1"},
+                        [
+                            html.button(
+                                {
+                                    "key": f"{q_val:.1f}",
+                                    "type": "button",
+                                    "on_click": lambda e, v=q_val: set_target_cgpa(v),
+                                    "class_name": f"px-2.5 py-1 font-mono text-mono-sm border border-light-outline-variant hover:bg-light-surface-container-low transition-colors duration-state-change cursor-pointer {'bg-light-secondary text-light-on-secondary font-bold' if abs(target_f - q_val) < 0.05 else 'bg-light-surface-container-lowest text-light-on-surface'}"
+                                },
+                                f"{q_val:.2f}"
+                            ) for q_val in [7.50, 8.00, 8.50, 9.00, 9.50]
+                        ]
                     )
                 )
             ),
-            # Feasibility Card
+
+            # Right: Feasibility Result & 7 What-If Scenarios (7 cols)
             html.div(
-                {"className": "card"},
-                html.div(
-                    {"style": {"display": "flex", "justifyContent": "space-between", "alignItems": "center", "marginBottom": "1.5rem"}},
-                    html.h3({"style": {"fontFamily": "var(--font-serif)", "fontSize": "1.35rem", "color": "var(--brand-navy)"}}, "Milestone Feasibility"),
-                    html.span(
-                        {"className": badge_class},
-                        badge_icon,
-                        badge_text
-                    )
-                ),
-                html.div(
-                    {"style": {"padding": "1.75rem", "backgroundColor": "#F8FAFC", "borderRadius": "var(--radius-md)", "border": "1px solid var(--border-subtle)", "marginBottom": "1.5rem", "textAlign": "center"}},
-                    html.div({"style": {"fontSize": "0.8rem", "textTransform": "uppercase", "color": "var(--text-muted)", "fontWeight": "700", "letterSpacing": "0.05em"}}, "Required Average SGPA Per Semester"),
-                    html.div(
-                        {"style": {"fontFamily": "var(--font-display)", "fontSize": "3.5rem", "color": sgpa_color, "margin": "0.5rem 0"}},
-                        display_sgpa
+                {"class_name": "xl:col-span-7 flex flex-col gap-gutter-lg"},
+                
+                # Feasibility Output Card
+                html.article(
+                    {"class_name": "bg-light-surface-container-lowest border border-light-outline-variant p-gutter-lg flex flex-col gap-gutter-md"},
+                    html.header(
+                        {"class_name": "flex items-center justify-between gap-gutter-sm"},
+                        html.div(
+                            html.h2({"class_name": "font-headline text-title-lg text-light-on-surface uppercase"}, "Required Future SGPA"),
+                            html.p({"class_name": "font-body text-body-sm text-light-on-surface-variant"}, f"Average needed across your {rem_cr_f:.0f} remaining credits")
+                        ),
+                        html.span(
+                            {"class_name": f"px-3 py-1 rounded-full font-mono text-mono-sm uppercase whitespace-nowrap shrink-0 {badge_cls}"},
+                            badge_text
+                        )
                     ),
+
+                    # Bento 2-block
+                    html.div(
+                        {"class_name": "grid grid-cols-1 sm:grid-cols-2 border border-light-outline-variant"},
+                        html.div(
+                            {"class_name": "p-gutter-md bg-light-primary-container text-light-on-primary-container"},
+                            html.span({"class_name": "font-mono text-mono-sm uppercase font-bold"}, "Required Avg SGPA"),
+                            html.p(
+                                {"class_name": "font-headline text-display-lg tabular-nums mt-1 font-bold"},
+                                f"{req_sgpa:.2f}" if req_sgpa is not None else "N/A"
+                            )
+                        ),
+                        html.div(
+                            {"class_name": "p-gutter-md bg-light-surface-container-low border-t sm:border-t-0 sm:border-l border-light-outline-variant"},
+                            html.span({"class_name": "font-mono text-mono-sm text-light-on-surface-variant uppercase font-bold"}, "Max Achievable CGPA"),
+                            html.p(
+                                {"class_name": "font-headline text-display-lg text-light-on-surface tabular-nums mt-1 font-bold"},
+                                f"{max_cgpa:.2f}"
+                            )
+                        )
+                    ),
+
+                    # Visual Feasibility Meter
+                    html.div(
+                        {"class_name": "flex flex-col gap-1.5 pt-gutter-xs"},
+                        html.div(
+                            {"class_name": "flex items-center justify-between font-mono text-mono-sm text-light-on-surface-variant"},
+                            html.span("TARGET DIFFICULTY (0.0 – 10.0)"),
+                            html.span(
+                                {"class_name": "text-light-on-surface font-bold"},
+                                "First Class with Distinction (≥ 8.50)" if target_f >= 8.5 else "First Class (≥ 7.50)" if target_f >= 7.5 else "Second Class (≥ 6.00)"
+                            )
+                        ),
+                        html.div(
+                            {"class_name": "w-full h-2 bg-light-surface-container-high overflow-hidden"},
+                            html.div(
+                                {
+                                    "class_name": "h-full transition-all duration-surface-enter " + ("bg-light-primary" if is_achievable else "bg-light-error"),
+                                    "style": {"width": f"{diff_pct}%"}
+                                }
+                            )
+                        )
+                    ),
+
+                    # Advisory Explanation Note
                     html.p(
-                        {"style": {"fontSize": "0.9rem", "color": "var(--text-secondary)", "lineHeight": "1.5", "maxWidth": "440px", "margin": "0 auto"}},
+                        {"class_name": "font-body text-body-sm text-light-on-surface-variant p-3 bg-light-surface-container-low border border-light-outline-variant"},
                         message
                     )
                 ),
-                html.h4({"style": {"fontFamily": "var(--font-serif)", "fontSize": "1.1rem", "color": "var(--brand-navy)", "marginBottom": "0.75rem"}}, "Future Performance Projections"),
-                html.div(
-                    {"className": "table-container"},
-                    html.table(
-                        html.thead(
-                            html.tr(
-                                html.th("Future Average SGPA"),
-                                html.th("Projected Final CGPA"),
-                                html.th("Target Status")
+
+                # 7 What-If Scenario Projections
+                html.article(
+                    {"class_name": "bg-light-surface-container-lowest border border-light-outline-variant overflow-hidden"},
+                    html.header(
+                        {"class_name": "px-gutter-lg py-gutter-md bg-light-surface-container-low border-b border-light-outline-variant"},
+                        html.h3({"class_name": "font-headline text-title-lg text-light-on-surface uppercase"}, "What-If Graduation Projections"),
+                        html.p({"class_name": "font-body text-body-sm text-light-on-surface-variant"}, f"Resulting final CGPA across future SGPA benchmarks with {rem_cr_f:.0f} credits remaining")
+                    ),
+
+                    html.div(
+                        {"class_name": "overflow-x-auto"},
+                        html.table(
+                            {"class_name": "w-full text-left border-collapse"},
+                            html.thead(
+                                html.tr(
+                                    {"class_name": "border-b border-light-outline-variant text-light-on-surface-variant font-label text-label-md bg-light-surface-container-lowest"},
+                                    html.th({"class_name": "py-3 px-gutter-lg"}, "Future Avg SGPA"),
+                                    html.th({"class_name": "py-3 px-gutter-md"}, "Projected Final CGPA"),
+                                    html.th({"class_name": "py-3 px-gutter-lg text-right"}, "Target Status")
+                                )
+                            ),
+                            html.tbody(
+                                {"class_name": "divide-y divide-light-outline-variant font-mono text-mono-md"},
+                                scenario_rows
                             )
-                        ),
-                        html.tbody(scenario_rows)
+                        )
                     )
                 )
             )

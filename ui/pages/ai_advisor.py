@@ -1,13 +1,14 @@
 """
 AI Academic Advisor Chat Component for EduGrade AI ReactPy Frontend.
-Editorial Consultancy Design (Anton, Newsreader, Vermillion, Navy).
+Industrial Academic Precision Design (Space Grotesk, IBM Plex Mono, Inter, Vermilion, Espresso).
+Matches New Ui/ai_academic_advisor/code.html.
 """
 
 import time
 from reactpy import component, html, use_state
-from ui.components.icons import icon_bot, icon_sparkles, icon_users
 from ui.services.data_service import (
-    get_advisor_messages, send_advisor_chat_message, clear_advisor_chat_history
+    get_advisor_messages, send_advisor_chat_message, clear_advisor_chat_history,
+    get_student_dashboard_data, get_placement_matrix_data
 )
 
 @component
@@ -18,7 +19,7 @@ def AiAdvisorPage(user):
             return [{"sender": m.sender, "message": m.message} for m in msgs]
         return [{
             "sender": "ai",
-            "message": "Hello! I am your EduGrade AI Academic Mentor. I have analyzed your course credits, historical SGPA, and subject performance. How can I help you optimize your academic trajectory or placement readiness today?"
+            "message": "Hello! I am your EduGrade AI Academic Mentor. I am grounded with your live transcript, historical SGPA trajectory, and placement eligibility. How can I assist you with your academic goals or placement preparations today?"
         }]
 
     messages, set_messages = use_state(get_initial_messages)
@@ -26,13 +27,25 @@ def AiAdvisorPage(user):
     loading, set_loading = use_state(False)
     confirm_clear_until, set_confirm_clear_until = use_state(0.0)
 
+    # Fetch context data for sidebar
+    data = get_student_dashboard_data(user)
+    student = data.get("student", {}) if data else {}
+    recent_courses = data.get("recent_courses", []) if data else []
+    placement_data = get_placement_matrix_data(user)
+    comp_list = placement_data.get("companies", []) if placement_data else []
+    eligible_count = sum(1 for c in comp_list if c.get("is_eligible", False))
+    total_companies = len(comp_list)
+
+    weak_courses = [c.course_code for c in recent_courses if c.grade in ['B+', 'B', 'C', 'U', 'RA']][:2]
+    weak_str = ", ".join(weak_courses) if weak_courses else "None (All Cleared)"
+
     def handle_clear_chat(e=None):
         now = time.time()
         if now < confirm_clear_until:
             clear_advisor_chat_history(user)
             set_messages([{
                 "sender": "ai",
-                "message": "Chat history has been cleared. How can I assist you with your academic goals today?"
+                "message": "Chat history has been cleared. How can I assist your academic trajectory today?"
             }])
             set_confirm_clear_until(0.0)
         else:
@@ -43,7 +56,6 @@ def AiAdvisorPage(user):
         if not clean_text or loading:
             return
 
-        # Append user message
         new_msgs = messages + [{"sender": "user", "message": clean_text}]
         set_messages(new_msgs)
         set_input_text("")
@@ -51,223 +63,255 @@ def AiAdvisorPage(user):
 
         try:
             res = send_advisor_chat_message(user, clean_text)
-            if isinstance(res, dict):
-                reply = res.get('reply', '')
-                source = res.get('source', 'rule_based')
-            else:
-                reply = str(res)
-                source = 'rule_based'
+            reply = res.get('reply', '') if isinstance(res, dict) else str(res)
+            source = res.get('source', 'grounded') if isinstance(res, dict) else 'grounded'
             set_messages(new_msgs + [{"sender": "ai", "message": reply, "source": source}])
-        except Exception as err:
-            set_messages(new_msgs + [{"sender": "ai", "message": f"Mentor response error: {str(err)}", "source": "rule_based"}])
+        except Exception as exc:
+            set_messages(new_msgs + [{
+                "sender": "ai",
+                "message": f"Unable to generate response at this time. Please try again. ({exc})"
+            }])
         finally:
             set_loading(False)
 
-    suggested = [
-        "Make a study plan for my weakest subject",
-        "How can I raise my CGPA to 9.0 in remaining semesters?",
-        "Which subjects should I focus on to clear arrears or improve grades?",
-        "Can you give me a weekly study schedule for Operating Systems & DBMS?",
-        "What companies can I apply for with my current CGPA?",
-        "எனது பலவீனமான பாடத்திற்கு ஒரு படிப்புத் திட்டம் உருவாக்கவும் (Tamil)"
-    ]
-
-    chat_elements = []
-    for idx, m in enumerate(messages):
-        is_user = m["sender"] == "user"
-        chat_elements.append(
-            html.div(
-                {
-                    "key": str(idx),
-                    "style": {
-                        "display": "flex",
-                        "justifyContent": "flex-end" if is_user else "flex-start",
-                        "marginBottom": "1.25rem"
-                    }
-                },
-                html.div(
-                    {
-                        "style": {
-                            "maxWidth": "78%",
-                            "padding": "1.1rem 1.4rem",
-                            "borderRadius": "20px 20px 4px 20px" if is_user else "20px 20px 20px 4px",
-                            "backgroundColor": "linear-gradient(135deg, #0284C7, #4F46E5)" if is_user else "var(--bg-surface-elevated)",
-                            "color": "#FFFFFF" if is_user else "var(--text-primary)",
-                            "border": "none" if is_user else "1px solid var(--border-medium)",
-                            "boxShadow": "var(--shadow-sm)",
-                            "fontSize": "0.925rem",
-                            "lineHeight": "1.6"
-                        }
-                    },
-                    html.div(
-                        {
-                            "style": {
-                                "display": "flex",
-                                "alignItems": "center",
-                                "gap": "0.5rem",
-                                "fontSize": "0.75rem",
-                                "fontWeight": "700",
-                                "marginBottom": "0.4rem",
-                                "color": "#BAE6FD" if is_user else "var(--primary)"
-                            }
-                        },
-                        icon_users(14) if is_user else icon_bot(14),
-                        "You" if is_user else "EduGrade AI Mentor"
-                    ),
-                    html.div({"style": {"whiteSpace": "pre-wrap"}}, m["message"]),
-                    html.div(
-                        {
-                            "style": {
-                                "fontSize": "0.72rem",
-                                "opacity": "0.6",
-                                "marginTop": "0.4rem",
-                                "fontStyle": "italic"
-                            }
-                        },
-                        "Powered by Groq" if m.get("source") == "groq" else "Built-in advisor"
-                    ) if not is_user and m.get("source") else None
-                )
-            )
-        )
+    def on_form_submit(e):
+        handle_send(input_text)
 
     is_confirming = time.time() < confirm_clear_until
 
+    # Render message items
+    rendered_messages = []
+    for idx, msg in enumerate(messages):
+        is_user = msg.get("sender") == "user"
+        text = msg.get("message", "")
+        source = msg.get("source")
+
+        if is_user:
+            rendered_messages.append(
+                html.div(
+                    {"key": str(idx), "class_name": "self-end max-w-xl bg-light-primary text-light-on-primary p-gutter-md"},
+                    html.p({"class_name": "font-body text-body-md whitespace-pre-wrap"}, text)
+                )
+            )
+        else:
+            source_badge = html.span(
+                {"class_name": "inline-flex items-center gap-1 font-mono text-[11px] text-light-primary uppercase font-bold mt-1"},
+                html.span({"class_name": "material-symbols-outlined text-[13px]"}, "verified"),
+                f"Grounded by EduGrade Engine ({source})" if source else "Grounded by Academic History"
+            )
+            rendered_messages.append(
+                html.div(
+                    {"key": str(idx), "class_name": "self-start max-w-2xl bg-light-surface-container-low border border-light-outline-variant p-gutter-md flex flex-col gap-gutter-sm"},
+                    html.p({"class_name": "font-body text-body-md text-light-on-surface whitespace-pre-wrap"}, text),
+                    source_badge
+                )
+            )
+
+    if loading:
+        rendered_messages.append(
+            html.div(
+                {"key": "loading", "class_name": "self-start max-w-2xl bg-light-surface-container-low border border-light-outline-variant p-gutter-md flex items-center gap-2"},
+                html.span({"class_name": "material-symbols-outlined text-[18px] text-light-primary animate-spin"}, "progress_activity"),
+                html.span({"class_name": "font-mono text-mono-sm text-light-on-surface-variant"}, "Analyzing transcript and synthesizing advice...")
+            )
+        )
+
+    # Prompt chips
+    prompts = [
+        "How do I reach 8.80 CGPA before graduation?",
+        "Audit Google 9.00 CGPA gap",
+        "தமிழில் எனது placement தகுதி பற்றி சொல்லுங்கள்",
+        "Build Sem VII weekly study schedule"
+    ]
+
     return html.div(
+        {"class_name": "flex-1 p-gutter-lg max-w-[1440px] w-full mx-auto flex flex-col gap-gutter-lg overflow-y-auto"},
+        
         # Header
         html.div(
-            {
-                "style": {
-                    "display": "flex",
-                    "justifyContent": "space-between",
-                    "alignItems": "flex-start",
-                    "marginBottom": "2rem",
-                    "flexWrap": "wrap",
-                    "gap": "1rem"
-                }
-            },
+            {"class_name": "flex flex-wrap items-center justify-between gap-gutter-md pb-gutter-md border-b border-light-outline-variant"},
             html.div(
-                html.h1(
-                    {
-                        "style": {
-                            "fontFamily": "var(--font-serif)",
-                            "fontSize": "2.25rem",
-                            "fontWeight": "400",
-                            "color": "var(--brand-navy)",
-                            "lineHeight": "1.2"
-                        }
-                    },
-                    "AI Academic Mentor & Trajectory Advisory"
-                ),
-                html.p({"style": {"color": "var(--text-secondary)", "marginTop": "0.25rem"}}, "Bilingual English & Tamil advisory grounded in your official credit weights, course history, and target milestones.")
+                html.h1({"class_name": "font-headline text-headline-md text-light-on-surface uppercase tracking-tight"}, "AI Academic Advisor"),
+                html.p({"class_name": "font-mono text-mono-sm text-light-on-surface-variant uppercase"}, "Grounded Bilingual Academic Guidance • English & தமிழ்")
             ),
-            html.button(
-                {
-                    "className": "btn btn-danger" if is_confirming else "btn btn-secondary",
-                    "style": {
-                        "backgroundColor": "var(--danger)" if is_confirming else "transparent",
-                        "color": "#FFFFFF" if is_confirming else "var(--danger)",
-                        "borderColor": "var(--danger)",
-                        "fontSize": "0.85rem",
-                        "padding": "0.5rem 1rem",
-                        "display": "inline-flex",
-                        "alignItems": "center",
-                        "gap": "0.4rem",
-                        "transition": "all 0.2s ease"
-                    },
-                    "on_click": handle_clear_chat
-                },
-                "⚠️ Click to Confirm Clear (4s)" if is_confirming else "🗑️ Clear Chat"
+            html.div(
+                {"class_name": "flex items-center gap-gutter-sm"},
+                html.span({"class_name": "px-3 py-1.5 rounded-full bg-light-primary-container text-light-on-primary-container font-mono text-mono-sm uppercase whitespace-nowrap font-bold"}, "EN / தமிழ் Active")
             )
         ),
 
-        # Suggested Prompt Chips
-        html.div(
-            {"style": {"marginBottom": "1.5rem"}},
-            html.div({"style": {"fontSize": "0.8rem", "fontWeight": "700", "color": "var(--text-primary)", "marginBottom": "0.5rem", "textTransform": "uppercase", "letterSpacing": "0.05em"}}, "Quick Guidance Inquiries:"),
-            html.div(
-                {"style": {"display": "flex", "flexWrap": "wrap", "gap": "0.5rem"}},
-                [
-                    html.button(
-                        {
-                            "key": p,
-                            "style": {
-                                "backgroundColor": "var(--danger-subtle)",
-                                "color": "var(--danger)",
-                                "border": "1px solid var(--border-subtle)",
-                                "borderRadius": "var(--radius-full)",
-                                "padding": "0.4rem 1rem",
-                                "fontSize": "0.8rem",
-                                "fontWeight": "600",
-                                "cursor": "pointer",
-                                "transition": "all 0.15s ease"
+        # Main Workspace Grid
+        html.main(
+            {"class_name": "grid grid-cols-1 xl:grid-cols-12 gap-gutter-lg items-start"},
+            
+            # Left: Chat Window (8 cols)
+            html.section(
+                {"class_name": "xl:col-span-8 bg-light-surface-container-lowest border border-light-outline-variant flex flex-col min-h-[640px]"},
+                
+                # Chat Header
+                html.header(
+                    {"class_name": "px-gutter-lg py-gutter-md border-b border-light-outline-variant flex items-center justify-between gap-gutter-sm flex-wrap"},
+                    html.div(
+                        {"class_name": "flex items-center gap-gutter-sm"},
+                        html.div(
+                            {"class_name": "w-9 h-9 bg-light-primary-container text-light-on-primary-container flex items-center justify-center shrink-0"},
+                            html.span({"class_name": "material-symbols-outlined text-[18px]"}, "psychology")
+                        ),
+                        html.div(
+                            html.h2({"class_name": "font-headline text-title-md text-light-on-surface uppercase font-bold"}, "EduGrade Mentor"),
+                            html.p({"class_name": "font-mono text-mono-sm text-light-on-surface-variant uppercase"}, f"Synced • Sem {student.get('current_semester', 6)} ({student.get('current_cgpa', 8.64):.2f} CGPA)")
+                        )
+                    ),
+                    html.div(
+                        {"class_name": "flex items-center gap-gutter-sm"},
+                        html.span({"class_name": "px-2.5 py-1 rounded-full bg-light-secondary-container text-light-on-secondary-container font-mono text-mono-sm whitespace-nowrap shrink-0 font-bold"}, "Grounded Mode"),
+                        html.button(
+                            {
+                                "type": "button",
+                                "on_click": handle_clear_chat,
+                                "class_name": f"inline-flex items-center justify-center gap-gutter-xs px-gutter-md py-2 border font-mono text-mono-sm uppercase transition-colors duration-state-change whitespace-nowrap shrink-0 cursor-pointer {'bg-light-primary text-light-on-primary border-light-primary font-bold' if is_confirming else 'bg-light-surface text-light-on-surface border-light-outline-variant hover:bg-light-surface-container-low'}"
                             },
-                            "on_click": lambda e, prompt_text=p: handle_send(prompt_text)
-                        },
-                        p
+                            html.span({"class_name": "material-symbols-outlined text-[16px]"}, "refresh"),
+                            html.span("Confirm Reset?" if is_confirming else "New Chat")
+                        )
                     )
-                    for p in suggested
-                ]
-            )
-        ),
+                ),
 
-        # Chat Window Card
-        html.div(
-            {
-                "className": "card",
-                "style": {
-                    "minHeight": "480px",
-                    "display": "flex",
-                    "flexDirection": "column",
-                    "justifyContent": "space-between",
-                    "padding": "1.75rem",
-                    "borderRadius": "var(--radius-xl)"
-                }
-            },
-            # Messages Box
-            html.div(
-                {
-                    "style": {
-                        "flex": "1",
-                        "overflowY": "auto",
-                        "maxHeight": "520px",
-                        "paddingRight": "0.5rem",
-                        "marginBottom": "1.5rem"
-                    }
-                },
-                chat_elements,
+                # Message Thread
                 html.div(
-                    {"style": {"display": "flex", "alignItems": "center", "gap": "0.5rem", "color": "var(--brand-vermillion)", "fontSize": "0.85rem", "fontStyle": "italic"}},
-                    icon_sparkles(16, "var(--brand-vermillion)"), " Analyzing student academic records and synthesizing advice..."
-                ) if loading else None
+                    {"class_name": "flex-1 p-gutter-lg flex flex-col gap-gutter-md overflow-y-auto max-h-[460px]"},
+                    rendered_messages
+                ),
+
+                # Footer with Recommendation Chips and Input
+                html.footer(
+                    {"class_name": "p-gutter-md border-t border-light-outline-variant flex flex-col gap-gutter-sm bg-light-surface-container-lowest"},
+                    
+                    # Prompt recommendation chips
+                    html.div(
+                        {"class_name": "flex flex-wrap gap-gutter-xs"},
+                        [
+                            html.button(
+                                {
+                                    "key": p_text,
+                                    "type": "button",
+                                    "on_click": lambda e, pt=p_text: handle_send(pt),
+                                    "class_name": "px-3 py-1.5 rounded-full bg-light-surface-container-low border border-light-outline-variant font-mono text-label-sm text-light-on-surface hover:bg-light-surface-container hover:border-light-primary transition-colors duration-state-change whitespace-nowrap cursor-pointer"
+                                },
+                                p_text
+                            ) for p_text in prompts
+                        ]
+                    ),
+
+                    # Input form
+                    html.div(
+                        {"class_name": "flex items-center gap-gutter-sm mt-1"},
+                        html.input(
+                            {
+                                "type": "text",
+                                "placeholder": "Ask about CGPA targets, weak subjects, or placement prep (EN / தமிழ்)...",
+                                "value": input_text,
+                                "on_change": lambda e: set_input_text(e.get("target", {}).get("value", "")),
+                                "on_key_down": lambda e: handle_send(input_text) if e.get("key") == "Enter" else None,
+                                "disabled": loading,
+                                "class_name": "flex-1 border border-light-outline-variant bg-light-surface-container-lowest px-3 py-2.5 font-body text-body-md text-light-on-surface focus:border-light-primary focus:ring-1 focus:ring-light-primary focus:outline-none"
+                            }
+                        ),
+                        html.button(
+                            {
+                                "type": "button",
+                                "on_click": on_form_submit,
+                                "disabled": loading or not input_text.strip(),
+                                "class_name": "inline-flex items-center justify-center gap-gutter-xs px-gutter-md py-2.5 bg-light-primary text-light-on-primary font-mono text-mono-md uppercase hover:bg-light-primary-container hover:text-light-on-primary-container transition-colors duration-state-change whitespace-nowrap shrink-0 disabled:opacity-50 cursor-pointer"
+                            },
+                            html.span("Send"),
+                            html.span({"class_name": "material-symbols-outlined text-[18px]"}, "send")
+                        )
+                    )
+                )
             ),
 
-            # Input Form Bar
-            html.div(
-                {
-                    "style": {
-                        "display": "flex",
-                        "gap": "0.75rem",
-                        "borderTop": "1.5px solid var(--border-subtle)",
-                        "paddingTop": "1.25rem"
-                    }
-                },
-                html.input({
-                    "type": "text",
-                    "className": "input",
-                    "style": {"borderRadius": "var(--radius-full)", "padding": "0.85rem 1.5rem"},
-                    "placeholder": "Ask in English or தமிழ் (e.g. How do I clear backlogs and reach 8.0 CGPA?)...",
-                    "value": input_text,
-                    "on_change": lambda e: set_input_text(e.get("target", {}).get("value", "") if isinstance(e, dict) else str(e)),
-                    "on_keydown": lambda e: handle_send(input_text) if e.get("key") == "Enter" else None
-                }),
-                html.button(
-                    {
-                        "className": "btn btn-primary",
-                        "style": {"padding": "0.85rem 1.75rem", "borderRadius": "var(--radius-full)"},
-                        "disabled": loading or not input_text.strip(),
-                        "on_click": lambda e: handle_send(input_text)
-                    },
-                    "Send Message →"
+            # Right: Grounded Context Sidebar (4 cols)
+            html.aside(
+                {"class_name": "xl:col-span-4 flex flex-col gap-gutter-lg"},
+                
+                # Context Snapshot Card
+                html.article(
+                    {"class_name": "bg-light-surface-container-lowest border border-light-outline-variant p-gutter-lg flex flex-col gap-gutter-md"},
+                    html.div(
+                        {"class_name": "flex items-center gap-gutter-sm border-b border-light-outline-variant pb-gutter-sm"},
+                        html.div(
+                            {"class_name": "w-8 h-8 bg-light-primary/10 text-light-primary flex items-center justify-center shrink-0"},
+                            html.span({"class_name": "material-symbols-outlined text-[20px]"}, "analytics")
+                        ),
+                        html.h3({"class_name": "font-headline text-title-md text-light-on-surface uppercase font-bold"}, "Context Snapshot")
+                    ),
+                    html.div(
+                        {"class_name": "flex flex-col gap-gutter-sm font-mono text-mono-sm"},
+                        html.div(
+                            {"class_name": "flex items-center justify-between py-1 border-b border-light-outline-variant/40"},
+                            html.span({"class_name": "text-light-on-surface-variant uppercase"}, "Current CGPA"),
+                            html.span({"class_name": "text-light-on-surface font-bold tabular-nums"}, f"{student.get('current_cgpa', 8.64):.2f}")
+                        ),
+                        html.div(
+                            {"class_name": "flex items-center justify-between py-1 border-b border-light-outline-variant/40"},
+                            html.span({"class_name": "text-light-on-surface-variant uppercase"}, "Active Arrears"),
+                            html.span({"class_name": "text-light-secondary font-bold tabular-nums"}, str(student.get("backlogs_count", 0)))
+                        ),
+                        html.div(
+                            {"class_name": "flex items-center justify-between py-1 border-b border-light-outline-variant/40"},
+                            html.span({"class_name": "text-light-on-surface-variant uppercase"}, "Weakest Courses"),
+                            html.span({"class_name": "text-light-primary font-bold"}, weak_str)
+                        ),
+                        html.div(
+                            {"class_name": "flex items-center justify-between py-1"},
+                            html.span({"class_name": "text-light-on-surface-variant uppercase"}, "Eligible Drives"),
+                            html.span({"class_name": "text-light-secondary font-bold tabular-nums"}, f"{eligible_count} / {total_companies}")
+                        )
+                    )
+                ),
+
+                # Weekly Study Plan Card
+                html.article(
+                    {"class_name": "bg-light-surface-container-lowest border border-light-outline-variant p-gutter-lg flex flex-col gap-gutter-md"},
+                    html.div(
+                        {"class_name": "flex items-center gap-gutter-sm border-b border-light-outline-variant pb-gutter-sm"},
+                        html.div(
+                            {"class_name": "w-8 h-8 bg-light-secondary text-light-on-secondary flex items-center justify-center shrink-0"},
+                            html.span({"class_name": "material-symbols-outlined text-[18px]"}, "event_note")
+                        ),
+                        html.div(
+                            html.h3({"class_name": "font-headline text-title-md text-light-on-surface uppercase font-bold"}, "Weekly Study Plan"),
+                            html.p({"class_name": "font-mono text-mono-sm text-light-on-surface-variant"}, "Recommended 12 hrs/wk focus")
+                        )
+                    ),
+                    html.div(
+                        {"class_name": "flex flex-col divide-y divide-light-outline-variant font-body text-body-sm"},
+                        html.div(
+                            {"class_name": "py-2.5 flex items-center justify-between gap-gutter-sm"},
+                            html.div(
+                                html.p({"class_name": "font-title text-title-md text-light-on-surface font-semibold"}, "DSA & System Design"),
+                                html.p({"class_name": "text-light-on-surface-variant text-body-sm"}, "Placement prep • Mon, Wed, Fri")
+                            ),
+                            html.span({"class_name": "font-mono text-mono-sm text-light-primary font-bold whitespace-nowrap"}, "6 hrs/wk")
+                        ),
+                        html.div(
+                            {"class_name": "py-2.5 flex items-center justify-between gap-gutter-sm"},
+                            html.div(
+                                html.p({"class_name": "font-title text-title-md text-light-on-surface font-semibold"}, "Core Subject Remediation"),
+                                html.p({"class_name": "text-light-on-surface-variant text-body-sm"}, "Foundational concepts • Tue, Thu")
+                            ),
+                            html.span({"class_name": "font-mono text-mono-sm text-light-secondary font-bold whitespace-nowrap"}, "4 hrs/wk")
+                        ),
+                        html.div(
+                            {"class_name": "py-2.5 flex items-center justify-between gap-gutter-sm"},
+                            html.div(
+                                html.p({"class_name": "font-title text-title-md text-light-on-surface font-semibold"}, "Upcoming Semester Preview"),
+                                html.p({"class_name": "text-light-on-surface-variant text-body-sm"}, "Advanced electives preview • Saturday")
+                            ),
+                            html.span({"class_name": "font-mono text-mono-sm text-light-on-surface-variant font-bold whitespace-nowrap"}, "2 hrs/wk")
+                        )
+                    )
                 )
             )
         )

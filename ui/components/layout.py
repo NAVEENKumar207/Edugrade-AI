@@ -1,168 +1,199 @@
 """
 Layout Component for EduGrade AI ReactPy Frontend.
-Provides responsive sidebar, top navbar, and user badges with Editorial Consultancy styling.
+Implements the Swiss-Brutalist 'Industrial Academic Precision' layout from New Ui.
+Pairs a persistent 256px architectural left rail with an exposed 1px hairline border top shell.
 """
 
 from reactpy import component, html
-from ui.components.icons import (
-    icon_user, icon_sparkles, icon_trending_up, icon_book_open, icon_briefcase,
-    icon_calculator, icon_bot, icon_layers, icon_shield_check,
-    icon_award, icon_logout
-)
 from ui.components.theme_toggle import ThemeToggle
 
+
 @component
-def AppLayout(user, current_page, set_page, logout_action, children, theme="dark", toggle_theme=None):
+def AppLayout(user, current_page, set_page, logout_action, children, theme="light", toggle_theme=None):
     profile = getattr(user, 'profile', None)
     is_admin = profile.is_admin() if profile else False
     cgpa_val = float(profile.current_cgpa) if profile else 0.0
+    full_name = f"{user.first_name} {user.last_name}".strip() or user.username if user else "Student"
+    
+    # Compute 2-letter initials
+    initials = "".join([part[0].upper() for part in full_name.split()[:2]]) or "EG"
+    roll_no = profile.roll_number if profile and profile.roll_number else (user.email if user else "2026")
+    dept = profile.department if profile and profile.department else "Computer Science"
+    curr_sem = f"Sem {profile.current_semester}" if profile else "CBCS"
 
-    nav_items = [
-        {"id": "admin_dashboard", "label": "Cohort Intelligence", "icon": icon_shield_check(18)},
-        {"id": "regulations", "label": "CBCS Regulations", "icon": icon_layers(18)},
-        {"id": "profile", "label": "Faculty Profile", "icon": icon_user(18)},
-    ] if is_admin else [
-        {"id": "dashboard", "label": "Overview Dashboard", "icon": icon_trending_up(18)},
-        {"id": "results", "label": "Semester Results", "icon": icon_book_open(18)},
-        {"id": "planner", "label": "Target CGPA Planner", "icon": icon_calculator(18)},
-        {"id": "placements", "label": "Placement Matrix", "icon": icon_briefcase(18)},
-        {"id": "advisor", "label": "AI Academic Mentor", "icon": icon_bot(18)},
-        {"id": "regulations", "label": "CBCS Framework", "icon": icon_layers(18)},
-        {"id": "profile", "label": "Academic Profile", "icon": icon_user(18)},
-    ]
+    if is_admin:
+        nav_items = [
+            {"id": "admin_dashboard", "label": "Cohort Directory", "icon": "groups"},
+            {"id": "regulations", "label": "CBCS Framework", "icon": "menu_book"},
+            {"id": "profile", "label": "Faculty Profile", "icon": "person"},
+        ]
+        page_title = "Faculty & Institutional Oversight"
+        page_subtitle = f"{dept.upper()} • COHORT METRICS & AUDIT TRAIL"
+    else:
+        nav_items = [
+            {"id": "dashboard", "label": "Dashboard", "icon": "dashboard"},
+            {"id": "results", "label": "Transcripts & Results", "icon": "receipt_long"},
+            {"id": "planner", "label": "CGPA Planner", "icon": "calculate"},
+            {"id": "placements", "label": "Placement Matrix", "icon": "work"},
+            {"id": "advisor", "label": "AI Advisor", "icon": "psychology"},
+            {"id": "regulations", "label": "Regulations", "icon": "menu_book"},
+            {"id": "profile", "label": "Profile", "icon": "person"},
+        ]
+        page_title = "Student Dashboard"
+        page_subtitle = f"B.E. {dept.upper()} • REGULATION 2026 (CBCS)"
 
-    nav_elements = []
+    nav_links = []
     for item in nav_items:
-        is_active = current_page == item["id"]
-        nav_elements.append(
-            html.li(
-                {"key": item["id"], "style": {"listStyle": "none"}},
-                html.div(
+        is_active = (current_page == item["id"]) or (current_page == "student_dashboard" and item["id"] == "dashboard")
+        
+        link_class = (
+            "flex items-center gap-gutter-sm px-3 py-2.5 bg-light-secondary text-light-on-secondary font-label text-label-lg transition-colors duration-state-change ease-state-change cursor-pointer"
+            if is_active else
+            "flex items-center gap-gutter-sm px-3 py-2.5 text-light-on-surface-variant hover:bg-light-surface-container-low hover:text-light-on-surface font-label text-label-lg transition-colors duration-state-change ease-state-change cursor-pointer"
+        )
+        
+        nav_links.append(
+            html.a(
+                {
+                    "key": item["id"],
+                    "className": link_class,
+                    "on_click": lambda e, pid=item["id"]: set_page(pid)
+                },
+                html.span(
                     {
-                        "className": f"nav-link {'active' if is_active else ''}",
-                        "on_click": lambda e, page_id=item["id"]: set_page(page_id)
+                        "className": "material-symbols-outlined text-[20px]",
+                        "style": {"fontVariationSettings": "'FILL' 1" if is_active else "'FILL' 0"}
                     },
-                    item["icon"],
-                    html.span(item["label"])
-                )
+                    item["icon"]
+                ),
+                html.span({"className": "truncate"}, item["label"])
             )
         )
 
     return html.div(
-        {"className": "app-container"},
-        # Responsive Editorial Sidebar
+        {"className": "min-h-screen flex bg-light-surface-container-low font-body antialiased"},
+        
+        # Persistent 256px Desktop Left Sidebar
         html.aside(
-            {"className": "sidebar"},
+            {"className": "w-64 shrink-0 min-h-screen bg-light-surface-container-lowest border-r border-light-outline-variant flex flex-col justify-between"},
             html.div(
-                {
-                    "style": {
-                        "padding": "1.75rem 1.5rem",
-                        "borderBottom": "1px solid var(--border-subtle)",
-                        "display": "flex",
-                        "alignItems": "center",
-                        "gap": "0.75rem",
-                        "cursor": "pointer"
-                    },
-                    "on_click": lambda e: set_page("landing")
-                },
+                {"className": "p-gutter-lg flex flex-col gap-gutter-xl"},
+                
+                # Brand Logo & Title Header
                 html.div(
                     {
-                        "style": {
-                            "width": "34px",
-                            "height": "34px",
-                            "borderRadius": "10px",
-                            "background": "linear-gradient(135deg, var(--primary), var(--accent-indigo))",
-                            "display": "flex",
-                            "alignItems": "center",
-                            "justifyContent": "center",
-                            "boxShadow": "0 0 16px rgba(56, 189, 248, 0.35)",
-                            "flexShrink": "0"
-                        }
+                        "className": "flex items-center gap-3 cursor-pointer",
+                        "on_click": lambda e: set_page("landing")
                     },
-                    icon_sparkles(18, "#FFFFFF")
-                ),
-                html.div(
                     html.div(
-                        {"style": {"fontFamily": "var(--font-sans)", "fontSize": "1.25rem", "fontWeight": "800", "letterSpacing": "-0.02em", "color": "var(--text-primary)"}},
-                        "EduGrade",
-                        html.span({"style": {"color": "var(--primary)"}}, " AI")
+                        {
+                            "className": "w-10 h-10 bg-light-primary flex items-center justify-center font-display font-bold text-white text-lg shrink-0",
+                            "style": {"borderRadius": "0px"}
+                        },
+                        "EG"
                     ),
-                    html.small({"style": {"color": "var(--text-muted)", "fontSize": "0.7rem", "fontWeight": "700", "letterSpacing": "0.08em", "textTransform": "uppercase"}}, "Academic Portal")
+                    html.div(
+                        {"className": "flex flex-col"},
+                        html.div(
+                            {"className": "font-headline text-lg font-bold uppercase tracking-tight text-light-on-surface"},
+                            "EduGrade ",
+                            html.span({"className": "text-light-primary"}, "AI")
+                        ),
+                        html.span(
+                            {"className": "font-mono text-[10px] text-light-on-surface-variant uppercase tracking-wider"},
+                            "Academic Precision"
+                        )
+                    )
+                ),
+                
+                # Navigation items
+                html.nav(
+                    {"aria-label": "Portal Navigation", "className": "flex flex-col gap-1"},
+                    nav_links
                 )
             ),
-            html.ul({"style": {"padding": "1rem 0", "flex": "1"}}, nav_elements),
+            
+            # Bottom User Identity & Controls
             html.div(
-                {
-                    "style": {
-                        "padding": "1.25rem",
-                        "borderTop": "1px solid var(--border-subtle)",
-                        "display": "flex",
-                        "flexDirection": "column",
-                        "gap": "0.75rem"
-                    }
-                },
-                ThemeToggle(theme=theme, toggle_theme=toggle_theme, compact=False, style={"width": "100%", "justifyContent": "center"}) if toggle_theme else None,
-                html.button(
+                {"className": "p-gutter-md border-t border-light-outline-variant flex flex-col gap-2"},
+                
+                # User profile pill
+                html.div(
                     {
-                        "className": "btn",
-                        "style": {
-                            "width": "100%",
-                            "justifyContent": "center",
-                            "backgroundColor": "var(--bg-surface-elevated)",
-                            "color": "var(--text-primary)",
-                            "border": "1px solid var(--border-medium)",
-                            "borderRadius": "var(--radius-full)",
-                            "padding": "0.6rem 1rem",
-                            "fontSize": "0.85rem"
-                        },
-                        "on_click": lambda e: logout_action()
+                        "className": "flex items-center justify-between gap-gutter-sm cursor-pointer hover:bg-light-surface-container-low p-1.5 transition-colors",
+                        "on_click": lambda e: set_page("profile"),
+                        "title": "View Profile"
                     },
-                    icon_logout(16),
-                    html.span({"style": {"marginLeft": "0.4rem"}}, "Sign Out")
+                    html.div(
+                        {"className": "flex items-center gap-gutter-sm min-w-0"},
+                        html.div(
+                            {"className": "w-9 h-9 bg-light-secondary text-light-on-secondary flex items-center justify-center font-mono text-mono-sm shrink-0 font-bold"},
+                            initials
+                        ),
+                        html.div(
+                            {"className": "flex flex-col min-w-0"},
+                            html.span({"className": "font-title text-title-md text-light-on-surface truncate font-semibold"}, full_name),
+                            html.span({"className": "font-mono text-mono-sm text-light-on-surface-variant truncate"}, f"{roll_no} • {curr_sem}")
+                        )
+                    )
+                ),
+                
+                # Quick Action Row: Theme toggle + Sign out
+                html.div(
+                    {"className": "flex items-center justify-between pt-1 border-t border-light-outline-variant/60"},
+                    ThemeToggle(theme=theme, toggle_theme=toggle_theme, compact=True) if toggle_theme else html.span(),
+                    html.button(
+                        {
+                            "type": "button",
+                            "aria-label": "Sign out",
+                            "className": "inline-flex items-center gap-1.5 px-3 py-1.5 text-light-on-surface-variant hover:bg-light-surface-container-low hover:text-light-primary font-mono text-mono-sm uppercase transition-colors shrink-0",
+                            "on_click": lambda e: logout_action()
+                        },
+                        html.span({"className": "material-symbols-outlined text-[18px]"}, "logout"),
+                        html.span("Sign Out")
+                    )
                 )
             )
         ),
-        # Main Workspace
+        
+        # Main Workspace Column
         html.div(
-            {"className": "main-content"},
+            {"className": "flex-1 flex flex-col min-w-0"},
+            
+            # Top Shell Header
             html.header(
-                {"className": "topbar"},
+                {"className": "bg-light-surface-container-lowest border-b border-light-outline-variant px-gutter-lg py-gutter-md flex items-center justify-between gap-gutter-md sticky top-0 z-20"},
                 html.div(
-                    {"style": {"display": "flex", "alignItems": "center", "gap": "1rem"}},
-                    html.span(
-                        {
-                            "style": {
-                                "fontFamily": "var(--font-sans)",
-                                "fontWeight": "600",
-                                "fontSize": "1.05rem",
-                                "color": "var(--text-primary)"
-                            }
-                        },
-                        profile.department if profile else "Academic Intelligence Platform"
+                    {"className": "flex items-center gap-gutter-md"},
+                    html.div(
+                        html.h1({"className": "font-headline text-headline-md text-light-on-surface uppercase tracking-tight font-bold"}, page_title),
+                        html.p({"className": "font-mono text-mono-sm text-light-on-surface-variant uppercase"}, page_subtitle)
                     )
                 ),
+                
+                # Status badges & metrics
                 html.div(
-                    {"style": {"display": "flex", "alignItems": "center", "gap": "0.85rem"}},
-                    ThemeToggle(theme=theme, toggle_theme=toggle_theme, compact=True) if toggle_theme else None,
-                    html.span(
-                        {"className": "badge badge-vermillion", "style": {"padding": "0.4rem 0.85rem"}},
-                        icon_shield_check(14, "var(--brand-vermillion)"), " Faculty / Admin"
-                    ) if is_admin else html.span(
-                        {"className": "badge", "style": {"backgroundColor": "var(--bg-surface-elevated)", "color": "var(--text-primary)", "border": "1px solid var(--border-medium)", "padding": "0.4rem 0.85rem"}},
-                        icon_award(14, "var(--primary)"), f" CGPA: {cgpa_val:.2f}"
-                    ),
-                    html.div(
-                        {
-                            "style": {"textAlign": "right", "cursor": "pointer"},
-                            "title": "View Academic Profile",
-                            "on_click": lambda e: set_page("profile")
-                        },
-                        html.div({"style": {"fontSize": "0.9rem", "fontWeight": "700", "color": "var(--text-primary)"}}, f"{user.first_name} {user.last_name}".strip() or user.username),
-                        html.div({"style": {"fontSize": "0.75rem", "color": "var(--text-muted)"}}, profile.roll_number if profile and profile.roll_number else user.email)
+                    {"className": "flex items-center gap-gutter-sm"},
+                    (
+                        html.span(
+                            {"className": "inline-flex items-center gap-gutter-xs px-3 py-1.5 rounded-full bg-light-primary text-white font-mono text-mono-sm uppercase whitespace-nowrap shrink-0 font-bold"},
+                            html.span({"className": "material-symbols-outlined text-[15px]"}, "shield_person"),
+                            html.span("Faculty / Admin")
+                        )
+                        if is_admin else
+                        html.span(
+                            {"className": "inline-flex items-center gap-gutter-xs px-3 py-1.5 rounded-full bg-light-secondary text-light-on-secondary font-mono text-mono-sm uppercase whitespace-nowrap shrink-0"},
+                            html.span({"className": "material-symbols-outlined text-[15px]"}, "verified"),
+                            html.span(f"CGPA: {cgpa_val:.2f} • {'Placement Eligible' if getattr(profile, 'is_placement_eligible', True) else 'Remediation Needed'}")
+                        )
                     )
                 )
             ),
-            html.main({"className": "page-body"}, children)
+            
+            # Main Content Canvas
+            html.main(
+                {"className": "flex-1 p-gutter-lg max-w-[1440px] w-full mx-auto flex flex-col gap-gutter-lg"},
+                children
+            )
         )
     )
-

@@ -99,22 +99,22 @@ def EduGradeApp():
     is_admin = profile.is_admin() if profile else False
 
     # Page routing logic
-    if current_page == "admin_dashboard":
+    if current_page in ["admin_dashboard", "admin", "cohort"]:
         page_content = AdminDashboard(user=current_user)
     elif current_page == "results":
         page_content = ResultsPage(user=current_user)
     elif current_page == "planner":
         page_content = CgpaPlanner(user=current_user)
-    elif current_page == "placements":
+    elif current_page in ["placements", "placement"]:
         page_content = PlacementPage(user=current_user)
-    elif current_page == "advisor":
+    elif current_page in ["advisor", "ai_advisor", "ai-advisor"]:
         page_content = AiAdvisorPage(user=current_user)
-    elif current_page == "regulations":
+    elif current_page in ["regulations", "syllabus"]:
         page_content = RegulationsPage()
     elif current_page == "profile":
         page_content = ProfilePage(user=current_user)
     else:
-        # Default student view
+        # Default view
         if is_admin:
             page_content = AdminDashboard(user=current_user)
         else:

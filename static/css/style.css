@@ -6,31 +6,31 @@
 
 
 :root, [data-theme="light"] {
-    --bg: #f7f8fc;
-    --white: #ffffff;
-    --dark: #15172b;
-    --text: #25263a;
-    --muted: #73758a;
-    --border: #e7e8ef;
-    --primary: #5b4df5;
-    --primary-dark: #493bdc;
-    --success: #16a06a;
-    --warning: #f59e0b;
-    --danger: #ef4444;
+    --bg: #F2F1F1;
+    --white: #FFFFFF;
+    --dark: #1B0401;
+    --text: #1B0401;
+    --muted: #6E5A57;
+    --border: #D4D0CF;
+    --primary: #C81E06;
+    --primary-dark: #FF3316;
+    --success: #006A63;
+    --warning: #9A4A00;
+    --danger: #BA1A1A;
 }
 
 [data-theme="dark"] {
-    --bg: #080C14;
-    --white: #0F172A;
-    --dark: #F8FAFC;
-    --text: #F1F5F9;
-    --muted: #94A3B8;
-    --border: rgba(255, 255, 255, 0.1);
-    --primary: #38BDF8;
-    --primary-dark: #0EA5E9;
-    --success: #10B981;
-    --warning: #F59E0B;
-    --danger: #EF4444;
+    --bg: #111111;
+    --white: #1B0401;
+    --dark: #FFFFFF;
+    --text: #FFFFFF;
+    --muted: #9E9594;
+    --border: #3A2D2B;
+    --primary: #FF6B54;
+    --primary-dark: #C81E06;
+    --success: #006A63;
+    --warning: #9A4A00;
+    --danger: #BA1A1A;
 }
 
 body {

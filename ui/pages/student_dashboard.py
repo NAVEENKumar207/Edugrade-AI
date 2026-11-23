@@ -1,387 +1,413 @@
 """
 Student Performance Dashboard Component for EduGrade AI ReactPy Frontend.
-Editorial Consultancy Design (Anton, Newsreader, Vermillion, Navy).
+Industrial Academic Precision Design (Space Grotesk, IBM Plex Mono, Inter, Vermilion, Espresso).
+Matches New Ui/student_dashboard/code.html.
 """
 
 from reactpy import component, html, use_state
-from ui.components.icons import (
-    icon_award, icon_trending_up, icon_book_open, icon_briefcase,
-    icon_check, icon_alert, icon_calculator, icon_bot
-)
-from ui.components.common import StatCard
-from ui.services.data_service import get_student_dashboard_data, get_arrears
+from ui.services.data_service import get_student_dashboard_data, get_placement_matrix_data, get_arrears
 
 @component
 def StudentDashboard(user, set_page):
     data, set_data = use_state(lambda: get_student_dashboard_data(user))
+    placement_data, set_placement_data = use_state(lambda: get_placement_matrix_data(user))
+    arrears_data, set_arrears_data = use_state(lambda: get_arrears(user))
 
     if not data:
         data = get_student_dashboard_data(user)
+    if not placement_data:
+        placement_data = get_placement_matrix_data(user)
+    if not arrears_data:
+        arrears_data = get_arrears(user)
 
-    student = data["student"]
-    semesters = data["semesters"]
-    subject_insights = data["subject_insights"]
-    recent_courses = data["recent_courses"]
+    student = data.get("student", {})
+    semesters = data.get("semesters", [])
+    recent_courses = data.get("recent_courses", [])
+    readiness = data.get("placement_readiness", {})
 
-    # Render semester progression bars in clean SVG/HTML with vermillion-to-navy gradient
-    bars = []
-    for s in semesters:
+    # Calculate active semester for trajectory pill
+    latest_sem_num = semesters[0].semester_number if semesters else 1
+    selected_sem_num, set_selected_sem_num = use_state(latest_sem_num)
+
+    selected_sem = next((s for s in semesters if s.semester_number == selected_sem_num), None)
+    if not selected_sem and semesters:
+        selected_sem = semesters[0]
+
+    # Selected semester metadata for detail pill
+    if selected_sem:
+        top_course = next((c for c in recent_courses if c.semester_number == selected_sem.semester_number), None)
+        top_meta = f"{top_course.course_code} ({top_course.grade})" if top_course else "Core Subjects Cleared"
+        pill_title = f"Sem {selected_sem.semester_number}"
+        pill_sgpa = f"{float(selected_sem.sgpa):.2f} SGPA"
+        pill_meta = f"{selected_sem.credits_earned} Cr • {top_meta}"
+    else:
+        pill_title = "Sem I"
+        pill_sgpa = "N/A"
+        pill_meta = "No record logged"
+
+    # Grade breakdown counts
+    o_count = sum(1 for c in recent_courses if c.grade == 'O')
+    aplus_count = sum(1 for c in recent_courses if c.grade == 'A+')
+    a_count = sum(1 for c in recent_courses if c.grade == 'A')
+    bplus_count = sum(1 for c in recent_courses if c.grade == 'B+')
+
+    # Credits %
+    total_credits = student.get("total_credits", 160) or 160
+    credits_earned = student.get("credits_earned", 0)
+    credits_pct = max(0, min(100, int((credits_earned / total_credits) * 100))) if total_credits else 0
+    remaining_credits = max(0, total_credits - credits_earned)
+
+    # Trajectory Bars
+    bar_elements = []
+    # Display in ascending order (Sem 1 to N)
+    sorted_sems = sorted(semesters, key=lambda s: s.semester_number)
+    for s in sorted_sems:
         sgpa_val = float(s.sgpa)
         pct = max(10, min(100, int((sgpa_val / 10.0) * 100)))
-        bars.append(
-            html.div(
-                {"key": str(s.semester_number), "style": {"flex": "1", "display": "flex", "flexDirection": "column", "alignItems": "center", "height": "100%", "justifyContent": "flex-end"}},
-                html.span({"style": {"fontFamily": "var(--font-sans)", "fontSize": "0.8rem", "fontWeight": "700", "color": "var(--brand-vermillion)", "marginBottom": "0.35rem"}}, f"{sgpa_val:.2f}"),
-                html.div({
-                    "style": {
-                        "width": "100%",
-                        "maxWidth": "44px",
-                        "height": f"{pct}%",
-                        "background": "linear-gradient(180deg, #F93812 0%, #051E34 100%)",
-                        "borderRadius": "8px 8px 0 0",
-                        "boxShadow": "0 4px 14px rgba(249, 56, 18, 0.25)"
-                    }
-                }),
-                html.span({"style": {"fontSize": "0.75rem", "color": "var(--text-secondary)", "marginTop": "0.5rem", "fontWeight": "700"}}, f"Sem {s.semester_number}")
-            )
-        )
+        is_selected = (s.semester_number == (selected_sem.semester_number if selected_sem else None))
+        
+        def make_select_handler(sem_n):
+            def handle_click(e):
+                set_selected_sem_num(sem_n)
+            return handle_click
 
-    # Subject insight cards
-    insight_items = []
-    for ins in subject_insights:
-        is_strong = ins.status_label == 'Strong'
-        is_needs = ins.status_label == 'Needs attention'
-        badge_cls = "badge badge-success" if is_strong else "badge badge-danger" if is_needs else "badge badge-warning"
-        insight_items.append(
-            html.div(
+        fill_cls = "bg-light-primary" if is_selected else "bg-light-surface-container-highest group-hover:bg-light-primary-container"
+        text_cls = "text-light-primary font-bold" if is_selected else "text-light-on-surface-variant"
+
+        bar_elements.append(
+            html.button(
                 {
-                    "key": str(ins.id),
-                    "style": {
-                        "display": "flex",
-                        "justifyContent": "space-between",
-                        "alignItems": "center",
-                        "padding": "0.85rem 1rem",
-                        "backgroundColor": "var(--bg-surface-elevated)",
-                        "borderRadius": "var(--radius-sm)",
-                        "border": "1px solid var(--border-subtle)"
-                    }
+                    "key": str(s.semester_number),
+                    "type": "button",
+                    "on_click": make_select_handler(s.semester_number),
+                    "class_name": "sem-bar group flex flex-col items-center gap-gutter-xs p-1 focus:outline-none flex-1",
+                    "title": f"Semester {s.semester_number}: {sgpa_val:.2f} SGPA",
                 },
+                html.span({"class_name": f"font-mono text-mono-sm tabular-nums {text_cls}"}, f"{sgpa_val:.2f}"),
                 html.div(
-                    html.div({"style": {"fontSize": "0.9rem", "fontWeight": "700", "color": "var(--brand-navy)"}}, ins.subject_name),
-                    html.small({"style": {"color": "var(--text-muted)"}}, f"Grade Point: {ins.grade_point} / 10.0")
+                    {"class_name": "w-full max-w-[52px] h-36 sm:h-40 bg-light-surface-container-low flex items-end overflow-hidden border border-light-outline-variant/30"},
+                    html.div({
+                        "class_name": f"bar-fill w-full transition-all duration-state-change {fill_cls}",
+                        "style": {"height": f"{pct}%"}
+                    })
                 ),
-                html.span({"className": badge_cls}, ins.status_label)
+                html.span({"class_name": f"font-mono text-mono-sm uppercase whitespace-nowrap {text_cls}"}, f"Sem {s.semester_number}")
             )
         )
 
-    # Course table rows
-    course_rows = []
-    for c in recent_courses:
-        course_rows.append(
-            html.tr(
-                {"key": str(c.id)},
-                html.td(f"Sem {c.semester_number}"),
-                html.td({"style": {"fontFamily": "var(--font-mono)", "fontWeight": "600", "color": "var(--brand-navy)"}}, c.course_code),
-                html.td({"style": {"fontWeight": "600"}}, c.course_name),
-                html.td(str(c.credits)),
-                html.td(html.span({"className": "badge badge-vermillion", "style": {"fontWeight": "700"}}, c.grade)),
-                html.td({"style": {"fontWeight": "700"}}, str(c.grade_point))
-            )
-        )
+    # Placement Summary
+    comp_list = placement_data.get("companies", [])
+    eligible_count = sum(1 for c in comp_list if c.get("is_eligible", False))
+    total_companies = len(comp_list)
+    top_3_companies = comp_list[:3]
 
-    # Arrears Tracker Card
-    arrears_data = get_arrears(user)
-    active_arrears = arrears_data.get("active", [])
-    cleared_arrears = arrears_data.get("cleared", [])
-
-    if not active_arrears and not cleared_arrears:
-        arrears_card = html.div(
-            {"className": "card", "style": {"marginBottom": "2rem"}},
-            html.div(
-                {"style": {"display": "flex", "justifyContent": "space-between", "alignItems": "center", "marginBottom": "0.75rem"}},
-                html.h3({"style": {"fontFamily": "var(--font-serif)", "fontSize": "1.35rem", "color": "var(--brand-navy)"}}, "Academic Arrears & Clearance Tracker"),
-                html.span({"className": "badge badge-success"}, icon_check(13), " Clean Record")
-            ),
-            html.div(
-                {"style": {"padding": "1.25rem", "textAlign": "center", "color": "var(--text-secondary)", "fontWeight": "600", "backgroundColor": "var(--bg-surface-elevated)", "borderRadius": "var(--radius-sm)"}},
-                "No arrears"
-            )
-        )
-    else:
-        active_items = []
-        if active_arrears:
-            for item in active_arrears:
-                active_items.append(
-                    html.tr(
-                        {"key": str(item["id"])},
-                        html.td(f"Sem {item['semester']}"),
-                        html.td({"style": {"fontFamily": "var(--font-mono)", "fontWeight": "700", "color": "var(--brand-navy)"}}, item["course_code"]),
-                        html.td({"style": {"fontWeight": "600"}}, item["course_name"]),
-                        html.td(html.span({"className": "badge badge-danger", "style": {"fontWeight": "700"}}, item["grade"]))
-                    )
-                )
-            active_section = html.div(
-                {"style": {"marginBottom": "1.5rem"}},
-                html.h4({"style": {"fontSize": "0.95rem", "color": "var(--danger)", "fontWeight": "700", "marginBottom": "0.5rem"}}, f"Active Standing Arrears ({len(active_arrears)})"),
-                html.div(
-                    {"className": "table-container"},
-                    html.table(
-                        html.thead(
-                            html.tr(
-                                html.th("Semester"),
-                                html.th("Course Code"),
-                                html.th("Course Title"),
-                                html.th("Current Grade")
-                            )
-                        ),
-                        html.tbody(active_items)
-                    )
-                )
-            )
-        else:
-            active_section = html.div(
-                {"style": {"marginBottom": "1.5rem", "padding": "0.75rem 1rem", "backgroundColor": "var(--bg-surface-elevated)", "borderRadius": "var(--radius-sm)", "color": "var(--success)", "fontSize": "0.85rem", "fontWeight": "600"}},
-                "✓ Zero active backlogs. All enrolled courses currently cleared."
-            )
-
-        cleared_items = []
-        if cleared_arrears:
-            for item in cleared_arrears:
-                cleared_items.append(
-                    html.tr(
-                        {"key": str(item["id"])},
-                        html.td(f"Sem {item['semester']}"),
-                        html.td({"style": {"fontFamily": "var(--font-mono)", "fontWeight": "700", "color": "var(--brand-navy)"}}, item["course_code"]),
-                        html.td({"style": {"fontWeight": "600"}}, item["course_name"]),
-                        html.td(
-                            html.span({"style": {"color": "var(--danger)", "fontWeight": "700"}}, item["previous_grade"]),
-                            " → ",
-                            html.span({"className": "badge badge-success", "style": {"fontWeight": "700"}}, item["current_grade"])
-                        ),
-                        html.td({"style": {"color": "var(--text-muted)", "fontSize": "0.85rem"}}, item["cleared_on"])
-                    )
-                )
-            cleared_section = html.div(
-                html.h4({"style": {"fontSize": "0.95rem", "color": "var(--success)", "fontWeight": "700", "marginBottom": "0.5rem"}}, f"Cleared Arrears History ({len(cleared_arrears)})"),
-                html.div(
-                    {"className": "table-container"},
-                    html.table(
-                        html.thead(
-                            html.tr(
-                                html.th("Semester"),
-                                html.th("Course Code"),
-                                html.th("Course Title"),
-                                html.th("Progression"),
-                                html.th("Cleared Date")
-                            )
-                        ),
-                        html.tbody(cleared_items)
-                    )
-                )
-            )
-        else:
-            cleared_section = html.div(
-                {"style": {"padding": "0.75rem 1rem", "backgroundColor": "var(--bg-surface-elevated)", "borderRadius": "var(--radius-sm)", "color": "var(--text-secondary)", "fontSize": "0.85rem"}},
-                "No past arrears recorded."
-            )
-
-        arrears_card = html.div(
-            {"className": "card", "style": {"marginBottom": "2rem"}},
-            html.div(
-                {"style": {"display": "flex", "justifyContent": "space-between", "alignItems": "center", "marginBottom": "1.25rem"}},
-                html.h3({"style": {"fontFamily": "var(--font-serif)", "fontSize": "1.35rem", "color": "var(--brand-navy)"}}, "Academic Arrears & Clearance Tracker"),
-                html.span({"className": "badge badge-warning" if active_arrears else "badge badge-success"}, f"{len(active_arrears)} Active Arrear{'s' if len(active_arrears) != 1 else ''}")
-            ),
-            active_section,
-            cleared_section
-        )
-
-    # Placement Readiness Score Progress Meter Card
-    has_results = len(semesters) > 0 or len(recent_courses) > 0
-    readiness = data.get("placement_readiness") or {}
-    score_raw = readiness.get("score", 0) if isinstance(readiness, dict) else int(readiness or 0)
-
-    if not has_results:
-        display_score = "Not available yet"
-        readiness_score = 0
-        readiness_tip = "Not available yet — grades are not published yet."
-        meter_color = "var(--text-muted)"
-    else:
-        display_score = f"{score_raw} / 100"
-        readiness_score = score_raw
-        readiness_tip = readiness.get("tip", "") if isinstance(readiness, dict) else ""
-        meter_color = "var(--danger)" if readiness_score < 40 else ("var(--brand-vermillion)" if readiness_score < 70 else "var(--success)")
-
-    readiness_card = html.div(
-        {"className": "card", "style": {"marginBottom": "2rem", "borderLeft": f"4px solid {meter_color}"}},
-        html.div(
-            {"style": {"display": "flex", "justifyContent": "space-between", "alignItems": "center", "marginBottom": "0.75rem", "flexWrap": "wrap", "gap": "0.75rem"}},
-            html.div(
-                html.h3({"style": {"fontFamily": "var(--font-serif)", "fontSize": "1.3rem", "color": "var(--brand-navy)"}}, "Placement Readiness Score"),
-                html.small({"style": {"color": "var(--text-secondary)"}}, "Comprehensive 100-pt index: CGPA (50%) + Zero-Arrears (30%) + Corporate Partner Eligibility (20%)")
-            ),
-            html.div(
-                {"style": {"display": "flex", "alignItems": "baseline", "gap": "0.3rem"}},
-                html.span({"style": {"fontFamily": "var(--font-display)", "fontSize": "1.5rem" if not has_results else "2rem", "color": meter_color, "fontWeight": "800"}}, display_score)
-            )
-        ),
-        # Progress Bar
-        html.div(
-            {"style": {"height": "10px", "width": "100%", "backgroundColor": "var(--border-subtle)", "borderRadius": "5px", "overflow": "hidden", "marginBottom": "0.75rem"}},
-            html.div({"style": {"width": f"{readiness_score}%", "height": "100%", "backgroundColor": meter_color, "transition": "width 0.4s ease"}})
-        ),
-        # Action Tip
-        html.div(
-            {"style": {"display": "flex", "alignItems": "center", "gap": "0.5rem", "fontSize": "0.85rem", "color": "var(--brand-navy)", "fontWeight": "600", "backgroundColor": "var(--bg-surface-elevated)", "padding": "0.6rem 0.85rem", "borderRadius": "var(--radius-sm)"}},
-            html.span({"style": {"color": meter_color, "fontWeight": "800"}}, "🎯 Improvement Tip:"),
-            html.span(readiness_tip)
-        )
-    )
+    # Strengths (Grade O or A+)
+    strong_courses = [c for c in recent_courses if c.grade in ['O', 'A+']][:3]
+    # Weakness / Remediation (Grade B+, B, C, or U)
+    remediation_courses = [c for c in recent_courses if c.grade in ['B+', 'B', 'C', 'U', 'RA']][:3]
 
     return html.div(
-        # Welcome Banner
-        html.div(
-            {
-                "style": {
-                    "display": "flex",
-                    "justifyContent": "space-between",
-                    "alignItems": "center",
-                    "marginBottom": "2.25rem",
-                    "flexWrap": "wrap",
-                    "gap": "1rem"
-                }
-            },
+        {"class_name": "flex-1 flex flex-col gap-section overflow-y-auto"},
+        
+        # Identity Banner
+        html.section(
+            {"class_name": "border-2 border-light-secondary p-gutter-lg bg-light-surface flex flex-col md:flex-row justify-between items-start md:items-center gap-gutter-md"},
             html.div(
-                html.h1(
-                    {
-                        "style": {
-                            "fontFamily": "var(--font-serif)",
-                            "fontSize": "2.25rem",
-                            "fontWeight": "400",
-                            "color": "var(--brand-navy)",
-                            "lineHeight": "1.2"
-                        }
-                    },
-                    "Academic Intelligence Dashboard"
+                {"class_name": "flex flex-col gap-1"},
+                html.div(
+                    {"class_name": "flex items-center gap-gutter-md flex-wrap"},
+                    html.h2({"class_name": "font-headline text-headline-lg tracking-tight uppercase"}, student.get("name", "STUDENT RECORD")),
+                    html.span({"class_name": "px-2.5 py-0.5 bg-light-secondary text-light-on-secondary font-mono text-mono-sm font-bold"}, student.get("roll_number", "21CS001")),
+                    html.span({"class_name": "px-2.5 py-0.5 bg-light-surface-container-high text-light-on-surface font-mono text-mono-sm font-bold"}, f"SEM {student.get('current_semester', 6)}")
                 ),
                 html.p(
-                    {"style": {"color": "var(--text-secondary)", "fontSize": "0.95rem", "marginTop": "0.25rem"}},
-                    "Welcome back, ",
-                    html.strong({"style": {"color": "var(--brand-navy)"}}, student["name"]),
-                    f" • Roll No: {student['roll_number']} • {student['department']}"
+                    {"class_name": "text-body-md text-light-on-surface-variant font-mono mt-1"},
+                    f"{student.get('department', 'Computer Science & Engineering')} | Regulation: 2021 CBCS | Target CGPA: {student.get('target_cgpa', 8.5):.2f}"
                 )
             ),
             html.div(
-                {"style": {"display": "flex", "gap": "0.75rem"}},
+                {"class_name": "flex items-center gap-gutter-md flex-wrap"},
                 html.button(
-                    {"className": "btn btn-secondary", "on_click": lambda e: set_page("planner")},
-                    icon_calculator(16), " Target CGPA Planner"
+                    {
+                        "type": "button",
+                        "on_click": lambda e: set_page("planner"),
+                        "class_name": "inline-flex items-center gap-2 px-gutter-md py-2 border-2 border-light-secondary text-light-secondary font-headline font-bold text-label-md hover:bg-light-secondary hover:text-light-on-secondary transition-colors duration-state-change uppercase cursor-pointer"
+                    },
+                    html.span({"class_name": "material-symbols-outlined text-[18px]"}, "calculate"),
+                    html.span("SIMULATE TARGET")
                 ),
                 html.button(
-                    {"className": "btn btn-primary", "on_click": lambda e: set_page("advisor")},
-                    icon_bot(16), " Consult AI Mentor"
+                    {
+                        "type": "button",
+                        "on_click": lambda e: set_page("advisor"),
+                        "class_name": "inline-flex items-center gap-2 px-gutter-md py-2 bg-light-primary text-light-on-primary font-headline font-bold text-label-md hover:bg-light-primary-container hover:text-light-on-primary-container transition-colors duration-state-change uppercase cursor-pointer"
+                    },
+                    html.span({"class_name": "material-symbols-outlined text-[18px]"}, "psychology"),
+                    html.span("ASK AI ADVISOR")
                 )
             )
         ),
 
-        # KPI Stats Grid with Anton Numerals
-        html.div(
-            {"className": "stat-grid"},
-            StatCard(
-                label="Cumulative CGPA",
-                value=f"{student['current_cgpa']:.2f}" if has_results else "N/A",
-                subtitle=f"Target: {student['target_cgpa']:.2f}" if has_results else "No results published yet",
-                icon=icon_award(26, "var(--brand-vermillion)"),
-                value_color="var(--brand-vermillion)"
-            ),
-            StatCard(
-                label="Latest Semester SGPA",
-                value=f"{student['latest_sgpa']:.2f}" if has_results else "N/A",
-                subtitle=f"Semester {len(semesters)} CBCS" if has_results else "No results published yet",
-                icon=icon_trending_up(26, "var(--brand-navy)")
-            ),
-            StatCard(
-                label="Credits Completed",
-                value=str(student['credits_earned']),
-                subtitle=f"{int(student['credits_earned'] / (student['total_credits'] or 160) * 100)}% of 160 credits completed",
-                icon=icon_book_open(26, "#53B7CF")
-            ),
-            html.div(
-                {"className": "stat-card"},
-                html.div(
-                    html.div({"className": "stat-label"}, "Placement Eligibility"),
+        # 4-KPI Bento Row
+        html.section(
+            {"class_name": "grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 border border-light-outline-variant bg-light-surface-container-lowest items-stretch"},
+            
+            # Card 1: Vermilion Highlight Block
+            html.article(
+                {"class_name": "h-full bg-light-primary-container text-light-on-primary-container p-gutter-lg flex flex-col justify-between gap-gutter-md border-b sm:border-b-0 sm:border-r border-light-outline-variant"},
+                html.header(
+                    {"class_name": "flex items-start justify-between gap-gutter-sm"},
                     html.div(
-                        {"style": {"margin": "0.5rem 0"}},
-                        html.span({"className": "badge badge-success"}, icon_check(13), " Eligible (0 Arrears)") if student["is_placement_eligible"] else html.span({"className": "badge badge-warning"}, icon_alert(13), f" {student['backlogs_count']} Arrear Pending")
+                        html.h3({"class_name": "font-mono text-mono-sm uppercase font-bold"}, "01 / Current CGPA"),
+                        html.p({"class_name": "font-body text-body-sm text-light-on-primary-container"}, "10-point UGC scale")
                     ),
-                    html.small({"style": {"color": "var(--text-muted)", "display": "block"}}, "Target recruitment benchmark: 7.0+ CGPA")
+                    html.span({"class_name": "material-symbols-outlined text-[20px]"}, "analytics")
                 ),
-                html.div({"style": {"alignSelf": "flex-end"}}, icon_briefcase(26, "#F59E0B"))
+                html.div(
+                    {"class_name": "flex items-center justify-between gap-gutter-sm mt-3"},
+                    html.p({"class_name": "font-headline text-display-lg tabular-nums"}, f"{student.get('current_cgpa', 0.0):.2f}"),
+                    html.span(
+                        {"class_name": "inline-flex items-center px-2.5 py-1 rounded-full border border-light-on-primary-container font-mono text-mono-sm tabular-nums whitespace-nowrap shrink-0 font-bold"},
+                        "FIRST CLASS" if student.get("current_cgpa", 0.0) >= 8.5 else "GOOD STANDING"
+                    )
+                )
+            ),
+
+            # Card 2: Latest SGPA
+            html.article(
+                {"class_name": "h-full bg-light-surface-container-lowest p-gutter-lg flex flex-col justify-between gap-gutter-md border-b xl:border-b-0 xl:border-r border-light-outline-variant"},
+                html.header(
+                    {"class_name": "flex items-start justify-between gap-gutter-sm"},
+                    html.div(
+                        html.h3({"class_name": "font-mono text-mono-sm text-light-on-surface-variant uppercase font-bold"}, "02 / Latest SGPA"),
+                        html.p({"class_name": "font-body text-body-sm text-light-on-surface-variant"}, f"Semester {latest_sem_num} Results")
+                    ),
+                    html.span({"class_name": "material-symbols-outlined text-[20px] text-light-primary"}, "trending_up")
+                ),
+                html.div(
+                    {"class_name": "flex items-center justify-between gap-gutter-sm mt-3"},
+                    html.p({"class_name": "font-headline text-display-lg text-light-on-surface tabular-nums"}, f"{student.get('latest_sgpa', 0.0):.2f}"),
+                    html.span({"class_name": "font-mono text-mono-sm text-light-on-surface-variant tabular-nums whitespace-nowrap"}, f"{credits_earned} Cr Total")
+                )
+            ),
+
+            # Card 3: Credits Earned
+            html.article(
+                {"class_name": "h-full bg-light-surface-container-lowest p-gutter-lg flex flex-col justify-between gap-gutter-md border-b sm:border-b-0 sm:border-r border-light-outline-variant"},
+                html.header(
+                    {"class_name": "flex items-start justify-between gap-gutter-sm"},
+                    html.div(
+                        html.h3({"class_name": "font-mono text-mono-sm text-light-on-surface-variant uppercase font-bold"}, "03 / Credits Earned"),
+                        html.p({"class_name": "font-body text-body-sm text-light-on-surface-variant"}, f"{remaining_credits} credits remaining")
+                    ),
+                    html.span({"class_name": "material-symbols-outlined text-[20px] text-light-on-surface"}, "task_alt")
+                ),
+                html.div(
+                    {"class_name": "flex flex-col gap-gutter-sm mt-3"},
+                    html.div(
+                        {"class_name": "flex items-center justify-between"},
+                        html.p({"class_name": "font-headline text-headline-lg text-light-on-surface tabular-nums"}, f"{credits_earned} ", html.span({"class_name": "text-body-md text-light-on-surface-variant font-mono"}, f"/ {total_credits}")),
+                        html.span({"class_name": "font-mono text-mono-md text-light-primary font-bold tabular-nums"}, f"{credits_pct}%")
+                    ),
+                    html.div(
+                        {"class_name": "w-full h-2 bg-light-surface-container-high overflow-hidden"},
+                        html.div({"class_name": "h-full bg-light-secondary", "style": {"width": f"{credits_pct}%"}})
+                    )
+                )
+            ),
+
+            # Card 4: Deep Espresso Contrast Block
+            html.article(
+                {"class_name": "h-full bg-light-secondary text-light-on-secondary p-gutter-lg flex flex-col justify-between gap-gutter-md"},
+                html.header(
+                    {"class_name": "flex items-start justify-between gap-gutter-sm"},
+                    html.div(
+                        html.h3({"class_name": "font-mono text-mono-sm uppercase text-light-on-secondary/80 font-bold"}, "04 / Standing Arrears"),
+                        html.p({"class_name": "font-body text-body-sm text-light-on-secondary/75"}, "Active backlogs")
+                    ),
+                    html.span({"class_name": "material-symbols-outlined text-[20px]"}, "verified_user")
+                ),
+                html.div(
+                    {"class_name": "flex items-center justify-between gap-gutter-sm mt-3"},
+                    html.p({"class_name": "font-headline text-display-lg tabular-nums"}, str(student.get("backlogs_count", 0))),
+                    html.span(
+                        {
+                            "class_name": "inline-flex items-center px-2.5 py-1 rounded-full border border-light-on-secondary/40 font-mono text-mono-sm uppercase whitespace-nowrap shrink-0 font-bold " + 
+                                ("bg-light-primary text-light-on-primary" if student.get("backlogs_count", 0) > 0 else "")
+                        },
+                        "All Clear" if student.get("backlogs_count", 0) == 0 else f"{student.get('backlogs_count')} Active"
+                    )
+                )
             )
         ),
 
-        # Placement Readiness Progress Meter Card
-        readiness_card,
-
-        # Trend Chart & Subject Insights
-        html.div(
-            {"style": {"display": "grid", "gridTemplateColumns": "repeat(auto-fit, minmax(350px, 1fr))", "gap": "1.75rem", "marginBottom": "2rem"}},
-            # Chart Card
-            html.div(
-                {"className": "card"},
-                html.div(
-                    {"style": {"display": "flex", "justifyContent": "space-between", "alignItems": "center", "marginBottom": "1.5rem"}},
-                    html.h3({"style": {"fontFamily": "var(--font-serif)", "fontSize": "1.35rem", "color": "var(--brand-navy)"}}, "Semester SGPA Trend History"),
-                    html.span({"className": "badge badge-vermillion"}, "CBCS Scale")
+        # Analytics & Placement Row
+        html.section(
+            {"class_name": "grid grid-cols-1 xl:grid-cols-12 gap-gutter-lg items-stretch"},
+            
+            # Interactive Semester SGPA Bar Chart (7 cols)
+            html.article(
+                {"class_name": "xl:col-span-7 bg-light-surface-container-lowest border border-light-outline-variant p-gutter-lg flex flex-col justify-between gap-gutter-lg"},
+                html.header(
+                    {"class_name": "flex flex-wrap items-start justify-between gap-gutter-md"},
+                    html.div(
+                        html.h3({"class_name": "font-headline text-title-lg text-light-on-surface uppercase"}, "Semester SGPA Trajectory"),
+                        html.p({"class_name": "font-body text-body-sm text-light-on-surface-variant"}, "Click any semester bar to inspect credit weight & details")
+                    ),
+                    html.div(
+                        {"class_name": "px-3 py-1.5 bg-light-surface-container-low border border-light-outline-variant flex items-center gap-gutter-sm"},
+                        html.span({"class_name": "font-mono text-mono-sm text-light-primary uppercase font-bold whitespace-nowrap"}, pill_title),
+                        html.span({"class_name": "font-mono text-mono-md text-light-on-surface tabular-nums font-bold whitespace-nowrap"}, pill_sgpa),
+                        html.span({"class_name": "font-body text-body-sm text-light-on-surface-variant hidden sm:inline"}, pill_meta)
+                    )
                 ),
+
+                # Bars Container
                 html.div(
-                    {"style": {"display": "flex", "alignItems": "flex-end", "height": "220px", "gap": "1.25rem", "padding": "1rem 0", "borderBottom": "1.5px solid var(--border-subtle)", "justifyContent": "center" if not bars else "flex-start"}},
-                    bars if bars else [html.div({"style": {"color": "var(--text-muted)", "fontSize": "0.9rem", "alignSelf": "center"}}, "No semester records published yet.")]
+                    {"class_name": "flex gap-gutter-md items-end pt-gutter-md border-b border-light-outline-variant pb-gutter-sm overflow-x-auto min-h-[180px]"},
+                    bar_elements if bar_elements else [html.p({"class_name": "font-mono text-mono-sm text-light-outline p-4"}, "No semester records found.")]
+                ),
+
+                # Grade Distribution Pill Strip
+                html.div(
+                    {"class_name": "flex flex-wrap items-center justify-between gap-gutter-md text-body-sm text-light-on-surface-variant"},
+                    html.div(
+                        {"class_name": "flex flex-wrap items-center gap-gutter-xs"},
+                        html.span({"class_name": "px-2.5 py-0.5 rounded-full bg-light-secondary text-light-on-secondary font-mono text-mono-sm tabular-nums"}, f"O: {o_count}"),
+                        html.span({"class_name": "px-2.5 py-0.5 rounded-full bg-light-surface-container-low border border-light-outline-variant font-mono text-mono-sm tabular-nums"}, f"A+: {aplus_count}"),
+                        html.span({"class_name": "px-2.5 py-0.5 rounded-full bg-light-surface-container-low border border-light-outline-variant font-mono text-mono-sm tabular-nums"}, f"A: {a_count}"),
+                        html.span({"class_name": "px-2.5 py-0.5 rounded-full bg-light-surface-container-low border border-light-outline-variant font-mono text-mono-sm tabular-nums"}, f"B+: {bplus_count}")
+                    ),
+                    html.button(
+                        {
+                            "type": "button",
+                            "on_click": lambda e: set_page("results"),
+                            "class_name": "inline-flex items-center gap-1 font-mono text-mono-sm uppercase text-light-primary hover:underline whitespace-nowrap shrink-0 cursor-pointer"
+                        },
+                        html.span("View Full Transcript"),
+                        html.span({"class_name": "material-symbols-outlined text-[16px]"}, "arrow_forward")
+                    )
                 )
             ),
-            # Insights Card
-            html.div(
-                {"className": "card"},
-                html.div(
-                    {"style": {"display": "flex", "justifyContent": "space-between", "alignItems": "center", "marginBottom": "1.25rem"}},
-                    html.h3({"style": {"fontFamily": "var(--font-serif)", "fontSize": "1.35rem", "color": "var(--brand-navy)"}}, "Academic Subject Insights"),
-                    html.span({"style": {"fontSize": "0.75rem", "fontWeight": "700", "color": "var(--text-muted)"}}, "TOP PERFORMANCE")
+
+            # Placement Matrix Snapshot (5 cols)
+            html.article(
+                {"class_name": "xl:col-span-5 bg-light-surface-container-lowest border border-light-outline-variant p-gutter-lg flex flex-col justify-between gap-gutter-md"},
+                html.header(
+                    {"class_name": "flex items-start justify-between gap-gutter-sm"},
+                    html.div(
+                        html.h3({"class_name": "font-headline text-title-lg text-light-on-surface uppercase"}, "Placement Matrix"),
+                        html.p({"class_name": "font-body text-body-sm text-light-on-surface-variant"}, f"Audited against {total_companies} corporate recruitment drives")
+                    ),
+                    html.span({"class_name": "font-headline text-headline-md text-light-primary tabular-nums whitespace-nowrap shrink-0"}, f"{eligible_count} / {total_companies}")
                 ),
+
                 html.div(
-                    {"style": {"display": "flex", "flexDirection": "column", "gap": "0.75rem"}},
-                    insight_items if insight_items else [html.div({"style": {"padding": "1.5rem", "textAlign": "center", "color": "var(--text-muted)", "fontSize": "0.9rem"}}, "No subject insights available yet.")]
+                    {"class_name": "flex flex-col gap-gutter-sm"},
+                    [
+                        html.div(
+                            {"key": str(idx), "class_name": "flex items-center justify-between gap-gutter-sm p-3 bg-light-surface-container-low border border-light-outline-variant"},
+                            html.div(
+                                {"class_name": "min-w-0"},
+                                html.p({"class_name": "font-title text-title-md text-light-on-surface font-semibold truncate"}, f"{c.get('company_name', 'Company')} • {c.get('role_title', 'Role')}"),
+                                html.p({"class_name": "font-mono text-mono-sm text-light-on-surface-variant tabular-nums"}, f"Min {c.get('min_cgpa', 7.0):.2f} CGPA • {c.get('package_lpa', 0.0):.1f} LPA")
+                            ),
+                            html.span(
+                                {
+                                    "class_name": "px-2.5 py-1 rounded-full font-mono text-mono-sm uppercase whitespace-nowrap shrink-0 " + 
+                                        ("bg-light-secondary text-light-on-secondary" if c.get("is_eligible") else "bg-light-primary-container text-light-on-primary-container font-bold")
+                                },
+                                "Eligible" if c.get("is_eligible") else f"{(float(c.get('min_cgpa', 0)) - float(student.get('current_cgpa', 0))):.2f} Short"
+                            )
+                        ) for idx, c in enumerate(top_3_companies)
+                    ] if top_3_companies else [html.p({"class_name": "font-mono text-mono-sm text-light-outline p-2"}, "No placement criteria available.")]
+                ),
+
+                html.footer(
+                    {"class_name": "pt-gutter-sm border-t border-light-outline-variant flex items-center justify-between gap-gutter-sm"},
+                    html.span({"class_name": "font-mono text-mono-sm text-light-on-surface-variant uppercase"}, f"Readiness: {readiness.get('score', 85) if readiness else 85}%"),
+                    html.button(
+                        {
+                            "type": "button",
+                            "on_click": lambda e: set_page("placement"),
+                            "class_name": "inline-flex items-center gap-gutter-xs font-mono text-mono-sm uppercase text-light-primary hover:underline whitespace-nowrap shrink-0 cursor-pointer"
+                        },
+                        html.span(f"Audit All {total_companies}"),
+                        html.span({"class_name": "material-symbols-outlined text-[16px]"}, "arrow_forward")
+                    )
                 )
             )
         ),
 
-        # Academic Arrears Tracker Card
-        arrears_card,
-
-        # Recent Courses Table
-        html.div(
-            {"className": "card"},
-            html.div(
-                {"style": {"display": "flex", "justifyContent": "space-between", "alignItems": "center", "marginBottom": "1.25rem"}},
-                html.h3({"style": {"fontFamily": "var(--font-serif)", "fontSize": "1.35rem", "color": "var(--brand-navy)"}}, "Current Semester Course Breakdown"),
-                html.button(
-                    {"className": "btn btn-secondary", "style": {"fontSize": "0.775rem", "padding": "0.4rem 0.85rem"}, "on_click": lambda e: set_page("results")},
-                    "Full Transcript →"
+        # Strengths & Remediation Section
+        html.section(
+            {"class_name": "grid grid-cols-1 lg:grid-cols-2 gap-gutter-lg items-stretch"},
+            
+            # Top Academic Strengths
+            html.article(
+                {"class_name": "h-full bg-light-surface-container-lowest border border-light-outline-variant p-gutter-lg flex flex-col gap-gutter-md"},
+                html.header(
+                    {"class_name": "flex items-center justify-between gap-gutter-sm"},
+                    html.div(
+                        html.h3({"class_name": "font-headline text-title-lg text-light-on-surface uppercase"}, "Top Academic Strengths"),
+                        html.p({"class_name": "font-body text-body-sm text-light-on-surface-variant"}, "Highest credit-weighted grade contributions")
+                    ),
+                    html.span({"class_name": "material-symbols-outlined text-[22px] text-light-on-surface"}, "workspace_premium")
+                ),
+                html.div(
+                    {"class_name": "flex flex-col divide-y divide-light-outline-variant"},
+                    [
+                        html.div(
+                            {"key": str(c.id), "class_name": "py-3 flex items-center justify-between gap-gutter-md"},
+                            html.div(
+                                html.p({"class_name": "font-title text-title-md text-light-on-surface font-semibold"}, c.course_name),
+                                html.p({"class_name": "font-mono text-mono-sm text-light-on-surface-variant tabular-nums"}, f"{c.course_code} • {c.credits} Cr • Sem {c.semester_number}")
+                            ),
+                            html.span({"class_name": "px-2.5 py-1 rounded-full bg-light-secondary text-light-on-secondary font-mono text-mono-sm tabular-nums whitespace-nowrap shrink-0"}, f"{c.grade} ({c.grade_point:.1f})")
+                        ) for c in strong_courses
+                    ] if strong_courses else [html.p({"class_name": "font-mono text-mono-sm text-light-outline py-2"}, "All grades are currently being compiled.")]
                 )
             ),
-            html.div(
-                {"className": "table-container"},
-                html.table(
-                    html.thead(
-                        html.tr(
-                            html.th("Semester"),
-                            html.th("Course Code"),
-                            html.th("Course Title"),
-                            html.th("Credits"),
-                            html.th("Grade"),
-                            html.th("Points")
-                        )
+
+            # Focus & Remediation
+            html.article(
+                {"class_name": "h-full bg-light-surface-container-lowest border border-light-outline-variant p-gutter-lg flex flex-col justify-between gap-gutter-md"},
+                html.div(
+                    {"class_name": "flex flex-col gap-gutter-md"},
+                    html.header(
+                        {"class_name": "flex items-center justify-between gap-gutter-sm"},
+                        html.div(
+                            html.h3({"class_name": "font-headline text-title-lg text-light-on-surface uppercase"}, "Focus & Remediation"),
+                            html.p({"class_name": "font-body text-body-sm text-light-on-surface-variant"}, f"Courses below your {student.get('current_cgpa', 8.5):.2f} CGPA baseline")
+                        ),
+                        html.span({"class_name": "material-symbols-outlined text-[22px] text-light-primary"}, "target")
                     ),
-                    html.tbody(course_rows if course_rows else [html.tr(html.td({"colSpan": "6", "style": {"textAlign": "center", "padding": "2rem", "color": "var(--text-muted)"}}, "No course results published yet."))])
+                    html.div(
+                        {"class_name": "flex flex-col divide-y divide-light-outline-variant"},
+                        [
+                            html.div(
+                                {"key": str(c.id), "class_name": "py-3 flex items-center justify-between gap-gutter-md"},
+                                html.div(
+                                    html.p({"class_name": "font-title text-title-md text-light-on-surface font-semibold"}, c.course_name),
+                                    html.p({"class_name": "font-mono text-mono-sm text-light-on-surface-variant tabular-nums"}, f"{c.course_code} • {c.credits} Cr • Sem {c.semester_number}")
+                                ),
+                                html.span({"class_name": "px-2.5 py-1 rounded-full bg-light-primary-container text-light-on-primary-container font-mono text-mono-sm tabular-nums whitespace-nowrap shrink-0 font-bold"}, f"{c.grade} ({c.grade_point:.1f})")
+                            ) for c in remediation_courses
+                        ] if remediation_courses else [html.p({"class_name": "font-mono text-mono-sm text-success py-2"}, "Excellent! No low-performing courses detected.")]
+                    )
+                ),
+                html.footer(
+                    {"class_name": "pt-gutter-sm border-t border-light-outline-variant flex items-center justify-between gap-gutter-sm"},
+                    html.span({"class_name": "font-mono text-mono-sm text-light-on-surface-variant uppercase"}, "EN / தமிழ் Study Plans"),
+                    html.button(
+                        {
+                            "type": "button",
+                            "on_click": lambda e: set_page("advisor"),
+                            "class_name": "inline-flex items-center gap-gutter-xs font-mono text-mono-sm uppercase text-light-primary hover:underline whitespace-nowrap shrink-0 cursor-pointer"
+                        },
+                        html.span("Get AI Study Plan"),
+                        html.span({"class_name": "material-symbols-outlined text-[16px]"}, "arrow_forward")
+                    )
                 )
             )
         )

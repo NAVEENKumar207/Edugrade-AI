@@ -1,6 +1,7 @@
 """
 Student & Faculty Profile Page Component for EduGrade AI ReactPy Frontend.
-Editorial Consultancy Design (Anton, Newsreader, Vermillion, Navy).
+Industrial Academic Precision Design (Space Grotesk, IBM Plex Mono, Inter, Vermilion, Espresso).
+Matches New Ui/profile_management/code.html.
 """
 
 from reactpy import component, html, use_state
@@ -15,7 +16,7 @@ def ProfilePage(user):
     first_name, set_first_name = use_state(user.first_name if user else "")
     last_name, set_last_name = use_state(user.last_name if user else "")
     email, set_email = use_state(user.email if user else "")
-    target_cgpa, set_target_cgpa = use_state(str(profile.target_cgpa) if profile else "9.00")
+    target_cgpa, set_target_cgpa = use_state(str(profile.target_cgpa) if profile else "8.80")
     department, set_department = use_state(profile.department if profile else "Computer Science & Engineering")
 
     save_status, set_save_status = use_state("")
@@ -27,33 +28,16 @@ def ProfilePage(user):
     confirm_password, set_confirm_password = use_state("")
     pw_status, set_pw_status = use_state("")
     pw_error, set_pw_error = use_state("")
-    pw_loading, set_pw_loading = use_state(False)
 
-    # Metrics
-    cgpa = float(profile.current_cgpa) if profile else 0.0
-    credits_earned = int(profile.credits_earned) if profile else 0
+    cgpa = float(profile.current_cgpa) if profile else 8.64
+    credits_earned = int(profile.credits_earned) if profile else 136
     total_credits = int(profile.total_credits) if profile else 160
-    credits_pct = min(100, int((credits_earned / total_credits * 100))) if total_credits > 0 else 0
     backlogs = int(profile.backlogs_count) if profile else 0
-    is_eligible = profile.is_placement_eligible if profile else True
-
-    # Academic semester and year
-    curr_sem = profile.current_semester if profile and profile.current_semester else 5
-    curr_year = ((curr_sem + 1) // 2)
-
-    # Classification
-    if cgpa >= 8.50:
-        standing_label = "First Class with Distinction"
-    elif cgpa >= 6.50:
-        standing_label = "First Class"
-    elif cgpa >= 5.00:
-        standing_label = "Second Class"
-    else:
-        standing_label = "Under Evaluation"
+    curr_sem = profile.current_semester if profile and profile.current_semester else 6
 
     initials = f"{user.first_name[:1] if user and user.first_name else ''}{user.last_name[:1] if user and user.last_name else ''}".upper() or user.username[:2].upper()
 
-    def handle_save(e=None):
+    def handle_save_profile(e=None):
         set_save_status("")
         set_save_error("")
         ok, msg = update_user_profile(
@@ -69,330 +53,236 @@ def ProfilePage(user):
         else:
             set_save_error(msg)
 
-    def handle_password_change(e=None):
+    def handle_change_password(e=None):
         set_pw_status("")
         set_pw_error("")
-        set_pw_loading(True)
-        try:
-            ok, msg = change_user_password(
-                user=user,
-                old_password=old_password,
-                new_password=new_password,
-                confirm_password=confirm_password
-            )
-            if ok:
-                set_pw_status(msg)
-                set_old_password("")
-                set_new_password("")
-                set_confirm_password("")
-            else:
-                set_pw_error(msg)
-        finally:
-            set_pw_loading(False)
+        ok, msg = change_user_password(
+            user=user,
+            old_password=old_password,
+            new_password=new_password,
+            confirm_password=confirm_password
+        )
+        if ok:
+            set_pw_status(msg)
+            set_old_password("")
+            set_new_password("")
+            set_confirm_password("")
+        else:
+            set_pw_error(msg)
 
     return html.div(
-        # Page Title Banner
-        html.div(
-            {"style": {"marginBottom": "2.25rem"}},
-            html.h1(
-                {
-                    "style": {
-                        "fontFamily": "var(--font-serif)",
-                        "fontSize": "2.25rem",
-                        "fontWeight": "400",
-                        "color": "var(--brand-navy)",
-                        "lineHeight": "1.2"
-                    }
-                },
-                "Academic Profile & Institutional Identity"
+        {"class_name": "flex-1 p-gutter-lg max-w-[1200px] w-full mx-auto flex flex-col gap-section overflow-y-auto"},
+        
+        # Header
+        html.header(
+            {"class_name": "pb-gutter-md border-b border-light-outline-variant flex items-center justify-between gap-gutter-md"},
+            html.div(
+                html.h1({"class_name": "font-headline text-headline-md tracking-tight uppercase"}, "Institutional Profile & Credentials"),
+                html.p({"class_name": "font-mono text-mono-sm text-light-on-surface-variant uppercase"}, f"Identity • {profile.role.upper() if profile else 'STUDENT'} Standing • Security")
             ),
-            html.p(
-                {"style": {"color": "var(--text-secondary)", "marginTop": "0.25rem"}},
-                "Verified student credentials, CBCS curriculum progress, academic standing, and goal configuration."
+            html.span({"class_name": "font-mono text-mono-sm font-bold bg-light-surface-container-highest px-3 py-1"}, "2021 CBCS REGULATION")
+        ),
+
+        # Profile Info & Academic Summary Bento
+        html.div(
+            {"class_name": "grid grid-cols-1 md:grid-cols-3 gap-gutter-lg"},
+            
+            # Identity Box
+            html.div(
+                {"class_name": "md:col-span-1 border-2 border-light-secondary p-gutter-lg bg-light-surface flex flex-col gap-gutter-md items-center text-center"},
+                html.div(
+                    {"class_name": "w-24 h-24 bg-light-secondary text-light-on-secondary flex items-center justify-center font-headline text-display-lg font-bold"},
+                    initials
+                ),
+                html.div(
+                    html.h2({"class_name": "font-headline text-headline-md uppercase"}, f"{first_name} {last_name}".strip() or user.username),
+                    html.p({"class_name": "font-mono text-mono-sm text-light-primary font-bold"}, getattr(profile, 'roll_number', user.username)),
+                    html.span({"class_name": "mt-2 inline-block px-3 py-0.5 bg-light-surface-container-highest font-mono text-mono-sm"}, f"{department} • {profile.role.upper() if profile else 'STUDENT'}")
+                )
+            ),
+
+            # Academic Standing
+            html.div(
+                {"class_name": "md:col-span-2 border border-light-outline-variant bg-light-surface p-gutter-lg flex flex-col justify-between gap-gutter-md"},
+                html.h3({"class_name": "font-headline text-title-lg uppercase border-b border-light-outline-variant pb-2"}, "Academic Standing & Metrics"),
+                html.div(
+                    {"class_name": "grid grid-cols-2 sm:grid-cols-4 gap-gutter-md"},
+                    html.div(
+                        html.span({"class_name": "font-mono text-mono-sm text-light-outline uppercase font-bold"}, "CURRENT CGPA"),
+                        html.p({"class_name": "font-headline text-headline-lg text-light-primary font-bold tabular-nums"}, f"{cgpa:.2f}")
+                    ),
+                    html.div(
+                        html.span({"class_name": "font-mono text-mono-sm text-light-outline uppercase font-bold"}, "CREDITS"),
+                        html.p({"class_name": "font-headline text-headline-lg font-bold tabular-nums"}, f"{credits_earned} / {total_credits}")
+                    ),
+                    html.div(
+                        html.span({"class_name": "font-mono text-mono-sm text-light-outline uppercase font-bold"}, "SEMESTER"),
+                        html.p({"class_name": "font-headline text-headline-lg font-bold tabular-nums"}, str(curr_sem))
+                    ),
+                    html.div(
+                        html.span({"class_name": "font-mono text-mono-sm text-light-outline uppercase font-bold"}, "ARREARS"),
+                        html.p({"class_name": f"font-headline text-headline-lg font-bold tabular-nums {'text-light-primary' if backlogs > 0 else 'text-success'}"}, f"{backlogs} Active")
+                    )
+                )
             )
         ),
-        # Main Grid Layout
-        html.div(
-            {"style": {"display": "grid", "gridTemplateColumns": "repeat(auto-fit, minmax(340px, 1fr))", "gap": "2rem"}},
-            # Left Column: Identity & Academic Overview
+
+        # Editable Profile Details Section
+        html.section(
+            {"class_name": "border border-light-outline-variant bg-light-surface p-gutter-lg flex flex-col gap-gutter-md"},
             html.div(
-                {"style": {"display": "flex", "flexDirection": "column", "gap": "1.75rem"}},
-                # Identity Card
+                {"class_name": "border-b border-light-outline-variant pb-gutter-sm"},
+                html.h3({"class_name": "font-headline text-title-lg uppercase"}, "Personal & Institutional Details"),
+                html.p({"class_name": "font-body text-body-sm text-light-on-surface-variant"}, "Keep your contact information and target CGPA up to date.")
+            ),
+
+            html.form(
+                {"class_name": "flex flex-col gap-gutter-md", "on_submit": lambda e: None},
                 html.div(
-                    {"className": "card"},
+                    {"class_name": "grid grid-cols-1 sm:grid-cols-2 gap-gutter-md"},
                     html.div(
-                        {"style": {"display": "flex", "alignItems": "center", "gap": "1.25rem", "marginBottom": "1.5rem"}},
-                        html.div(
+                        {"class_name": "flex flex-col gap-1"},
+                        html.label({"class_name": "font-mono text-mono-sm font-bold uppercase"}, "First Name"),
+                        html.input(
                             {
-                                "style": {
-                                    "width": "64px",
-                                    "height": "64px",
-                                    "borderRadius": "var(--radius-md)",
-                                    "background": "linear-gradient(135deg, var(--brand-navy), #1E293B)",
-                                    "color": "#FFFFFF",
-                                    "fontFamily": "var(--font-display)",
-                                    "fontSize": "1.75rem",
-                                    "display": "flex",
-                                    "alignItems": "center",
-                                    "justifyContent": "center",
-                                    "boxShadow": "0 4px 14px rgba(10, 25, 47, 0.25)"
-                                }
-                            },
-                            initials
-                        ),
-                        html.div(
-                            html.h2(
-                                {"style": {"fontFamily": "var(--font-serif)", "fontSize": "1.5rem", "color": "var(--brand-navy)", "marginBottom": "0.2rem"}},
-                                f"{user.first_name} {user.last_name}".strip() or user.username
-                            ),
-                            html.div(
-                                {"style": {"display": "flex", "gap": "0.5rem", "alignItems": "center"}},
-                                html.span(
-                                    {"className": "badge badge-vermillion" if is_admin else "badge badge-success"},
-                                    "Faculty / Staff" if is_admin else "Registered Student"
-                                ),
-                                html.span(
-                                    {"style": {"fontSize": "0.8rem", "color": "var(--text-muted)", "fontWeight": "600"}},
-                                    f"Roll: {profile.roll_number}" if profile and profile.roll_number else f"ID: #{user.id}"
-                                )
-                            )
-                        )
-                    ),
-                    html.div(
-                        {"style": {"display": "flex", "flexDirection": "column", "gap": "0.85rem", "borderTop": "1px solid var(--border-subtle)", "paddingTop": "1.25rem"}},
-                        html.div(
-                            {"style": {"display": "flex", "justifyContent": "space-between", "fontSize": "0.85rem"}},
-                            html.span({"style": {"color": "var(--text-muted)"}}, "Department"),
-                            html.span({"style": {"fontWeight": "700", "color": "var(--brand-navy)"}}, profile.department if profile else "Computer Science")
-                        ),
-                        html.div(
-                            {"style": {"display": "flex", "justifyContent": "space-between", "fontSize": "0.85rem"}},
-                            html.span({"style": {"color": "var(--text-muted)"}}, "Current Semester"),
-                            html.span({"style": {"fontWeight": "700", "color": "var(--brand-navy)"}}, f"Semester {curr_sem} (Year {curr_year})")
-                        ),
-                        html.div(
-                            {"style": {"display": "flex", "justifyContent": "space-between", "fontSize": "0.85rem"}},
-                            html.span({"style": {"color": "var(--text-muted)"}}, "Degree Program"),
-                            html.span({"style": {"fontWeight": "700", "color": "var(--brand-navy)"}}, "B.E. (Autonomous CBCS 2026)")
-                        ),
-                        html.div(
-                            {"style": {"display": "flex", "justifyContent": "space-between", "fontSize": "0.85rem"}},
-                            html.span({"style": {"color": "var(--text-muted)"}}, "Academic Classification"),
-                            html.span({"style": {"fontWeight": "700", "color": "var(--brand-vermillion)"}}, standing_label)
-                        )
-                    )
-                ),
-                # Credit Progress Card
-                html.div(
-                    {"className": "card"},
-                    html.div(
-                        {"style": {"display": "flex", "justifyContent": "space-between", "alignItems": "center", "marginBottom": "1rem"}},
-                        html.h3({"style": {"fontFamily": "var(--font-serif)", "fontSize": "1.25rem", "color": "var(--brand-navy)"}}, "Degree Credit Completion"),
-                        html.span({"style": {"fontFamily": "var(--font-display)", "fontSize": "1.5rem", "color": "var(--brand-navy)"}}, f"{credits_pct}%")
-                    ),
-                    html.div(
-                        {"style": {"width": "100%", "height": "10px", "backgroundColor": "var(--border-subtle)", "borderRadius": "var(--radius-full)", "overflow": "hidden", "marginBottom": "0.75rem"}},
-                        html.div(
-                            {
-                                "style": {
-                                    "width": f"{credits_pct}%",
-                                    "height": "100%",
-                                    "background": "linear-gradient(90deg, var(--brand-navy), var(--brand-vermillion))",
-                                    "borderRadius": "var(--radius-full)"
-                                }
+                                "type": "text",
+                                "value": first_name,
+                                "on_change": lambda e: set_first_name(e.get("target", {}).get("value", "")),
+                                "class_name": "border border-light-outline-variant p-2 font-body text-body-md"
                             }
                         )
                     ),
                     html.div(
-                        {"style": {"display": "flex", "justifyContent": "space-between", "fontSize": "0.8rem", "color": "var(--text-muted)"}},
-                        html.span(f"Completed: {credits_earned} credits"),
-                        html.span(f"Degree Requirement: {total_credits} credits")
-                    )
-                )
-            ),
-            # Right Column: Academic Metrics & Settings Form
-            html.div(
-                {"style": {"display": "flex", "flexDirection": "column", "gap": "1.75rem"}},
-                # 3 KPI Stat Tiles
-                html.div(
-                    {"style": {"display": "grid", "gridTemplateColumns": "repeat(auto-fit, minmax(150px, 1fr))", "gap": "1rem"}},
-                    # CGPA Tile
-                    html.div(
-                        {"className": "card", "style": {"textAlign": "center", "padding": "1.25rem 1rem"}},
-                        html.div({"style": {"fontSize": "0.75rem", "textTransform": "uppercase", "color": "var(--text-muted)", "fontWeight": "700"}}, "Current CGPA"),
-                        html.div({"style": {"fontFamily": "var(--font-display)", "fontSize": "2.25rem", "color": "var(--brand-vermillion)", "margin": "0.25rem 0"}}, f"{cgpa:.2f}"),
-                        html.span({"className": "badge badge-success"}, "10.0 Scale")
-                    ),
-                    # Backlogs Tile
-                    html.div(
-                        {"className": "card", "style": {"textAlign": "center", "padding": "1.25rem 1rem"}},
-                        html.div({"style": {"fontSize": "0.75rem", "textTransform": "uppercase", "color": "var(--text-muted)", "fontWeight": "700"}}, "Standing Arrears"),
-                        html.div({"style": {"fontFamily": "var(--font-display)", "fontSize": "2.25rem", "color": "var(--brand-navy)" if backlogs == 0 else "var(--danger)", "margin": "0.25rem 0"}}, str(backlogs)),
-                        html.span(
-                            {"className": "badge badge-success" if backlogs == 0 else "badge badge-warning"},
-                            "Clean Record" if backlogs == 0 else f"{backlogs} Backlog"
-                        )
-                    ),
-                    # Placement Readiness
-                    html.div(
-                        {"className": "card", "style": {"textAlign": "center", "padding": "1.25rem 1rem"}},
-                        html.div({"style": {"fontSize": "0.75rem", "textTransform": "uppercase", "color": "var(--text-muted)", "fontWeight": "700"}}, "Campus Placement"),
-                        html.div({"style": {"fontFamily": "var(--font-display)", "fontSize": "1.35rem", "color": "#059669" if is_eligible else "var(--danger)", "margin": "0.6rem 0"}}, "Eligible" if is_eligible else "Audit Req."),
-                        html.span({"className": "badge badge-success" if is_eligible else "badge badge-danger"}, "Tier-1 Ready" if is_eligible else "Review Arrears")
-                    )
-                ),
-                # Profile Configuration Form Card
-                html.div(
-                    {"className": "card"},
-                    html.div(
-                        {"style": {"display": "flex", "justifyContent": "space-between", "alignItems": "center", "marginBottom": "1.25rem"}},
-                        html.h3({"style": {"fontFamily": "var(--font-serif)", "fontSize": "1.35rem", "color": "var(--brand-navy)"}}, "Edit Profile & Academic Goals"),
-                        html.span({"className": "badge badge-vermillion"}, "Live Sync")
-                    ),
-                    html.div(
-                        {"style": {"display": "flex", "flexDirection": "column", "gap": "1rem"}},
-                        # Name Grid
-                        html.div(
-                            {"style": {"display": "grid", "gridTemplateColumns": "1fr 1fr", "gap": "1rem"}},
-                            html.div(
-                                html.label({"style": {"display": "block", "fontSize": "0.8rem", "fontWeight": "700", "color": "var(--brand-navy)", "marginBottom": "0.35rem"}}, "First Name"),
-                                html.input({
-                                    "type": "text",
-                                    "className": "input",
-                                    "value": str(first_name),
-                                    "on_change": lambda e: set_first_name(e.get("target", {}).get("value", "") if isinstance(e, dict) else str(e))
-                                })
-                            ),
-                            html.div(
-                                html.label({"style": {"display": "block", "fontSize": "0.8rem", "fontWeight": "700", "color": "var(--brand-navy)", "marginBottom": "0.35rem"}}, "Last Name"),
-                                html.input({
-                                    "type": "text",
-                                    "className": "input",
-                                    "value": str(last_name),
-                                    "on_change": lambda e: set_last_name(e.get("target", {}).get("value", "") if isinstance(e, dict) else str(e))
-                                })
-                            )
-                        ),
-                        # Email & Department
-                        html.div(
-                            {"style": {"display": "grid", "gridTemplateColumns": "1fr 1fr", "gap": "1rem"}},
-                            html.div(
-                                html.label({"style": {"display": "block", "fontSize": "0.8rem", "fontWeight": "700", "color": "var(--brand-navy)", "marginBottom": "0.35rem"}}, "Institutional Email"),
-                                html.input({
-                                    "type": "email",
-                                    "className": "input",
-                                    "value": str(email),
-                                    "on_change": lambda e: set_email(e.get("target", {}).get("value", "") if isinstance(e, dict) else str(e))
-                                })
-                            ),
-                            html.div(
-                                html.label({"style": {"display": "block", "fontSize": "0.8rem", "fontWeight": "700", "color": "var(--brand-navy)", "marginBottom": "0.35rem"}}, "Target Graduation CGPA"),
-                                html.input({
-                                    "type": "number",
-                                    "step": "0.05",
-                                    "min": "5.00",
-                                    "max": "10.00",
-                                    "className": "input",
-                                    "value": str(target_cgpa),
-                                    "on_change": lambda e: set_target_cgpa(e.get("target", {}).get("value", "9.00") if isinstance(e, dict) else str(e))
-                                })
-                            )
-                        ),
-                        # Department
-                        html.div(
-                            html.label({"style": {"display": "block", "fontSize": "0.8rem", "fontWeight": "700", "color": "var(--brand-navy)", "marginBottom": "0.35rem"}}, "Department"),
-                            html.input({
+                        {"class_name": "flex flex-col gap-1"},
+                        html.label({"class_name": "font-mono text-mono-sm font-bold uppercase"}, "Last Name"),
+                        html.input(
+                            {
                                 "type": "text",
-                                "className": "input",
-                                "value": str(department),
-                                "on_change": lambda e: set_department(e.get("target", {}).get("value", "") if isinstance(e, dict) else str(e))
-                            })
-                        ),
-                        # Feedback message
-                        html.div(
-                            {"style": {"color": "#059669", "fontSize": "0.85rem", "fontWeight": "700", "display": "block" if save_status else "none"}},
-                            f"✓ {save_status}"
-                        ),
-                        html.div(
-                            {"style": {"color": "var(--danger)", "fontSize": "0.85rem", "fontWeight": "700", "display": "block" if save_error else "none"}},
-                            f"⚠ {save_error}"
-                        ),
-                        # Submit Button
-                        html.button(
-                            {
-                                "className": "btn btn-primary",
-                                "style": {"width": "100%", "marginTop": "0.5rem"},
-                                "on_click": handle_save
-                            },
-                            "Save Profile Changes"
+                                "value": last_name,
+                                "on_change": lambda e: set_last_name(e.get("target", {}).get("value", "")),
+                                "class_name": "border border-light-outline-variant p-2 font-body text-body-md"
+                            }
                         )
                     )
                 ),
-                # Change Password Section
                 html.div(
-                    {"className": "card", "style": {"marginTop": "1.75rem"}},
+                    {"class_name": "grid grid-cols-1 sm:grid-cols-2 gap-gutter-md"},
                     html.div(
-                        {"style": {"display": "flex", "justifyContent": "space-between", "alignItems": "center", "marginBottom": "1.25rem"}},
-                        html.h3({"style": {"fontFamily": "var(--font-serif)", "fontSize": "1.35rem", "color": "var(--brand-navy)"}}, "Security & Change Password"),
-                        html.span({"className": "badge badge-cyan"}, "Encrypted")
+                        {"class_name": "flex flex-col gap-1"},
+                        html.label({"class_name": "font-mono text-mono-sm font-bold uppercase"}, "Email Address"),
+                        html.input(
+                            {
+                                "type": "email",
+                                "value": email,
+                                "on_change": lambda e: set_email(e.get("target", {}).get("value", "")),
+                                "class_name": "border border-light-outline-variant p-2 font-body text-body-md"
+                            }
+                        )
                     ),
                     html.div(
-                        {"style": {"display": "flex", "flexDirection": "column", "gap": "1rem"}},
-                        # Current Password
-                        html.div(
-                            html.label({"style": {"display": "block", "fontSize": "0.8rem", "fontWeight": "700", "color": "var(--brand-navy)", "marginBottom": "0.35rem"}}, "Current Password"),
-                            html.input({
-                                "type": "password",
-                                "className": "input",
-                                "placeholder": "Enter your current password",
-                                "value": str(old_password),
-                                "on_change": lambda e: set_old_password(e.get("target", {}).get("value", "") if isinstance(e, dict) else str(e))
-                            })
-                        ),
-                        # New and Confirm Password
-                        html.div(
-                            {"style": {"display": "grid", "gridTemplateColumns": "1fr 1fr", "gap": "1rem"}},
-                            html.div(
-                                html.label({"style": {"display": "block", "fontSize": "0.8rem", "fontWeight": "700", "color": "var(--brand-navy)", "marginBottom": "0.35rem"}}, "New Password"),
-                                html.input({
-                                    "type": "password",
-                                    "className": "input",
-                                    "placeholder": "Min. 8 characters",
-                                    "value": str(new_password),
-                                    "on_change": lambda e: set_new_password(e.get("target", {}).get("value", "") if isinstance(e, dict) else str(e))
-                                })
-                            ),
-                            html.div(
-                                html.label({"style": {"display": "block", "fontSize": "0.8rem", "fontWeight": "700", "color": "var(--brand-navy)", "marginBottom": "0.35rem"}}, "Confirm New Password"),
-                                html.input({
-                                    "type": "password",
-                                    "className": "input",
-                                    "placeholder": "Re-enter new password",
-                                    "value": str(confirm_password),
-                                    "on_change": lambda e: set_confirm_password(e.get("target", {}).get("value", "") if isinstance(e, dict) else str(e))
-                                })
-                            )
-                        ),
-                        # Feedback messages
-                        html.div(
-                            {"style": {"color": "#059669", "fontSize": "0.85rem", "fontWeight": "700", "display": "block" if pw_status else "none"}},
-                            f"✓ {pw_status}"
-                        ),
-                        html.div(
-                            {"style": {"color": "var(--danger)", "fontSize": "0.85rem", "fontWeight": "700", "display": "block" if pw_error else "none"}},
-                            f"⚠ {pw_error}"
-                        ),
-                        # Submit Button
-                        html.button(
+                        {"class_name": "flex flex-col gap-1"},
+                        html.label({"class_name": "font-mono text-mono-sm font-bold uppercase"}, "Target CGPA"),
+                        html.input(
                             {
-                                "className": "btn btn-secondary",
-                                "style": {"width": "100%", "marginTop": "0.5rem"},
-                                "disabled": pw_loading,
-                                "on_click": handle_password_change
-                            },
-                            "Updating Password..." if pw_loading else "Update Password"
+                                "type": "number",
+                                "step": "0.01",
+                                "min": "0",
+                                "max": "10",
+                                "value": target_cgpa,
+                                "on_change": lambda e: set_target_cgpa(e.get("target", {}).get("value", "8.80")),
+                                "class_name": "border border-light-outline-variant p-2 font-mono text-mono-md"
+                            }
                         )
                     )
+                ),
+
+                html.div(
+                    {"class_name": f"{'block' if save_status else 'hidden'} p-2 bg-success text-on-success font-mono text-mono-sm"},
+                    save_status
+                ),
+                html.div(
+                    {"class_name": f"{'block' if save_error else 'hidden'} p-2 bg-light-error text-light-on-error font-mono text-mono-sm"},
+                    save_error
+                ),
+
+                html.button(
+                    {
+                        "type": "button",
+                        "on_click": handle_save_profile,
+                        "class_name": "self-start px-gutter-lg py-2.5 bg-light-secondary text-light-on-secondary font-headline font-bold text-label-md hover:bg-light-primary hover:text-light-on-primary transition-colors duration-state-change uppercase cursor-pointer"
+                    },
+                    "SAVE PROFILE DETAILS"
+                )
+            )
+        ),
+
+        # Password Change Card (Mandatory Requirement)
+        html.section(
+            {"class_name": "border border-light-outline-variant bg-light-surface p-gutter-lg flex flex-col gap-gutter-md"},
+            html.div(
+                {"class_name": "border-b border-light-outline-variant pb-gutter-sm"},
+                html.h3({"class_name": "font-headline text-title-lg uppercase"}, "Change Institutional Password"),
+                html.p({"class_name": "font-body text-body-sm text-light-on-surface-variant"}, "Update your institutional account password with security validation.")
+            ),
+
+            html.form(
+                {"class_name": "flex flex-col gap-gutter-md max-w-lg", "on_submit": lambda e: None},
+                html.div(
+                    {"class_name": "flex flex-col gap-1"},
+                    html.label({"class_name": "font-mono text-mono-sm font-bold uppercase"}, "Current Password"),
+                    html.input(
+                        {
+                            "type": "password",
+                            "value": old_password,
+                            "on_change": lambda e: set_old_password(e.get("target", {}).get("value", "")),
+                            "class_name": "border border-light-outline-variant p-2 font-mono text-mono-md",
+                            "placeholder": "••••••••"
+                        }
+                    )
+                ),
+                html.div(
+                    {"class_name": "flex flex-col gap-1"},
+                    html.label({"class_name": "font-mono text-mono-sm font-bold uppercase"}, "New Password"),
+                    html.input(
+                        {
+                            "type": "password",
+                            "value": new_password,
+                            "on_change": lambda e: set_new_password(e.get("target", {}).get("value", "")),
+                            "class_name": "border border-light-outline-variant p-2 font-mono text-mono-md",
+                            "placeholder": "Minimum 8 characters"
+                        }
+                    )
+                ),
+                html.div(
+                    {"class_name": "flex flex-col gap-1"},
+                    html.label({"class_name": "font-mono text-mono-sm font-bold uppercase"}, "Confirm New Password"),
+                    html.input(
+                        {
+                            "type": "password",
+                            "value": confirm_password,
+                            "on_change": lambda e: set_confirm_password(e.get("target", {}).get("value", "")),
+                            "class_name": "border border-light-outline-variant p-2 font-mono text-mono-md",
+                            "placeholder": "Re-enter new password"
+                        }
+                    )
+                ),
+
+                html.div(
+                    {"class_name": f"{'block' if pw_status else 'hidden'} p-2 bg-success text-on-success font-mono text-mono-sm"},
+                    pw_status
+                ),
+                html.div(
+                    {"class_name": f"{'block' if pw_error else 'hidden'} p-2 bg-light-error text-light-on-error font-mono text-mono-sm"},
+                    pw_error
+                ),
+
+                html.button(
+                    {
+                        "type": "button",
+                        "on_click": handle_change_password,
+                        "class_name": "self-start px-gutter-lg py-2.5 bg-light-primary text-light-on-primary font-headline font-bold text-label-md hover:bg-light-primary-container hover:text-light-on-primary-container transition-colors duration-state-change uppercase cursor-pointer"
+                    },
+                    "UPDATE PASSWORD"
                 )
             )
         )

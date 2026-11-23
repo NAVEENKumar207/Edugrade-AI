@@ -1,20 +1,24 @@
 """
 Authentication Components (Login & Registration) for EduGrade AI ReactPy Frontend.
-Enterprise Dark SaaS Aesthetic (Plus Jakarta Sans, Obsidian Slate, Electric Cyan).
+Industrial Academic Precision Design System (Swiss-Brutalist 0px geometry, Vermilion signals).
+Matches New Ui/authentication_login_signup/code.html.
 """
 
+from django.conf import settings
 from reactpy import component, html, use_state
-from ui.components.icons import icon_sparkles, icon_alert
 from ui.components.theme_toggle import ThemeToggle
 from ui.services.data_service import authenticate_user, register_user
 
 @component
 def LoginPage(set_page, set_user, current_role='student', theme='dark', toggle_theme=None):
-    role, set_role = use_state(current_role)
+    role, set_role = use_state(current_role or 'student')
     username, set_username = use_state("")
     password, set_password = use_state("")
+    show_password, set_show_password = use_state(False)
     error, set_error = use_state("")
     loading, set_loading = use_state(False)
+
+    is_debug = getattr(settings, 'DEBUG', False)
 
     def do_login(u_val, p_val):
         set_error("")
@@ -48,252 +52,331 @@ def LoginPage(set_page, set_user, current_role='student', theme='dark', toggle_t
     def handle_submit(e=None):
         do_login(username, password)
 
+    def fill_demo(u, p, r):
+        set_username(u)
+        set_password(p)
+        set_role(r)
+        do_login(u, p)
+
     return html.div(
         {
-            "style": {
-                "minHeight": "100vh",
-                "display": "flex",
-                "alignItems": "center",
-                "justifyContent": "center",
-                "padding": "2rem 1rem",
-                "backgroundColor": "var(--bg-app)",
-                "backgroundImage": "radial-gradient(circle at 50% 20%, rgba(56, 189, 248, 0.12) 0%, transparent 60%)",
-                "position": "relative"
-            }
+            "className": "min-h-screen grid grid-cols-1 lg:grid-cols-12 bg-light-surface text-light-on-surface font-body antialiased selection:bg-light-primary selection:text-white"
         },
-        # Top-right quick actions
-        html.div(
-            {
-                "style": {
-                    "position": "fixed",
-                    "top": "1.25rem",
-                    "right": "1.5rem",
-                    "display": "flex",
-                    "alignItems": "center",
-                    "gap": "0.75rem",
-                    "zIndex": "30"
-                }
-            },
-            html.button(
-                {
-                    "className": "btn btn-secondary",
-                    "style": {"fontSize": "0.8rem", "padding": "0.45rem 0.85rem"},
-                    "on_click": lambda e: set_page("landing")
-                },
-                "← Home"
-            ),
-            ThemeToggle(theme=theme, toggle_theme=toggle_theme, compact=True) if toggle_theme else None
-        ),
-        html.div(
-            {
-                "className": "card",
-                "style": {
-                    "width": "100%",
-                    "maxWidth": "460px",
-                    "padding": "2.75rem 2.25rem",
-                    "borderRadius": "var(--radius-xl)",
-                    "boxShadow": "var(--shadow-lg)",
-                    "border": "1px solid var(--border-medium)",
-                    "background": "var(--card-bg)"
-                }
-            },
-            # Brand Header
+        # Left Matte Carbon Institutional Showcase Panel (5 cols on lg)
+        html.aside(
+            {"className": "hidden lg:flex lg:col-span-5 bg-light-inverse-surface text-light-inverse-on-surface p-10 flex-col justify-between border-r border-light-outline-variant relative overflow-hidden"},
+            # Top Brand header
             html.div(
-                {"style": {"textAlign": "center", "marginBottom": "2rem"}},
+                {"className": "flex items-center justify-between gap-4"},
                 html.div(
                     {
-                        "style": {
-                            "width": "46px", "height": "46px",
-                            "borderRadius": "12px",
-                            "background": "linear-gradient(135deg, #38BDF8, #2563EB)",
-                            "display": "flex", "alignItems": "center", "justifyContent": "center",
-                            "margin": "0 auto 1rem auto",
-                            "boxShadow": "0 0 20px rgba(56, 189, 248, 0.35)"
-                        }
+                        "className": "inline-flex items-center gap-3 bg-light-surface px-3 py-1.5 border border-light-outline-variant cursor-pointer",
+                        "on_click": lambda e: set_page("landing")
                     },
-                    icon_sparkles(24, "#FFFFFF")
+                    html.img({
+                        "src": "/static/images/edugrade_ai_logo.jpeg",
+                        "className": "h-7 w-auto object-contain",
+                        "alt": "EduGrade AI"
+                    }),
+                    html.span({"className": "font-headline font-bold text-sm tracking-tight text-light-on-surface uppercase"}, "EduGrade AI")
                 ),
-                html.h2(
-                    {"style": {"fontSize": "1.75rem", "fontWeight": "800", "letterSpacing": "-0.02em", "color": "var(--text-primary)"}},
-                    "Sign in to EduGrade"
-                ),
-                html.p(
-                    {"style": {"color": "var(--text-secondary)", "fontSize": "0.9rem", "marginTop": "0.35rem"}},
-                    "Access real-time CGPA tracking and placement intelligence"
-                )
+                html.span({"className": "font-mono text-mono-sm uppercase text-light-inverse-on-surface/60"}, "CBCS 2026")
             ),
 
-            # Role Switcher Toggle
+            # Mid Showcase Bento Grid
             html.div(
-                {
-                    "style": {
-                        "display": "flex",
-                        "backgroundColor": "var(--bg-surface-elevated)",
-                        "borderRadius": "var(--radius-sm)",
-                        "padding": "0.25rem",
-                        "marginBottom": "1.5rem",
-                        "border": "1px solid var(--border-subtle)"
-                    }
-                },
-                html.button(
-                    {
-                        "style": {
-                            "flex": "1",
-                            "padding": "0.6rem 1rem",
-                            "borderRadius": "var(--radius-sm)",
-                            "cursor": "pointer",
-                            "fontWeight": "700",
-                            "fontSize": "0.85rem",
-                            "backgroundColor": "rgba(56, 189, 248, 0.15)" if role == "student" else "transparent",
-                            "color": "#38BDF8" if role == "student" else "var(--text-muted)",
-                            "border": "1px solid rgba(56, 189, 248, 0.3)" if role == "student" else "1px solid transparent",
-                            "transition": "all 0.15s ease"
-                        },
-                        "on_click": lambda e: set_role("student")
-                    },
-                    "Student"
-                ),
-                html.button(
-                    {
-                        "style": {
-                            "flex": "1",
-                            "padding": "0.6rem 1rem",
-                            "borderRadius": "var(--radius-sm)",
-                            "cursor": "pointer",
-                            "fontWeight": "700",
-                            "fontSize": "0.85rem",
-                            "backgroundColor": "rgba(56, 189, 248, 0.15)" if role == "admin" else "transparent",
-                            "color": "#38BDF8" if role == "admin" else "var(--text-muted)",
-                            "border": "1px solid rgba(56, 189, 248, 0.3)" if role == "admin" else "1px solid transparent",
-                            "transition": "all 0.15s ease"
-                        },
-                        "on_click": lambda e: set_role("admin")
-                    },
-                    "Faculty / Admin"
-                )
-            ),
-
-            # Error Notice
-            html.div(
-                {
-                    "className": "badge-danger",
-                    "style": {
-                        "padding": "0.75rem 1rem",
-                        "borderRadius": "var(--radius-sm)",
-                        "display": "flex",
-                        "alignItems": "center",
-                        "gap": "0.5rem",
-                        "marginBottom": "1.25rem",
-                        "fontSize": "0.85rem"
-                    }
-                },
-                icon_alert(16, "#F87171"),
-                html.span(error)
-            ) if error else None,
-
-            # Form Fields
-            html.div(
-                {"style": {"display": "flex", "flexDirection": "column", "gap": "1.25rem"}},
+                {"className": "flex flex-col gap-6 my-auto py-8"},
                 html.div(
-                    html.label(
-                        {"style": {"display": "block", "fontSize": "0.825rem", "fontWeight": "600", "color": "var(--text-secondary)", "marginBottom": "0.4rem"}},
-                        "Username or University Email"
+                    {"className": "flex flex-col gap-2"},
+                    html.span({"className": "font-mono text-mono-sm uppercase text-light-primary tracking-wider font-semibold"}, "Institutional Portal"),
+                    html.h1({"className": "font-headline text-3xl font-bold uppercase tracking-tight leading-tight"}, "Precision Grading. Guaranteed Placement Clearance.")
+                ),
+                html.div(
+                    {"className": "grid grid-cols-1 gap-4 font-mono text-mono-sm"},
+                    # Telemetry Card 1
+                    html.div(
+                        {"className": "p-4 bg-light-surface-container-highest/20 border border-light-outline-variant/30 flex flex-col gap-1"},
+                        html.span({"className": "text-light-inverse-on-surface/60 uppercase text-[11px]"}, "Target Simulator"),
+                        html.div(
+                            {"className": "flex items-baseline justify-between"},
+                            html.span({"className": "text-white font-bold text-base"}, "Target: 8.50 CGPA"),
+                            html.span({"className": "text-light-primary font-bold"}, "Req: 8.78 SGPA")
+                        ),
+                        html.span({"className": "text-[11px] text-emerald-400 uppercase mt-1"}, "● Status: Feasible Clearance")
                     ),
-                    html.input({
-                        "type": "text",
-                        "className": "input",
-                        "value": username,
-                        "placeholder": "student" if role == "student" else "admin",
-                        "on_change": lambda e: set_username(e.get("target", {}).get("value", "") if isinstance(e, dict) else str(e))
-                    })
-                ),
-                html.div(
-                    html.label(
-                        {"style": {"display": "block", "fontSize": "0.825rem", "fontWeight": "600", "color": "var(--text-secondary)", "marginBottom": "0.4rem"}},
-                        "Password"
-                    ),
-                    html.input({
-                        "type": "password",
-                        "className": "input",
-                        "value": password,
-                        "placeholder": "••••••••",
-                        "on_change": lambda e: set_password(e.get("target", {}).get("value", "") if isinstance(e, dict) else str(e))
-                    })
-                ),
-                html.button(
-                    {
-                        "className": "btn btn-primary",
-                        "style": {
-                            "width": "100%",
-                            "padding": "0.85rem",
-                            "marginTop": "0.5rem",
-                            "fontSize": "0.95rem"
-                        },
-                        "disabled": loading,
-                        "on_click": handle_submit
-                    },
-                    "Authenticating..." if loading else f"Sign in as {'Student' if role == 'student' else 'Faculty'} →"
-                )
-            ),
-
-            # Navigation Links
-            html.div(
-                {"style": {"marginTop": "1.75rem", "textAlign": "center", "fontSize": "0.875rem", "color": "var(--text-secondary)"}},
-                "Don't have an account? ",
-                html.span(
-                    {"style": {"color": "#38BDF8", "fontWeight": "600", "cursor": "pointer"}, "on_click": lambda e: set_page("signup")},
-                    "Create Account"
-                ),
-                html.div(
-                    {"style": {"marginTop": "0.75rem"}},
-                    html.span(
-                        {"style": {"color": "var(--text-muted)", "fontSize": "0.8rem", "cursor": "pointer"}, "on_click": lambda e: set_page("landing")},
-                        "← Return to Landing Page"
+                    # Telemetry Card 2
+                    html.div(
+                        {"className": "p-4 bg-light-surface-container-highest/20 border border-light-outline-variant/30 flex flex-col gap-1"},
+                        html.span({"className": "text-light-inverse-on-surface/60 uppercase text-[11px]"}, "Placement Cutoff Matrix"),
+                        html.div(
+                            {"className": "flex items-baseline justify-between"},
+                            html.span({"className": "text-white font-bold text-base"}, "Microsoft • Tier 1"),
+                            html.span({"className": "text-light-inverse-on-surface/80"}, "Cutoff: 8.50")
+                        ),
+                        html.span({"className": "text-[11px] text-emerald-400 uppercase mt-1"}, "● Eligible with Zero Arrears")
                     )
                 )
+            ),
+
+            # Bottom Security Footnote
+            html.div(
+                {"className": "flex items-center justify-between font-mono text-mono-sm uppercase text-light-inverse-on-surface/60 border-t border-light-inverse-on-surface/20 pt-4"},
+                html.span("PBKDF2 SHA-256 Encryption"),
+                html.span("Atomic Audit Log")
+            )
+        ),
+
+        # Right Authentication Panel (7 cols on lg)
+        html.div(
+            {"className": "col-span-1 lg:col-span-7 flex flex-col justify-between p-6 sm:p-10 lg:p-12 bg-light-surface min-h-screen"},
+            # Top Action Bar
+            html.div(
+                {"className": "flex items-center justify-between gap-4 border-b border-light-outline-variant pb-4"},
+                # Mode Tabs
+                html.div(
+                    {"className": "flex items-center gap-2 font-mono text-mono-sm uppercase"},
+                    html.button(
+                        {"className": "px-4 py-1.5 bg-light-secondary text-light-on-secondary font-semibold cursor-pointer"},
+                        "Sign In"
+                    ),
+                    html.button(
+                        {
+                            "className": "px-4 py-1.5 text-light-on-surface-variant hover:text-light-on-surface transition-colors cursor-pointer",
+                            "on_click": lambda e: set_page("signup")
+                        },
+                        "Create Account"
+                    )
+                ),
+                # Quick Action buttons
+                html.div(
+                    {"className": "flex items-center gap-3"},
+                    ThemeToggle(theme=theme, toggle_theme=toggle_theme, compact=True) if toggle_theme else None,
+                    html.button(
+                        {
+                            "className": "px-3 py-1 border border-light-outline-variant font-mono text-mono-sm uppercase hover:border-light-secondary transition-colors cursor-pointer",
+                            "on_click": lambda e: set_page("landing")
+                        },
+                        "← Home"
+                    )
+                )
+            ),
+
+            # Main Form Body
+            html.div(
+                {"className": "max-w-xl w-full mx-auto my-auto py-8 flex flex-col gap-6"},
+                # Header & Role switcher
+                html.div(
+                    {"className": "flex flex-col gap-4"},
+                    html.h2({"className": "font-headline text-3xl font-bold uppercase tracking-tight text-light-on-surface"}, "Secure Access Gateway"),
+                    html.p({"className": "font-mono text-mono-sm text-light-on-surface-variant uppercase"}, "Authenticate using institutional credentials to access academic records."),
+                    # Role Buttons
+                    html.div(
+                        {"className": "grid grid-cols-2 gap-3 mt-1"},
+                        html.button(
+                            {
+                                "className": f"p-3 border font-mono text-mono-sm uppercase text-left transition-colors cursor-pointer flex flex-col gap-1 {('border-light-primary bg-light-primary text-white font-semibold' if role == 'student' else 'border-light-outline-variant bg-light-surface-container-low text-light-on-surface-variant hover:border-light-secondary')}",
+                                "on_click": lambda e: set_role("student")
+                            },
+                            html.span({"className": "text-[11px] opacity-75"}, "Undergraduate"),
+                            html.span({"className": "text-sm font-bold"}, "Student Portal")
+                        ),
+                        html.button(
+                            {
+                                "className": f"p-3 border font-mono text-mono-sm uppercase text-left transition-colors cursor-pointer flex flex-col gap-1 {('border-light-primary bg-light-primary text-white font-semibold' if role == 'admin' else 'border-light-outline-variant bg-light-surface-container-low text-light-on-surface-variant hover:border-light-secondary')}",
+                                "on_click": lambda e: set_role("admin")
+                            },
+                            html.span({"className": "text-[11px] opacity-75"}, "Department"),
+                            html.span({"className": "text-sm font-bold"}, "Faculty / Admin")
+                        )
+                    )
+                ),
+
+                # 1-Click Demo Buttons (Only when DEBUG is True)
+                html.div(
+                    {"className": "p-3.5 bg-light-surface-container-low border border-light-outline-variant flex flex-col gap-2"},
+                    html.div(
+                        {"className": "flex items-center justify-between font-mono text-[11px] uppercase text-light-on-surface-variant"},
+                        html.span({"className": "font-semibold flex items-center gap-1.5"}, html.span({"className": "material-symbols-outlined text-sm text-light-primary"}, "bolt"), "1-Click Demo Credentials (DEBUG Active)"),
+                        html.span("Pre-seeded")
+                    ),
+                    html.div(
+                        {"className": "grid grid-cols-2 gap-2"},
+                        html.button(
+                            {
+                                "className": "px-3 py-1.5 bg-light-surface border border-light-outline-variant hover:border-light-primary font-mono text-[11px] uppercase text-left transition-colors cursor-pointer flex items-center justify-between",
+                                "on_click": lambda e: fill_demo("student01", "student123", "student")
+                            },
+                            html.span("Demo Student"),
+                            html.span({"className": "text-[10px] text-light-primary font-bold"}, "FILL →")
+                        ),
+                        html.button(
+                            {
+                                "className": "px-3 py-1.5 bg-light-surface border border-light-outline-variant hover:border-light-primary font-mono text-[11px] uppercase text-left transition-colors cursor-pointer flex items-center justify-between",
+                                "on_click": lambda e: fill_demo("admin01", "admin123", "admin")
+                            },
+                            html.span("Demo Faculty"),
+                            html.span({"className": "text-[10px] text-light-primary font-bold"}, "FILL →")
+                        )
+                    )
+                ) if is_debug else None,
+
+                # Error Alert
+                html.div(
+                    {"className": "p-3.5 bg-red-50 dark:bg-red-950/40 border border-light-error text-light-error font-mono text-mono-sm flex items-center gap-2.5"},
+                    html.span({"className": "material-symbols-outlined text-lg"}, "warning"),
+                    html.span(error)
+                ) if error else None,
+
+                # Form Inputs
+                html.form(
+                    {
+                        "className": "flex flex-col gap-4",
+                        "on_submit": lambda e: handle_submit()
+                    },
+                    # Username / Register Number
+                    html.div(
+                        {"className": "flex flex-col gap-1.5"},
+                        html.label(
+                            {"className": "font-mono text-mono-sm uppercase text-light-on-surface-variant font-medium flex items-center justify-between"},
+                            html.span("Username or Register Number"),
+                            html.span({"className": "text-[11px] opacity-75"}, "REQUIRED")
+                        ),
+                        html.div(
+                            {"className": "relative flex items-center"},
+                            html.span({"className": "material-symbols-outlined absolute left-3 text-light-on-surface-variant pointer-events-none text-lg"}, "badge"),
+                            html.input({
+                                "type": "text",
+                                "value": username,
+                                "className": "w-full pl-10 pr-3 py-2.5 bg-light-surface border border-light-outline-variant focus:border-light-primary focus:ring-0 font-mono text-mono-sm outline-none transition-colors",
+                                "placeholder": "e.g. 22CSE041 or student01" if role == "student" else "e.g. faculty.cse or admin01",
+                                "on_change": lambda e: set_username(e.get("target", {}).get("value", "") if isinstance(e, dict) else str(e))
+                            })
+                        )
+                    ),
+                    # Password
+                    html.div(
+                        {"className": "flex flex-col gap-1.5"},
+                        html.div(
+                            {"className": "flex items-center justify-between font-mono text-mono-sm uppercase text-light-on-surface-variant font-medium"},
+                            html.span("Password"),
+                            html.button(
+                                {
+                                    "type": "button",
+                                    "className": "text-[11px] hover:text-light-primary transition-colors cursor-pointer",
+                                    "on_click": lambda e: set_error("Contact your institutional department administrator to reset credentials.")
+                                },
+                                "Forgot Password?"
+                            )
+                        ),
+                        html.div(
+                            {"className": "relative flex items-center"},
+                            html.span({"className": "material-symbols-outlined absolute left-3 text-light-on-surface-variant pointer-events-none text-lg"}, "lock"),
+                            html.input({
+                                "type": "text" if show_password else "password",
+                                "value": password,
+                                "className": "w-full pl-10 pr-10 py-2.5 bg-light-surface border border-light-outline-variant focus:border-light-primary focus:ring-0 font-mono text-mono-sm outline-none transition-colors",
+                                "placeholder": "Enter institutional password",
+                                "on_change": lambda e: set_password(e.get("target", {}).get("value", "") if isinstance(e, dict) else str(e))
+                            }),
+                            html.button(
+                                {
+                                    "type": "button",
+                                    "className": "absolute right-3 text-light-on-surface-variant hover:text-light-on-surface transition-colors cursor-pointer flex items-center",
+                                    "on_click": lambda e: set_show_password(not show_password)
+                                },
+                                html.span({"className": "material-symbols-outlined text-lg"}, "visibility_off" if show_password else "visibility")
+                            )
+                        )
+                    ),
+                    # Submit Button
+                    html.button(
+                        {
+                            "type": "button",
+                            "disabled": loading,
+                            "className": "w-full py-3.5 bg-light-primary text-white hover:bg-light-primary-container hover:text-light-secondary font-mono text-mono-sm uppercase font-semibold transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-sm mt-2 disabled:opacity-50",
+                            "on_click": lambda e: handle_submit()
+                        },
+                        html.span("Verifying..." if loading else (f"Sign In to {'Faculty Portal' if role == 'admin' else 'Student Portal'}")),
+                        html.span({"className": "material-symbols-outlined text-base"}, "login")
+                    )
+                ),
+
+                # Bottom Switcher
+                html.div(
+                    {"className": "text-center font-mono text-mono-sm text-light-on-surface-variant border-t border-light-outline-variant pt-4"},
+                    html.span("Don't have an institutional profile? "),
+                    html.button(
+                        {
+                            "className": "text-light-primary font-semibold hover:underline uppercase cursor-pointer",
+                            "on_click": lambda e: set_page("signup")
+                        },
+                        "Create Account"
+                    )
+                )
+            ),
+
+            # Bottom Compliance Strip
+            html.div(
+                {"className": "flex flex-wrap items-center justify-between gap-4 font-mono text-[11px] uppercase text-light-on-surface-variant/75 border-t border-light-outline-variant pt-4"},
+                html.span("256-Bit SSL Encryption"),
+                html.span("ISO 27001 Audited"),
+                html.span("Zero Data Leakage Guarantee")
             )
         )
     )
 
 @component
-def SignupPage(set_page, set_user, theme='dark', toggle_theme=None):
-    role, set_role = use_state("student")
+def SignupPage(set_page, set_user, current_role='student', theme='dark', toggle_theme=None):
+    role, set_role = use_state(current_role or 'student')
     fullname, set_fullname = use_state("")
     username, set_username = use_state("")
-    department, set_department = use_state("Computer Science & Engineering")
+    department, set_department = use_state("Computer Science and Engineering")
     roll_number, set_roll_number = use_state("")
-    semester, set_semester = use_state(1)
-    password, set_password = use_state("")
     admin_key, set_admin_key = use_state("")
+    password, set_password = use_state("")
+    confirm_password, set_confirm_password = use_state("")
+    show_password, set_show_password = use_state(False)
     error, set_error = use_state("")
     loading, set_loading = use_state(False)
 
-    def handle_submit(e=None):
+    def handle_signup(e=None):
         set_error("")
-        if not username.strip() or not password:
-            set_error("Username and password are required.")
+        if not username.strip() or not password or not fullname.strip():
+            set_error("Full name, username, and password are required.")
+            return
+
+        if password != confirm_password:
+            set_error("Passwords do not match.")
+            return
+
+        if len(password) < 6:
+            set_error("Password must be at least 6 characters long.")
             return
 
         set_loading(True)
         try:
-            ok, result = register_user(
-                role=role,
-                fullname=fullname,
+            reg_res = register_user(
                 username=username.strip(),
-                department=department,
                 password=password,
-                roll_number=roll_number,
-                semester=semester,
-                admin_key=admin_key
+                fullname=fullname.strip(),
+                role=role,
+                department=department.strip(),
+                roll_number=roll_number.strip(),
+                admin_key=admin_key.strip()
             )
-            if ok:
-                set_user(result)
+            if isinstance(reg_res, tuple):
+                user, reg_err = reg_res
+            else:
+                user, reg_err = reg_res, None
+
+            if user:
+                set_user(user)
                 if role == "admin":
                     set_page("admin_dashboard")
                 else:
                     set_page("dashboard")
             else:
-                set_error(str(result))
+                set_error(reg_err or "Registration failed. Please verify your details.")
         except Exception as err:
             set_error(f"Registration error: {str(err)}")
         finally:
@@ -301,187 +384,240 @@ def SignupPage(set_page, set_user, theme='dark', toggle_theme=None):
 
     return html.div(
         {
-            "style": {
-                "minHeight": "100vh",
-                "display": "flex",
-                "alignItems": "center",
-                "justifyContent": "center",
-                "padding": "2rem 1rem",
-                "backgroundColor": "var(--bg-app)",
-                "position": "relative"
-            }
+            "className": "min-h-screen grid grid-cols-1 lg:grid-cols-12 bg-light-surface text-light-on-surface font-body antialiased selection:bg-light-primary selection:text-white"
         },
-        # Top-right quick actions
-        html.div(
-            {
-                "style": {
-                    "position": "fixed",
-                    "top": "1.25rem",
-                    "right": "1.5rem",
-                    "display": "flex",
-                    "alignItems": "center",
-                    "gap": "0.75rem",
-                    "zIndex": "30"
-                }
-            },
-            html.button(
-                {
-                    "className": "btn btn-secondary",
-                    "style": {"fontSize": "0.8rem", "padding": "0.45rem 0.85rem"},
-                    "on_click": lambda e: set_page("landing")
-                },
-                "← Home"
+        # Left Matte Carbon Panel
+        html.aside(
+            {"className": "hidden lg:flex lg:col-span-5 bg-light-inverse-surface text-light-inverse-on-surface p-10 flex-col justify-between border-r border-light-outline-variant relative overflow-hidden"},
+            html.div(
+                {"className": "flex items-center justify-between gap-4"},
+                html.div(
+                    {
+                        "className": "inline-flex items-center gap-3 bg-light-surface px-3 py-1.5 border border-light-outline-variant cursor-pointer",
+                        "on_click": lambda e: set_page("landing")
+                    },
+                    html.img({
+                        "src": "/static/images/edugrade_ai_logo.jpeg",
+                        "className": "h-7 w-auto object-contain",
+                        "alt": "EduGrade AI"
+                    }),
+                    html.span({"className": "font-headline font-bold text-sm tracking-tight text-light-on-surface uppercase"}, "EduGrade AI")
+                ),
+                html.span({"className": "font-mono text-mono-sm uppercase text-light-inverse-on-surface/60"}, "CBCS 2026")
             ),
-            ThemeToggle(theme=theme, toggle_theme=toggle_theme, compact=True) if toggle_theme else None
+            html.div(
+                {"className": "flex flex-col gap-6 my-auto py-8"},
+                html.div(
+                    {"className": "flex flex-col gap-2"},
+                    html.span({"className": "font-mono text-mono-sm uppercase text-light-primary tracking-wider font-semibold"}, "Institutional Enrollment"),
+                    html.h1({"className": "font-headline text-3xl font-bold uppercase tracking-tight leading-tight"}, "Create Your Verified Academic Ledger Identity.")
+                ),
+                html.p(
+                    {"className": "font-mono text-mono-sm text-light-inverse-on-surface/80 uppercase leading-relaxed"},
+                    "Once registered, your transcripts, semester credits, target CGPA models, and placement audits are stored securely with zero third-party telemetry."
+                )
+            ),
+            html.div(
+                {"className": "flex items-center justify-between font-mono text-mono-sm uppercase text-light-inverse-on-surface/60 border-t border-light-inverse-on-surface/20 pt-4"},
+                html.span("Anna Univ CBCS Scale"),
+                html.span("Atomic Audit Trail")
+            )
         ),
+
+        # Right Form Panel
         html.div(
-            {
-                "className": "card",
-                "style": {
-                    "width": "100%",
-                    "maxWidth": "500px",
-                    "padding": "2.75rem 2.25rem",
-                    "borderRadius": "var(--radius-xl)",
-                    "boxShadow": "var(--shadow-lg)",
-                    "border": "1px solid var(--border-medium)",
-                    "background": "var(--card-bg)"
-                }
-            },
+            {"className": "col-span-1 lg:col-span-7 flex flex-col justify-between p-6 sm:p-10 lg:p-12 bg-light-surface min-h-screen"},
+            # Top Action Bar
             html.div(
-                {"style": {"textAlign": "center", "marginBottom": "1.75rem"}},
-                html.h2(
-                    {"style": {"fontSize": "1.65rem", "fontWeight": "800", "color": "var(--text-primary)"}},
-                    "Create Your Account"
-                ),
-                html.p({"style": {"color": "var(--text-secondary)", "fontSize": "0.85rem", "marginTop": "0.25rem"}}, "Register to access academic intelligence tools.")
-            ),
-
-            # Role Switcher
-            html.div(
-                {
-                    "style": {
-                        "display": "flex",
-                        "backgroundColor": "var(--bg-surface-elevated)",
-                        "borderRadius": "var(--radius-sm)",
-                        "padding": "0.25rem",
-                        "marginBottom": "1.5rem",
-                        "border": "1px solid var(--border-subtle)"
-                    }
-                },
-                html.button(
-                    {
-                        "style": {
-                            "flex": "1",
-                            "padding": "0.5rem",
-                            "borderRadius": "var(--radius-sm)",
-                            "border": "none",
-                            "cursor": "pointer",
-                            "fontWeight": "700",
-                            "fontSize": "0.85rem",
-                            "backgroundColor": "rgba(56, 189, 248, 0.15)" if role == "student" else "transparent",
-                            "color": "#38BDF8" if role == "student" else "var(--text-muted)"
+                {"className": "flex items-center justify-between gap-4 border-b border-light-outline-variant pb-4"},
+                html.div(
+                    {"className": "flex items-center gap-2 font-mono text-mono-sm uppercase"},
+                    html.button(
+                        {
+                            "className": "px-4 py-1.5 text-light-on-surface-variant hover:text-light-on-surface transition-colors cursor-pointer",
+                            "on_click": lambda e: set_page("login")
                         },
-                        "on_click": lambda e: set_role("student")
-                    },
-                    "Student"
+                        "Sign In"
+                    ),
+                    html.button(
+                        {"className": "px-4 py-1.5 bg-light-secondary text-light-on-secondary font-semibold cursor-pointer"},
+                        "Create Account"
+                    )
                 ),
-                html.button(
-                    {
-                        "style": {
-                            "flex": "1",
-                            "padding": "0.5rem",
-                            "borderRadius": "var(--radius-sm)",
-                            "border": "none",
-                            "cursor": "pointer",
-                            "fontWeight": "700",
-                            "fontSize": "0.85rem",
-                            "backgroundColor": "rgba(56, 189, 248, 0.15)" if role == "admin" else "transparent",
-                            "color": "#38BDF8" if role == "admin" else "var(--text-muted)"
+                html.div(
+                    {"className": "flex items-center gap-3"},
+                    ThemeToggle(theme=theme, toggle_theme=toggle_theme, compact=True) if toggle_theme else None,
+                    html.button(
+                        {
+                            "className": "px-3 py-1 border border-light-outline-variant font-mono text-mono-sm uppercase hover:border-light-secondary transition-colors cursor-pointer",
+                            "on_click": lambda e: set_page("landing")
                         },
-                        "on_click": lambda e: set_role("admin")
-                    },
-                    "Faculty / Admin"
+                        "← Home"
+                    )
                 )
             ),
 
-            # Error Alert
+            # Main Form Body
             html.div(
-                {
-                    "className": "badge-danger",
-                    "style": {"padding": "0.75rem 1rem", "borderRadius": "var(--radius-sm)", "marginBottom": "1.25rem", "display": "flex", "alignItems": "center", "gap": "0.5rem"}
-                },
-                icon_alert(16, "#F87171"),
-                html.span(error)
-            ) if error else None,
+                {"className": "max-w-xl w-full mx-auto my-auto py-8 flex flex-col gap-6"},
+                html.div(
+                    {"className": "flex flex-col gap-2"},
+                    html.h2({"className": "font-headline text-3xl font-bold uppercase tracking-tight text-light-on-surface"}, "Register New Account"),
+                    html.p({"className": "font-mono text-mono-sm text-light-on-surface-variant uppercase"}, "Enroll into the official institutional academic intelligence system.")
+                ),
 
-            # Form Fields
-            html.div(
-                {"style": {"display": "flex", "flexDirection": "column", "gap": "1rem"}},
+                # Role Selection
                 html.div(
-                    html.label({"style": {"display": "block", "fontSize": "0.8rem", "fontWeight": "600", "color": "var(--text-secondary)", "marginBottom": "0.3rem"}}, "Full Name"),
-                    html.input({
-                        "type": "text", "className": "input", "value": fullname,
-                        "placeholder": "e.g. John Doe",
-                        "on_change": lambda e: set_fullname(e.get("target", {}).get("value", "") if isinstance(e, dict) else str(e))
-                    })
+                    {"className": "grid grid-cols-2 gap-3"},
+                    html.button(
+                        {
+                            "className": f"p-3 border font-mono text-mono-sm uppercase text-left transition-colors cursor-pointer flex flex-col gap-1 {('border-light-primary bg-light-primary text-white font-semibold' if role == 'student' else 'border-light-outline-variant bg-light-surface-container-low text-light-on-surface-variant hover:border-light-secondary')}",
+                            "on_click": lambda e: set_role("student")
+                        },
+                        html.span({"className": "text-[11px] opacity-75"}, "Undergraduate"),
+                        html.span({"className": "text-sm font-bold"}, "Student Account")
+                    ),
+                    html.button(
+                        {
+                            "className": f"p-3 border font-mono text-mono-sm uppercase text-left transition-colors cursor-pointer flex flex-col gap-1 {('border-light-primary bg-light-primary text-white font-semibold' if role == 'admin' else 'border-light-outline-variant bg-light-surface-container-low text-light-on-surface-variant hover:border-light-secondary')}",
+                            "on_click": lambda e: set_role("admin")
+                        },
+                        html.span({"className": "text-[11px] opacity-75"}, "Department"),
+                        html.span({"className": "text-sm font-bold"}, "Faculty / Admin")
+                    )
                 ),
+
+                # Error Alert
                 html.div(
-                    html.label({"style": {"display": "block", "fontSize": "0.8rem", "fontWeight": "600", "color": "var(--text-secondary)", "marginBottom": "0.3rem"}}, "Username"),
-                    html.input({
-                        "type": "text", "className": "input", "value": username,
-                        "placeholder": "e.g. student01",
-                        "on_change": lambda e: set_username(e.get("target", {}).get("value", "") if isinstance(e, dict) else str(e))
-                    })
-                ),
-                html.div(
-                    html.label({"style": {"display": "block", "fontSize": "0.8rem", "fontWeight": "600", "color": "var(--text-secondary)", "marginBottom": "0.3rem"}}, "Department"),
-                    html.input({
-                        "type": "text", "className": "input", "value": department,
-                        "on_change": lambda e: set_department(e.get("target", {}).get("value", "") if isinstance(e, dict) else str(e))
-                    })
-                ),
-                html.div(
-                    html.label({"style": {"display": "block", "fontSize": "0.8rem", "fontWeight": "600", "color": "var(--text-secondary)", "marginBottom": "0.3rem"}}, "Roll Number"),
-                    html.input({
-                        "type": "text", "className": "input", "value": roll_number,
-                        "placeholder": "e.g. 21CS042",
-                        "on_change": lambda e: set_roll_number(e.get("target", {}).get("value", "") if isinstance(e, dict) else str(e))
-                    })
-                ) if role == "student" else None,
-                html.div(
-                    html.label({"style": {"display": "block", "fontSize": "0.8rem", "fontWeight": "600", "color": "var(--text-secondary)", "marginBottom": "0.3rem"}}, "Faculty Key"),
-                    html.input({
-                        "type": "password", "className": "input", "value": admin_key,
-                        "placeholder": "Enter Authorization Key",
-                        "on_change": lambda e: set_admin_key(e.get("target", {}).get("value", "") if isinstance(e, dict) else str(e))
-                    })
-                ) if role == "admin" else None,
-                html.div(
-                    html.label({"style": {"display": "block", "fontSize": "0.8rem", "fontWeight": "600", "color": "var(--text-secondary)", "marginBottom": "0.3rem"}}, "Password"),
-                    html.input({
-                        "type": "password", "className": "input", "value": password,
-                        "placeholder": "••••••••",
-                        "on_change": lambda e: set_password(e.get("target", {}).get("value", "") if isinstance(e, dict) else str(e))
-                    })
-                ),
-                html.button(
+                    {"className": "p-3.5 bg-red-50 dark:bg-red-950/40 border border-light-error text-light-error font-mono text-mono-sm flex items-center gap-2.5"},
+                    html.span({"className": "material-symbols-outlined text-lg"}, "warning"),
+                    html.span(error)
+                ) if error else None,
+
+                # Form Fields
+                html.form(
                     {
-                        "className": "btn btn-primary",
-                        "style": {"width": "100%", "padding": "0.85rem", "marginTop": "0.5rem"},
-                        "disabled": loading,
-                        "on_click": handle_submit
+                        "className": "flex flex-col gap-4",
+                        "on_submit": lambda e: handle_signup()
                     },
-                    "Creating Account..." if loading else "Register Account →"
+                    # Full Name
+                    html.div(
+                        {"className": "flex flex-col gap-1.5"},
+                        html.label({"className": "font-mono text-mono-sm uppercase text-light-on-surface-variant font-medium"}, "Full Name"),
+                        html.input({
+                            "type": "text",
+                            "value": fullname,
+                            "className": "w-full px-3.5 py-2.5 bg-light-surface border border-light-outline-variant focus:border-light-primary focus:ring-0 font-mono text-mono-sm outline-none transition-colors",
+                            "placeholder": "e.g. Anand Kumar",
+                            "on_change": lambda e: set_fullname(e.get("target", {}).get("value", "") if isinstance(e, dict) else str(e))
+                        })
+                    ),
+                    # Username
+                    html.div(
+                        {"className": "flex flex-col gap-1.5"},
+                        html.label({"className": "font-mono text-mono-sm uppercase text-light-on-surface-variant font-medium"}, "Username"),
+                        html.input({
+                            "type": "text",
+                            "value": username,
+                            "className": "w-full px-3.5 py-2.5 bg-light-surface border border-light-outline-variant focus:border-light-primary focus:ring-0 font-mono text-mono-sm outline-none transition-colors",
+                            "placeholder": "e.g. anand01",
+                            "on_change": lambda e: set_username(e.get("target", {}).get("value", "") if isinstance(e, dict) else str(e))
+                        })
+                    ),
+                    # Department
+                    html.div(
+                        {"className": "flex flex-col gap-1.5"},
+                        html.label({"className": "font-mono text-mono-sm uppercase text-light-on-surface-variant font-medium"}, "Department"),
+                        html.input({
+                            "type": "text",
+                            "value": department,
+                            "className": "w-full px-3.5 py-2.5 bg-light-surface border border-light-outline-variant focus:border-light-primary focus:ring-0 font-mono text-mono-sm outline-none transition-colors",
+                            "placeholder": "e.g. Computer Science and Engineering",
+                            "on_change": lambda e: set_department(e.get("target", {}).get("value", "") if isinstance(e, dict) else str(e))
+                        })
+                    ),
+                    # Roll Number (if student)
+                    html.div(
+                        {"className": "flex flex-col gap-1.5"},
+                        html.label({"className": "font-mono text-mono-sm uppercase text-light-on-surface-variant font-medium"}, "Register / Roll Number"),
+                        html.input({
+                            "type": "text",
+                            "value": roll_number,
+                            "className": "w-full px-3.5 py-2.5 bg-light-surface border border-light-outline-variant focus:border-light-primary focus:ring-0 font-mono text-mono-sm outline-none transition-colors",
+                            "placeholder": "e.g. 22CSE041",
+                            "on_change": lambda e: set_roll_number(e.get("target", {}).get("value", "") if isinstance(e, dict) else str(e))
+                        })
+                    ) if role == "student" else None,
+                    # Admin Key (if faculty/admin)
+                    html.div(
+                        {"className": "flex flex-col gap-1.5"},
+                        html.label({"className": "font-mono text-mono-sm uppercase text-light-on-surface-variant font-medium flex items-center justify-between"}, html.span("Admin Verification Key"), html.span({"className": "text-light-primary text-[11px]"}, "REQUIRED")),
+                        html.input({
+                            "type": "password",
+                            "value": admin_key,
+                            "className": "w-full px-3.5 py-2.5 bg-light-surface border border-light-outline-variant focus:border-light-primary focus:ring-0 font-mono text-mono-sm outline-none transition-colors",
+                            "placeholder": "Enter institutional ADMIN_SIGNUP_KEY",
+                            "on_change": lambda e: set_admin_key(e.get("target", {}).get("value", "") if isinstance(e, dict) else str(e))
+                        })
+                    ) if role == "admin" else None,
+                    # Password & Confirm Password in 2 cols
+                    html.div(
+                        {"className": "grid grid-cols-1 sm:grid-cols-2 gap-4"},
+                        html.div(
+                            {"className": "flex flex-col gap-1.5"},
+                            html.label({"className": "font-mono text-mono-sm uppercase text-light-on-surface-variant font-medium"}, "Password"),
+                            html.input({
+                                "type": "password",
+                                "value": password,
+                                "className": "w-full px-3.5 py-2.5 bg-light-surface border border-light-outline-variant focus:border-light-primary focus:ring-0 font-mono text-mono-sm outline-none transition-colors",
+                                "placeholder": "Min. 6 chars",
+                                "on_change": lambda e: set_password(e.get("target", {}).get("value", "") if isinstance(e, dict) else str(e))
+                            })
+                        ),
+                        html.div(
+                            {"className": "flex flex-col gap-1.5"},
+                            html.label({"className": "font-mono text-mono-sm uppercase text-light-on-surface-variant font-medium"}, "Confirm Password"),
+                            html.input({
+                                "type": "password",
+                                "value": confirm_password,
+                                "className": "w-full px-3.5 py-2.5 bg-light-surface border border-light-outline-variant focus:border-light-primary focus:ring-0 font-mono text-mono-sm outline-none transition-colors",
+                                "placeholder": "Repeat password",
+                                "on_change": lambda e: set_confirm_password(e.get("target", {}).get("value", "") if isinstance(e, dict) else str(e))
+                            })
+                        )
+                    ),
+                    # Submit Button
+                    html.button(
+                        {
+                            "type": "button",
+                            "disabled": loading,
+                            "className": "w-full py-3.5 bg-light-primary text-white hover:bg-light-primary-container hover:text-light-secondary font-mono text-mono-sm uppercase font-semibold transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-sm mt-3 disabled:opacity-50",
+                            "on_click": lambda e: handle_signup()
+                        },
+                        html.span("Registering..." if loading else (f"Register {'Faculty Account' if role == 'admin' else 'Student Account'}")),
+                        html.span({"className": "material-symbols-outlined text-base"}, "person_add")
+                    )
+                ),
+
+                html.div(
+                    {"className": "text-center font-mono text-mono-sm text-light-on-surface-variant border-t border-light-outline-variant pt-4"},
+                    html.span("Already registered? "),
+                    html.button(
+                        {
+                            "className": "text-light-primary font-semibold hover:underline uppercase cursor-pointer",
+                            "on_click": lambda e: set_page("login")
+                        },
+                        "Sign In"
+                    )
                 )
             ),
 
+            # Bottom Compliance Strip
             html.div(
-                {"style": {"marginTop": "1.5rem", "textAlign": "center", "fontSize": "0.85rem", "color": "var(--text-secondary)"}},
-                "Already registered? ",
-                html.span(
-                    {"style": {"color": "#38BDF8", "fontWeight": "600", "cursor": "pointer"}, "on_click": lambda e: set_page("login")},
-                    "Sign In"
-                )
+                {"className": "flex flex-wrap items-center justify-between gap-4 font-mono text-[11px] uppercase text-light-on-surface-variant/75 border-t border-light-outline-variant pt-4"},
+                html.span("CBCS 2026 Compatible"),
+                html.span("Encrypted Credentials"),
+                html.span("Instant Access")
             )
         )
     )
