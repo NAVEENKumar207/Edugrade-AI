@@ -9,7 +9,7 @@ import hashlib
 import json
 from django.conf import settings
 from django.utils import timezone
-from core.models import UserProfile, SemesterRecord, TranscriptIssue
+from core.models import SemesterRecord, TranscriptIssue
 
 def mask_name(full_name: str) -> str:
     """

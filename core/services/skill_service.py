@@ -4,8 +4,7 @@ Computes credit-weighted academic skill scores, company skill match percentages,
 gap identification, and overall career readiness classification.
 """
 
-from core.models import UserProfile, CourseResult, CompanyPlacementCriteria, CourseSkillMap
-from core.services.academic_service import FAILING_GRADES
+from core.models import CourseResult, CourseSkillMap
 
 KEYWORD_SKILL_RULES = [
     (["data structure", "dsa", "algorithm"], "DSA"),

@@ -22,7 +22,6 @@ def PlacementPage(user):
     companies = data.get("companies", []) if data else []
     student = data.get("student", {}) if data else {}
     summary = data.get("summary", {}) if data else {}
-    readiness = data.get("placement_readiness", {})
 
     skills_dict = skills_data.get("skills", {})
     companies_fit = skills_data.get("companies", [])
@@ -96,7 +95,6 @@ def PlacementPage(user):
         max_arr = int(c.get("max_backlogs", 0))
         skills_str = c.get("required_skills", "") or ""
         skill_tags = [s.strip() for s in skills_str.split(",") if s.strip()] if skills_str else ["Engineering Fundamentals"]
-        reasons = c.get("reasons", [])
 
         cgpa_diff = current_cgpa - min_cgpa
         fit_info = fit_lookup.get(c.get("id"), {})

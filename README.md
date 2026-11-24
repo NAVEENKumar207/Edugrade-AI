@@ -29,7 +29,7 @@
 
 <!-- Live Pulse Telemetry Indicators -->
 <p align="center">
-  <img src="https://img.shields.io/badge/Tests-180_Passed-success?style=flat-square&logo=pytest&logoColor=white" alt="Tests" />
+  <img src="https://img.shields.io/badge/Tests-181_Passed-success?style=flat-square&logo=pytest&logoColor=white" alt="Tests" />
   <img src="https://img.shields.io/badge/Scale-10.0_CBCS-orange?style=flat-square" alt="Scale" />
   <img src="https://img.shields.io/badge/Credits-164_Degree_Total-blue?style=flat-square" alt="Credits" />
   <img src="https://img.shields.io/badge/Language-English_Only-purple?style=flat-square&logo=google-translate&logoColor=white" alt="Language" />
@@ -276,19 +276,13 @@ All modern REST APIs enforce student isolation and return structured JSON respon
 
 ## 🧪 Automated Testing & Verification
 
-EduGrade AI maintains 100% test coverage across 180 automated test cases:
+EduGrade AI maintains 100% test coverage across 181 automated test cases:
 
 ```bash
-# 1. Run all unit and integration tests
+# 1. Run full automated test suite (models, APIs, ReactPy, permissions, digital twin)
 python manage.py test
 
-# 2. Run end-to-end route, auth, and student isolation suite
-python test_routes.py
-
-# 3. Verify ReactPy host component mounting
-python test_reactpy.py
-
-# 4. Comprehensive database health and referential integrity check
+# 2. Comprehensive database health and referential integrity check
 python manage.py check_database
 ```
 

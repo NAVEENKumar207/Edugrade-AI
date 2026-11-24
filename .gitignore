@@ -32,3 +32,9 @@ dist/
 Thumbs.db
 .vscode/
 .idea/
+
+# Developer scratch, temporary audits & reports
+scratch/
+audit/
+*.tmp
+*.log

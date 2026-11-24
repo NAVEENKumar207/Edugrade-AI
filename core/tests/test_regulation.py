@@ -9,7 +9,6 @@ from core.regulation import (
     marks_to_grade,
 )
 from core.services.academic_service import (
-    marks_to_grade as service_marks_to_grade,
     required_marks,
     evaluate_expected_marks,
 )

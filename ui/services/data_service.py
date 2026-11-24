@@ -7,7 +7,6 @@ the deterministic academic calculation engine.
 import os
 os.environ.setdefault("DJANGO_ALLOW_ASYNC_UNSAFE", "true")
 
-import hmac
 from django.db import transaction
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
@@ -20,7 +19,7 @@ from core.models import (
 )
 from core.services.academic_service import (
     calculate_cgpa, check_placement_eligibility,
-    record_course_result, placement_readiness, GRADE_ORDER
+    record_course_result, placement_readiness
 )
 from core.services.ai_service import generate_ai_advice
 from core.services.security_service import (
@@ -40,9 +39,8 @@ def prepare_demo_environment(clean_demo_courses=False):
     Ensures demo_student is provisioned with password student01 and realistic data.
     Preserves all existing modifications and demo courses in the DB unless clean_demo_courses=True.
     """
-    from django.contrib.auth.models import User
     from django.core.management import call_command
-    from core.models import UserProfile, CourseResult
+    from core.models import CourseResult
     from core.services.academic_service import recalculate_student_metrics
 
     if clean_demo_courses:
@@ -232,7 +230,7 @@ def quick_demo_login(role='student'):
             )
     else:
         username = user.username
-        if user.first_name in ('Kavitha', 'Arunachalam', ''):
+        if user.first_name != 'Naveenkumar' or user.last_name != 'S':
             user.first_name = 'Naveenkumar'
             user.last_name = 'S'
             user.save(update_fields=['first_name', 'last_name'])

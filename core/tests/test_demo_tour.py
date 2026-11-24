@@ -8,7 +8,7 @@ import os
 from django.test import TestCase
 from django.contrib.auth.models import User
 from django.urls import reverse
-from core.models import UserProfile, CourseResult, SemesterRecord
+from core.models import CourseResult, SemesterRecord
 from ui.services.data_service import (
     is_demo_mode_enabled,
     prepare_demo_environment,

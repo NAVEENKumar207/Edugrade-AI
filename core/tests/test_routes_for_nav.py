@@ -5,6 +5,7 @@ used across EduGrade AI resolve to real, functional endpoints in a student-only 
 
 from django.test import TestCase, Client
 from django.urls import reverse
+from django.template.loader import render_to_string
 from django.contrib.auth.models import User
 from core.models import UserProfile
 
@@ -43,6 +44,13 @@ class RoutesForNavTestCase(TestCase):
         url_syllabus = reverse('syllabus')
         resp_syllabus = self.client.get(url_syllabus)
         self.assertEqual(resp_syllabus.status_code, 302, "Unauthenticated syllabus access must redirect to login")
+
+    def test_reactpy_host_template_render(self):
+        """Verifies ReactPy host template renders properly with body tag and ReactPy script."""
+        html_out = render_to_string('reactpy_index.html')
+        self.assertIn('<body', html_out)
+        self.assertIn('EduGrade AI', html_out)
+        self.assertIn('reactpy', html_out.lower())
 
     def test_student_legacy_nav_routes(self):
         """Logged-in student legacy navigation endpoints return 200 OK."""

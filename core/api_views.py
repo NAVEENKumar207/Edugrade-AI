@@ -4,7 +4,6 @@ Serves modern React frontend and API clients with strict authentication,
 Database transactions and deterministic calculations.
 """
 
-import hmac
 from django.db import transaction
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
@@ -15,7 +14,6 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 
-from django.conf import settings
 from .models import (
     UserProfile, SemesterRecord, SubjectInsight,
     CourseResult, CompanyPlacementCriteria, AdvisorChatMessage, AcademicAuditLog
@@ -23,7 +21,7 @@ from .models import (
 from .services.academic_service import (
     calculate_cgpa, plan_target_cgpa, check_placement_eligibility,
     placement_readiness, record_course_result, recalculate_student_metrics,
-    AT_RISK_CGPA_THRESHOLD, AT_RISK_BACKLOG_THRESHOLD, GRADE_ORDER
+    VALID_GRADES, GRADE_ORDER, grade_to_point, is_failing_grade
 )
 from .services.ai_service import generate_ai_advice
 from .services.security_service import (
@@ -140,7 +138,7 @@ def api_signup(request):
                 user.last_name = parts[1]
             user.save()
 
-        profile = UserProfile.objects.create(
+        UserProfile.objects.create(
             user=user,
             roll_number=roll_number or ('7176' + username),
             institution_name=institution_name,
@@ -347,7 +345,6 @@ def api_results(request, course_id=None):
         except (ValueError, TypeError):
             return Response({'error': 'Invalid credits value.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        from .services.academic_service import VALID_GRADES, GRADE_ORDER
         if grade_raw not in VALID_GRADES:
             return Response({'error': f"Invalid grade '{grade_raw}'. Allowed: {', '.join(GRADE_ORDER)}"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -407,7 +404,6 @@ def api_results(request, course_id=None):
                 pass
         if 'grade' in data:
             new_grade = str(data['grade']).strip().upper()
-            from .services.academic_service import VALID_GRADES, grade_to_point, is_failing_grade
             if new_grade in VALID_GRADES:
                 from django.utils import timezone
                 old_grade = cr.grade

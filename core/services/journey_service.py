@@ -3,7 +3,7 @@ Student Academic Journey, Milestone Badges, and Early Warning Predictive Analyti
 Calculates semester timeline evolution, gamified achievement badges, and least-squares SGPA forecasting.
 """
 
-from core.models import UserProfile, SemesterRecord, CourseResult, AcademicAuditLog
+from core.models import SemesterRecord, CourseResult
 from core.services.academic_service import (
     FAILING_GRADES,
     placement_readiness,

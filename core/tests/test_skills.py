@@ -1,7 +1,6 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
 from rest_framework.test import APIClient
-from rest_framework import status
 from core.models import UserProfile, CourseResult, CompanyPlacementCriteria, CourseSkillMap
 from core.services.skill_service import skill_scores, company_skill_match, evaluate_placement_fit
 

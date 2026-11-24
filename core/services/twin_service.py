@@ -3,7 +3,6 @@ Digital Twin Academic Simulation and Career Impact Engine for EduGrade AI.
 Provides Monte Carlo future trajectory forecasting and 'Next Best Move' arrear impact ranking.
 """
 
-import math
 import random
 from core.models import UserProfile, CourseResult, CompanyPlacementCriteria
 from core.services.academic_service import (

@@ -4,8 +4,7 @@ from rest_framework.test import APIClient
 from rest_framework import status
 from core.models import UserProfile, SemesterRecord, CourseResult, CompanyPlacementCriteria
 from core.services.journey_service import (
-    get_journey, get_badges, predict_next_sgpa, evaluate_student_risk,
-    DISTINCTION_CGPA_THRESHOLD, STEADY_SGPA_VARIANCE_THRESHOLD, PLACEMENT_READY_THRESHOLD
+    get_journey, get_badges, predict_next_sgpa, evaluate_student_risk
 )
 
 class JourneyBadgesAndEarlyWarningTests(TestCase):

@@ -18,9 +18,9 @@ from core.models import (
     CompanyPlacementCriteria, AcademicAuditLog, AdvisorChatMessage
 )
 from core.services.journey_service import (
-    evaluate_student_risk, predict_next_sgpa,
-    RISK_HIGH_CGPA, RISK_HIGH_BACKLOGS, RISK_HIGH_PREDICTED_SGPA,
-    RISK_MEDIUM_SGPA_DROP, RISK_MEDIUM_BACKLOGS
+    evaluate_student_risk,
+    RISK_HIGH_BACKLOGS,
+    RISK_MEDIUM_BACKLOGS
 )
 
 

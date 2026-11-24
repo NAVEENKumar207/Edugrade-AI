@@ -3,11 +3,9 @@ Automated AST and static analysis test suite verifying that no dead controls,
 unanchored '#' links, unhandled buttons, or insecure target='_blank' links exist.
 """
 
-import os
 import re
 import glob
 from django.test import SimpleTestCase
-from django.urls import resolve, Resolver404
 
 
 class NoDeadControlsTestCase(SimpleTestCase):
@@ -69,7 +67,6 @@ class NoDeadControlsTestCase(SimpleTestCase):
 
     def test_no_todo_or_coming_soon_in_user_facing_controls(self):
         """Ensures no clickable control is left as a 'TODO' or 'Coming soon' placeholder."""
-        placeholder_pattern = re.compile(r'(TODO|Coming\s*soon)', re.IGNORECASE)
         violations = []
         for path in self.ui_files + self.template_files:
             with open(path, 'r', encoding='utf-8') as f:
