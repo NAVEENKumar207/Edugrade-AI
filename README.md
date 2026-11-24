@@ -1,37 +1,39 @@
 <div align="center">
 
-<!-- Animated Header Banner -->
-<img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=20,18,24&height=220&section=header&text=EduGrade%20AI&fontSize=52&fontAlignY=36&animation=twinkling&fontColor=ffffff&desc=Industrial%20Academic%20Precision%20%E2%80%A2%20Academic%20Digital%20Twin%20%E2%80%A2%20CBCS%20Intelligence&descAlignY=58&descAlign=50&descSize=18" width="100%" alt="EduGrade AI Header" />
-
-<br/>
-
-<!-- Animated Typing Subtitle -->
-<a href="https://github.com/NAVEENKumar207/Edugrade-AI">
-  <img src="https://readme-typing-svg.demolab.com?font=Space+Grotesk&weight=700&size=24&duration=2800&pause=1100&color=FF3316&center=true&vCenter=true&multiline=true&width=850&height=80&lines=Your+Academic+Digital+Twin+%E2%80%94+See+Your+Future%2C+Not+Just+Your+Past.;10-Point+CBCS+Telemetry+%E2%80%A2+164+Credits+Regulation+2022+Engine;K.S.+Rangasamy+College+of+Technology+(Autonomous)+%E2%80%A2+B.Tech+CSBS;Monte+Carlo+Simulation+%E2%80%A2+AI+Academic+Advisor+%E2%80%A2+QR+Verified+Transcripts" alt="Typing SVG" />
-</a>
-
-<br/>
-
-<!-- Shields Badges -->
+<!-- Project Logo -->
 <p align="center">
-  <a href="https://github.com/NAVEENKumar207/Edugrade-AI/stargazers"><img src="https://img.shields.io/github/stars/NAVEENKumar207/Edugrade-AI?style=for-the-badge&color=FF3316&logo=github&logoColor=white" alt="Stars" /></a>
-  <a href="https://github.com/NAVEENKumar207/Edugrade-AI/network/members"><img src="https://img.shields.io/github/forks/NAVEENKumar207/Edugrade-AI?style=for-the-badge&color=1B0401&logo=github&logoColor=white" alt="Forks" /></a>
-  <a href="https://github.com/NAVEENKumar207/Edugrade-AI/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-006A63?style=for-the-badge&logo=opensourceinitiative&logoColor=white" alt="License" /></a>
-  <a href="https://www.python.org/"><img src="https://img.shields.io/badge/Python-3.11%20%7C%203.12%20%7C%203.13-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python" /></a>
-  <a href="https://www.djangoproject.com/"><img src="https://img.shields.io/badge/Django-5.1%20%2B%20Channels-092E20?style=for-the-badge&logo=django&logoColor=white" alt="Django" /></a>
-  <a href="https://reactpy.dev/"><img src="https://img.shields.io/badge/Frontend-ReactPy%20SPA-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="ReactPy" /></a>
-  <a href="https://tailwindcss.com/"><img src="https://img.shields.io/badge/Styling-Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind" /></a>
-  <a href="https://sqlite.org/"><img src="https://img.shields.io/badge/Database-SQLite_Atomic-003B57?style=for-the-badge&logo=sqlite&logoColor=white" alt="SQLite" /></a>
-  <a href="https://groq.com/"><img src="https://img.shields.io/badge/AI_Engine-Llama_3.3_70B_via_Groq-F55036?style=for-the-badge&logo=groq&logoColor=white" alt="Groq" /></a>
+  <img src="static/images/edugrade_ai_logo.jpeg" alt="EduGrade AI Official Logo" width="140" style="border-radius: 18px; border: 2px solid #FF3316; box-shadow: 0 12px 35px rgba(255, 51, 22, 0.4);" />
 </p>
 
-<!-- Live Pulse Metrics -->
+<!-- Animated SVG Hero Banner -->
 <p align="center">
-  <img src="https://img.shields.io/badge/Test_Suite-162_Passed_%E2%9C%94-006A63?style=flat-square&logo=pytest&logoColor=white" />
-  <img src="https://img.shields.io/badge/Latency-%3C1.0s_Realtime-blueviolet?style=flat-square&logo=speedtest&logoColor=white" />
-  <img src="https://img.shields.io/badge/Scale-10.0_CBCS-orange?style=flat-square&logo=buffer&logoColor=white" />
-  <img src="https://img.shields.io/badge/Language-English_Only-purple?style=flat-square&logo=google-translate&logoColor=white" />
-  <img src="https://img.shields.io/badge/Architecture-Student--Only_Portal-1B0401?style=flat-square&logo=shield&logoColor=white" />
+  <img src="static/images/animated_banner.svg" alt="EduGrade AI Animated Architectural Banner" width="100%" />
+</p>
+
+<!-- Verified Badge Matrix (100% Reliable Render) -->
+<p align="center">
+  <img src="https://img.shields.io/badge/Platform-EduGrade_AI_v2.6-FF3316?style=for-the-badge&logo=rocket&logoColor=white" alt="Platform" />
+  <img src="https://img.shields.io/badge/Syllabus-R2022_B.Tech_CSBS-006A63?style=for-the-badge&logo=book&logoColor=white" alt="Syllabus" />
+  <img src="https://img.shields.io/badge/Institution-KSRCT_(Autonomous)-872D00?style=for-the-badge&logo=googleclassroom&logoColor=white" alt="Institution" />
+  <img src="https://img.shields.io/badge/Portal-Student--Only_Architecture-1B0401?style=for-the-badge&logo=shield&logoColor=white" alt="Architecture" />
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python" />
+  <img src="https://img.shields.io/badge/Django-5.1-092E20?style=for-the-badge&logo=django&logoColor=white" alt="Django" />
+  <img src="https://img.shields.io/badge/Frontend-ReactPy_SPA-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="ReactPy" />
+  <img src="https://img.shields.io/badge/Styling-Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind" />
+  <img src="https://img.shields.io/badge/Database-SQLite-003B57?style=for-the-badge&logo=sqlite&logoColor=white" alt="SQLite" />
+  <img src="https://img.shields.io/badge/AI_Engine-Groq_Cloud-F55036?style=for-the-badge&logo=fastapi&logoColor=white" alt="Groq" />
+</p>
+
+<!-- Live Pulse Telemetry Indicators -->
+<p align="center">
+  <img src="https://img.shields.io/badge/Tests-180_Passed-success?style=flat-square&logo=pytest&logoColor=white" alt="Tests" />
+  <img src="https://img.shields.io/badge/Scale-10.0_CBCS-orange?style=flat-square" alt="Scale" />
+  <img src="https://img.shields.io/badge/Credits-164_Degree_Total-blue?style=flat-square" alt="Credits" />
+  <img src="https://img.shields.io/badge/Language-English_Only-purple?style=flat-square&logo=google-translate&logoColor=white" alt="Language" />
+  <img src="https://img.shields.io/badge/License-MIT-006A63?style=flat-square" alt="License" />
 </p>
 
 </div>
@@ -40,7 +42,7 @@
 
 ## ⚡ Executive Summary
 
-**EduGrade AI** is an institutional academic intelligence platform, credit-weighted CGPA/SGPA engine, stochastic milestone digital twin, campus placement readiness auditor, and bilingual AI mentor.
+**EduGrade AI** is an institutional academic intelligence platform, credit-weighted CGPA/SGPA engine, stochastic milestone digital twin, campus placement readiness auditor, and AI mentor.
 
 Engineered specifically for autonomous engineering institutions operating under the **UGC / Anna University Choice Based Credit System (CBCS)**, EduGrade AI embeds the exact curriculum of **K.S. Rangasamy College of Technology (Autonomous)** for the **B.Tech Computer Science & Business Systems (Regulation 2022, 2024–2028 batch, 164 Total Credits)**.
 
@@ -110,7 +112,7 @@ Built with a unified, high-performance **Django REST Backend** and an interactiv
 
 ## 🧭 Page Architecture & Component Inventory
 
-EduGrade AI mounts 12 specialized pages inside a persistent **Swiss-Brutalist Layout**:
+EduGrade AI mounts 12 specialized pages inside a persistent **Swiss-Brutalist Layout** featuring a sticky sidebar with independent navigation scrolling:
 
 <details>
 <summary><b>🔍 Click to Expand: Complete 12-Page Breakdown</b></summary>
@@ -157,21 +159,6 @@ The platform is pre-seeded with the authoritative **B.Tech CSBS (Regulation 2022
 | **RA / U** | Re-Appearance (Arrear) | **0.0** | < 50 Total or < 45 External |
 
 $$\text{SGPA} = \frac{\sum_{i=1}^{n} (C_i \times GP_i)}{\sum_{i=1}^{n} C_i} \qquad\qquad \text{CGPA} = \frac{\sum_{j=1}^{m} (C_j \times GP_j)}{\sum_{j=1}^{m} C_j}$$
-
----
-
-## 💻 Tech Stack & Engineering Specifications
-
-<p align="center">
-  <img src="https://skillicons.dev/icons?i=python,django,sqlite,tailwind,html,css,js,git,github,vscode" />
-</p>
-
-* **Backend Framework**: Django 5.1+, Django REST Framework (DRF), ASGI Channels with Daphne.
-* **Frontend Engine**: 100% Python ReactPy Single-Page Application (`reactpy-django`) running via WebSockets.
-* **Design System**: Swiss-Brutalist Architecture (*Vermilion Signal, Espresso Ink, IBM Plex Mono, Space Grotesk, Inter*).
-* **AI & NLP**: Groq Cloud SDK (`llama-3.3-70b-versatile`), browser Web Speech API for bilingual voice.
-* **Cryptographic Signing**: HMAC-SHA256 digital tokens for QR-verified ReportLab PDF transcripts.
-* **Database**: SQLite 3 with atomic transactions, referential cascade constraints, and automated audit logging.
 
 ---
 
@@ -246,7 +233,7 @@ For instant review without registering:
 * **Password**: `student123`
 * **Student Identity**: `Naveenkumar S` (Roll: `717622CB041`, Sem 6, CSBS, KSRCT)
 * **Pre-loaded Records**: 5 Semesters (38 courses, 109 credits, CGPA 8.77, 1 cleared backlog).
-* **Auto-Play Presentation Demo**: Click **"Watch Auto-Play Demo ⚡"** on the Landing Page to launch the self-guided 14-step platform tour!
+* **Auto-Play Presentation Tour**: Click **"Watch Auto-Play Demo ⚡"** on the Landing Page to launch the self-guided 14-step presentation tour!
 
 ---
 
@@ -289,7 +276,7 @@ All modern REST APIs enforce student isolation and return structured JSON respon
 
 ## 🧪 Automated Testing & Verification
 
-EduGrade AI maintains 100% test coverage across 162 automated test cases:
+EduGrade AI maintains 100% test coverage across 180 automated test cases:
 
 ```bash
 # 1. Run all unit and integration tests
@@ -324,8 +311,10 @@ ALL ROUTE, AUTH, API, AND PERMISSION TESTS PASSED (100% OK)
 
 <div align="center">
 
-<!-- Footer Waving Banner -->
-<img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=24,18,20&height=140&section=footer" width="100%" alt="Footer Banner" />
+<!-- Animated SVG Footer Banner -->
+<p align="center">
+  <img src="static/images/animated_footer.svg" alt="EduGrade AI Footer" width="100%" />
+</p>
 
 <p align="center">
   <b>EduGrade AI</b> — <i>Industrial Academic Precision. Empowering Students to Own Their Future.</i><br/>

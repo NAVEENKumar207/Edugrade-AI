@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 90" width="100%" height="90">
+  <defs>
+    <linearGradient id="footerBg" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#140604" />
+      <stop offset="50%" stop-color="#240A07" />
+      <stop offset="100%" stop-color="#140604" />
+    </linearGradient>
+    <linearGradient id="footerLine" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#C81E06" stop-opacity="0" />
+      <stop offset="30%" stop-color="#FF3316" stop-opacity="0.9" />
+      <stop offset="50%" stop-color="#FF6B54" stop-opacity="1" />
+      <stop offset="70%" stop-color="#FF3316" stop-opacity="0.9" />
+      <stop offset="100%" stop-color="#C81E06" stop-opacity="0" />
+    </linearGradient>
+  </defs>
+  <style>
+    @keyframes pulseFooter {
+      0%, 100% { opacity: 0.7; }
+      50% { opacity: 1; }
+    }
+    .footer-glow {
+      animation: pulseFooter 3s ease-in-out infinite;
+    }
+  </style>
+  <rect x="0" y="0" width="960" height="90" rx="12" fill="url(#footerBg)" stroke="#3A1C18" stroke-width="1" />
+  <rect x="0" y="0" width="960" height="3" fill="url(#footerLine)" class="footer-glow" />
+  <text x="480" y="38" text-anchor="middle" fill="#FFFFFF" font-family="'Space Grotesk', -apple-system, sans-serif" font-size="14" font-weight="700" letter-spacing="1">
+    EDUGRADE AI • INDUSTRIAL ACADEMIC INTELLIGENCE PLATFORM
+  </text>
+  <text x="480" y="62" text-anchor="middle" fill="#A89F9D" font-family="'IBM Plex Mono', monospace" font-size="11" letter-spacing="0.5">
+    K.S. Rangasamy College of Technology (Autonomous) • Empowering Students to Own Their Future
+  </text>
+</svg>
