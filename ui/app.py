@@ -109,7 +109,7 @@ def EduGradeApp():
     elif current_page in ["regulations", "syllabus"]:
         page_content = RegulationsPage()
     elif current_page == "profile":
-        page_content = ProfilePage(user=current_user)
+        page_content = ProfilePage(user=current_user, set_user=set_current_user)
     else:
         page_content = StudentDashboard(user=current_user, set_page=set_current_page)
 

@@ -445,9 +445,18 @@ def api_results(request, course_id=None):
         }, status=status.HTTP_200_OK)
 
     elif request.method == 'DELETE':
-        target_id = course_id or request.query_params.get('id') or request.query_params.get('course_id') or request.data.get('id')
+        sem_param = request.query_params.get('semester_number') or request.query_params.get('semester') or (request.data.get('semester_number') if isinstance(request.data, dict) else None)
+        target_id = course_id or request.query_params.get('id') or request.query_params.get('course_id') or (request.data.get('id') if isinstance(request.data, dict) else None)
+
+        if sem_param and not target_id:
+            from ui.services.data_service import delete_student_semester_result
+            ok, msg = delete_student_semester_result(request.user, sem_param)
+            if ok:
+                return Response({'message': msg}, status=status.HTTP_200_OK)
+            return Response({'error': msg}, status=status.HTTP_400_BAD_REQUEST)
+
         if not target_id:
-            return Response({'error': 'course_id is required.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'course_id or semester_number is required.'}, status=status.HTTP_400_BAD_REQUEST)
 
         cr = CourseResult.objects.filter(id=target_id, student=profile).first()
         if not cr:

@@ -23,7 +23,7 @@ class DemoTourModeTests(TestCase):
         User.objects.filter(username='demo_student').delete()
 
     def tearDown(self):
-        cleanup_demo_environment()
+        cleanup_demo_environment(delete_demo_courses=True)
 
     def test_demo_mode_setting_and_service_function(self):
         """DEMO_MODE_ENABLED setting is recognized and returns boolean."""
@@ -69,8 +69,8 @@ class DemoTourModeTests(TestCase):
         self.assertIsNone(user_invalid)
         self.assertIsNotNone(err_invalid)
 
-    def test_cleanup_demo_environment_removes_demo_artifacts(self):
-        """cleanup_demo_environment deletes test course DEMO101 without breaking base student."""
+    def test_cleanup_demo_environment_persists_modifications_in_db(self):
+        """cleanup_demo_environment preserves demo modifications in the database and recalculates metrics."""
         prepare_demo_environment()
         demo_user = User.objects.get(username='demo_student')
         sem1 = SemesterRecord.objects.filter(student=demo_user.profile).first()
@@ -88,8 +88,12 @@ class DemoTourModeTests(TestCase):
         )
         self.assertTrue(CourseResult.objects.filter(course_code='DEMO101').exists())
 
-        # Cleanup
+        # Cleanup preserves modifications by default
         cleanup_demo_environment()
+        self.assertTrue(CourseResult.objects.filter(course_code='DEMO101').exists())
+
+        # When explicitly requested with delete_demo_courses=True, removes demo courses
+        cleanup_demo_environment(delete_demo_courses=True)
         self.assertFalse(CourseResult.objects.filter(course_code='DEMO101').exists())
 
     def test_demo_api_endpoints(self):

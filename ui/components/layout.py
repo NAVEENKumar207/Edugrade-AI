@@ -12,15 +12,22 @@ from ui.components.theme_toggle import ThemeToggle
 @component
 def AppLayout(user, current_page, set_page, logout_action, children, theme="light", toggle_theme=None):
     mobile_open, set_mobile_open = use_state(False)
-    profile = getattr(user, 'profile', None)
-    cgpa_val = float(profile.current_cgpa) if profile else 0.0
-    full_name = f"{user.first_name} {user.last_name}".strip() or user.username if user else "Student"
+    profile = getattr(user, 'profile', None) if (user and hasattr(user, 'profile')) else None
+    cgpa_val = float(profile.current_cgpa) if (profile and hasattr(profile, 'current_cgpa')) else 0.0
+    
+    first = getattr(user, 'first_name', '') if user else ''
+    last = getattr(user, 'last_name', '') if user else ''
+    uname = getattr(user, 'username', '') if user else ''
+    full_name = f"{first} {last}".strip() or uname or "Student"
     
     # Compute 2-letter initials
-    initials = "".join([part[0].upper() for part in full_name.split()[:2]]) or "EG"
-    roll_no = profile.roll_number if profile and profile.roll_number else (user.email if user else "2026")
-    dept = profile.department if profile and profile.department else "Computer Science"
-    curr_sem = f"Sem {profile.current_semester}" if profile else "CBCS"
+    parts = full_name.split()[:2]
+    initials = "".join([p[0].upper() for p in parts if p]) or "EG"
+    
+    user_email = getattr(user, 'email', None) if user else None
+    roll_no = getattr(profile, 'roll_number', None) or user_email or "2026"
+    dept = getattr(profile, 'department', None) or "Computer Science"
+    curr_sem = f"Sem {profile.current_semester}" if (profile and hasattr(profile, 'current_semester')) else "CBCS"
 
     nav_items = [
         {"id": "dashboard", "label": "Dashboard", "icon": "dashboard"},

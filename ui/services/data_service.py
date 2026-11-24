@@ -35,18 +35,18 @@ def is_demo_mode_enabled():
     """Returns True if auto-play presentation demo mode is enabled."""
     return getattr(settings, 'DEMO_MODE_ENABLED', True)
 
-def prepare_demo_environment():
+def prepare_demo_environment(clean_demo_courses=False):
     """
     Ensures demo_student is provisioned with password student01 and realistic data.
-    Cleans up any leftover DEMO101 courses.
+    Preserves all existing modifications and demo courses in the DB unless clean_demo_courses=True.
     """
     from django.contrib.auth.models import User
     from django.core.management import call_command
     from core.models import UserProfile, CourseResult
     from core.services.academic_service import recalculate_student_metrics
 
-    # Clean up leftover demo course records
-    CourseResult.objects.filter(course_code__iexact='DEMO101').delete()
+    if clean_demo_courses:
+        CourseResult.objects.filter(course_code__iexact='DEMO101').delete()
 
     user = User.objects.filter(username='demo_student').first()
     if not user:
@@ -66,20 +66,24 @@ def prepare_demo_environment():
         return True, "Demo environment prepared successfully."
     return False, "Failed to prepare demo student."
 
-def cleanup_demo_environment():
+def cleanup_demo_environment(delete_demo_courses=False):
     """
-    Cleans up any test records created during demo (e.g. DEMO101 courses),
-    recalculates student metrics, and restores clean state.
+    Ensures demo student metrics are recalculated and all modifications made during
+    the demo are persisted in the database.
+    If delete_demo_courses=True is explicitly passed, demo courses are purged.
     """
     from django.contrib.auth.models import User
     from core.models import CourseResult
     from core.services.academic_service import recalculate_student_metrics
 
-    deleted_count, _ = CourseResult.objects.filter(course_code__iexact='DEMO101').delete()
+    deleted_count = 0
+    if delete_demo_courses:
+        deleted_count, _ = CourseResult.objects.filter(course_code__iexact='DEMO101').delete()
+
     user = User.objects.filter(username='demo_student').first()
     if user and hasattr(user, 'profile'):
         recalculate_student_metrics(user.profile)
-    return True, f"Cleaned {deleted_count} demo records."
+    return True, f"Demo modifications synchronized in database ({deleted_count} courses purged)."
 
 def quick_demo_login(role='student'):
     """
@@ -304,10 +308,10 @@ def change_user_password(user, old_password, new_password, confirm_password):
 def register_user(username, password, fullname='', department='Computer Science & Engineering', roll_number='', semester=1, institution_name='Anna University / Affiliated Institution', **kwargs):
     """Registers a new student user and student profile."""
     if not username or not password:
-        return False, "Username and password are required."
+        return None, "Username and password are required."
     
     if User.objects.filter(username=username).exists():
-        return False, "An account with this username already exists."
+        return None, "An account with this username already exists."
 
     with transaction.atomic():
         user = User.objects.create_user(
@@ -335,7 +339,7 @@ def register_user(username, password, fullname='', department='Computer Science 
             total_credits=160
         )
 
-    return True, user
+    return user, None
 
 def get_student_dashboard_data(user):
     """Retrieves live metrics, semesters, subject insights, and recent courses for student."""
@@ -581,12 +585,40 @@ def delete_student_course_result(user, course_id):
     except Exception as e:
         return False, str(e)
 
+def delete_student_semester_result(user, semester_number):
+    """
+    Deletes all student-owned course results and the semester record
+    for the specified semester atomically, and recalculates student metrics in the DB.
+    """
+    profile = getattr(user, 'profile', None)
+    if not profile:
+        return False, "Student profile not found."
+    try:
+        sem_int = int(semester_number)
+    except (ValueError, TypeError):
+        return False, "Invalid semester number."
+
+    try:
+        with transaction.atomic():
+            c_count, _ = CourseResult.objects.filter(student=profile, semester_number=sem_int).delete()
+            s_count, _ = SemesterRecord.objects.filter(student=profile, semester_number=sem_int).delete()
+            from core.services.academic_service import recalculate_student_metrics
+            recalculate_student_metrics(profile)
+            AcademicAuditLog.objects.create(
+                action_by=user,
+                action_type="SEMESTER_DELETED",
+                description=f"Semester {sem_int} ({c_count} courses) deleted by student {user.username}."
+            )
+        return True, f"Semester {sem_int} and its {c_count} courses deleted successfully."
+    except Exception as e:
+        return False, str(e)
+
 def import_student_grades_csv(user, csv_text: str):
     """Processes student-owned CSV grade import."""
     from core.services.academic_service import process_student_grades_csv
     return process_student_grades_csv(user, csv_text)
 
-def update_user_profile(user, first_name=None, last_name=None, email=None, target_cgpa=None, department=None, institution_name=None):
+def update_user_profile(user, first_name=None, last_name=None, email=None, target_cgpa=None, department=None, institution_name=None, roll_number=None):
     """Updates user and user profile details."""
     try:
         profile = getattr(user, 'profile', None)
@@ -600,6 +632,9 @@ def update_user_profile(user, first_name=None, last_name=None, email=None, targe
         if email is not None and email.strip():
             user.email = email.strip()
         user.save()
+
+        if roll_number is not None and roll_number.strip():
+            profile.roll_number = roll_number.strip()
 
         if target_cgpa is not None:
             try:
@@ -616,6 +651,8 @@ def update_user_profile(user, first_name=None, last_name=None, email=None, targe
             profile.institution_name = institution_name.strip()
 
         profile.save()
+        user.refresh_from_db()
+        profile.refresh_from_db()
         return True, "Profile details updated successfully."
     except Exception as e:
         return False, str(e)

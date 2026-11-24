@@ -10,6 +10,7 @@ from ui.services.data_service import (
     save_student_course_result,
     update_student_course_result,
     delete_student_course_result,
+    delete_student_semester_result,
     import_student_grades_csv,
 )
 
@@ -152,9 +153,24 @@ def ResultsPage(user):
             set_form_error(msg)
 
     def handle_delete_course(course_id):
+        set_form_error("")
+        set_form_status("")
         ok, msg = delete_student_course_result(user, course_id)
         if ok:
+            set_form_status(msg)
             refresh_data()
+        else:
+            set_form_error(msg)
+
+    def handle_delete_semester(sem_num):
+        set_form_error("")
+        set_form_status("")
+        ok, msg = delete_student_semester_result(user, sem_num)
+        if ok:
+            set_form_status(msg)
+            refresh_data()
+        else:
+            set_form_error(msg)
 
     def handle_run_csv_import(e=None):
         set_csv_error("")
@@ -302,18 +318,34 @@ def ResultsPage(user):
                 )
             )
 
+        sem_num_val = s.get("semester_number")
         sem_sections.append(
             html.article(
-                {"key": str(s.get("semester_number")), "class_name": "bg-light-surface-container-lowest border border-light-outline-variant overflow-hidden"},
+                {"key": str(sem_num_val), "class_name": "bg-light-surface-container-lowest border border-light-outline-variant overflow-hidden"},
                 html.header(
                     {"class_name": "px-gutter-lg py-gutter-md bg-light-surface-container-low border-b border-light-outline-variant flex flex-wrap items-center justify-between gap-gutter-md"},
                     html.div(
-                        html.h2({"class_name": "font-headline text-title-lg text-light-on-surface uppercase"}, f"Semester {s.get('semester_number')} Record"),
+                        {"class_name": "flex flex-col gap-0.5"},
+                        html.h2({"class_name": "font-headline text-title-lg text-light-on-surface uppercase"}, f"Semester {sem_num_val} Record"),
                         html.p({"class_name": "font-mono text-mono-sm text-light-on-surface-variant uppercase"}, f"{len(courses)} Courses • {s.get('credits_earned', 0)} Credits Cleared")
                     ),
-                    html.span(
-                        {"class_name": "px-3 py-1.5 rounded-full bg-light-secondary text-light-on-secondary font-mono text-mono-md tabular-nums whitespace-nowrap font-bold"},
-                        f"SGPA: {s.get('sgpa', 0.0):.2f}"
+                    html.div(
+                        {"class_name": "flex items-center gap-3 flex-wrap"},
+                        html.span(
+                            {"class_name": "px-3 py-1.5 rounded-full bg-light-secondary text-light-on-secondary font-mono text-mono-md tabular-nums whitespace-nowrap font-bold"},
+                            f"SGPA: {s.get('sgpa', 0.0):.2f}"
+                        ),
+                        html.button(
+                            {
+                                "type": "button",
+                                "title": f"Delete Semester {sem_num_val} and all its course records",
+                                "data-demo": f"delete-sem-{sem_num_val}-btn",
+                                "on_click": (lambda cur_sn=sem_num_val: lambda e: handle_delete_semester(cur_sn))(),
+                                "class_name": "inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-600/10 hover:bg-red-600 text-red-600 hover:text-white border border-red-500/40 rounded font-mono text-mono-xs uppercase font-bold transition-colors cursor-pointer shadow-sm"
+                            },
+                            html.span({"class_name": "material-symbols-outlined text-[16px]"}, "delete_forever"),
+                            html.span(f"Delete Sem {sem_num_val}")
+                        )
                     )
                 ),
                 html.div(
@@ -395,6 +427,18 @@ def ResultsPage(user):
                     html.span("Export Official PDF")
                 )
             )
+        ),
+
+        # Feedback Banners (Global for Actions / Deletions)
+        html.div(
+            {"class_name": f"{'flex items-center gap-2' if form_status and not show_form else 'hidden'} p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-500 text-emerald-700 dark:text-emerald-300 font-mono text-mono-sm font-semibold"},
+            html.span({"class_name": "material-symbols-outlined text-[18px]"}, "check_circle"),
+            form_status
+        ),
+        html.div(
+            {"class_name": f"{'flex items-center gap-2' if form_error and not show_form else 'hidden'} p-3 bg-red-50 dark:bg-red-950/40 border border-light-error text-light-error font-mono text-mono-sm font-semibold"},
+            html.span({"class_name": "material-symbols-outlined text-[18px]"}, "warning"),
+            form_error
         ),
 
         # Add / Edit Result Interactive Form Section

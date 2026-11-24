@@ -9,7 +9,7 @@ from ui.services.data_service import update_user_profile, change_user_password
 
 
 @component
-def ProfilePage(user):
+def ProfilePage(user, set_user=None):
     profile = getattr(user, 'profile', None)
 
     # State for edit mode toggle
@@ -18,6 +18,7 @@ def ProfilePage(user):
     # State for editable fields
     first_name, set_first_name = use_state(user.first_name if user else "")
     last_name, set_last_name = use_state(user.last_name if user else "")
+    roll_number, set_roll_number = use_state(getattr(profile, 'roll_number', user.username if user else "") or "")
     email, set_email = use_state(user.email if user else "")
     target_cgpa, set_target_cgpa = use_state(str(profile.target_cgpa) if profile else "8.80")
     department, set_department = use_state(profile.department if profile else "Computer Science & Business Systems")
@@ -56,17 +57,25 @@ def ProfilePage(user):
             email=email,
             target_cgpa=target_cgpa,
             department=department,
-            institution_name=institution_name
+            institution_name=institution_name,
+            roll_number=roll_number
         )
         if ok:
             set_save_status(msg)
             set_is_editing(False)
+            if user:
+                user.refresh_from_db()
+                if hasattr(user, 'profile'):
+                    user.profile.refresh_from_db()
+                if set_user:
+                    set_user(user)
         else:
             set_save_error(msg)
 
     def handle_cancel_edit(e=None):
         set_first_name(user.first_name if user else "")
         set_last_name(user.last_name if user else "")
+        set_roll_number(getattr(profile, 'roll_number', user.username if user else "") or "")
         set_email(user.email if user else "")
         set_target_cgpa(str(profile.target_cgpa) if profile else "8.80")
         set_department(profile.department if profile else "Computer Science & Business Systems")
@@ -143,7 +152,7 @@ def ProfilePage(user):
                 html.div(
                     {"className": "flex flex-col items-center gap-1"},
                     html.h2({"className": "font-headline text-headline-md text-light-on-surface uppercase font-bold"}, f"{first_name} {last_name}".strip() or (user.username if user else "STUDENT")),
-                    html.p({"className": "font-mono text-mono-sm text-light-primary font-bold tracking-wider"}, getattr(profile, 'roll_number', user.username if user else "2026")),
+                    html.p({"className": "font-mono text-mono-sm text-light-primary font-bold tracking-wider"}, roll_number or getattr(profile, 'roll_number', user.username if user else "2026")),
                     html.span({"className": "mt-2 inline-block px-3 py-1 bg-light-surface-container-highest text-light-on-surface font-mono text-mono-sm font-semibold border border-light-outline-variant"}, f"{department} • STUDENT"),
                     html.p(
                         {"className": "mt-2 text-center font-body text-body-xs font-semibold text-light-on-surface flex items-center justify-center gap-1.5 max-w-[240px]"},
@@ -282,7 +291,7 @@ def ProfilePage(user):
                         html.div(
                             {"className": "flex flex-col gap-1 p-3 bg-light-surface-container-low border border-light-outline-variant"},
                             html.span({"className": "font-mono text-mono-xs font-bold text-light-on-surface-variant uppercase"}, "Roll Number / ID"),
-                            html.p({"className": "font-mono text-mono-md font-bold text-light-primary"}, getattr(profile, 'roll_number', user.username if user else "—"))
+                            html.p({"className": "font-mono text-mono-md font-bold text-light-primary"}, roll_number or getattr(profile, 'roll_number', user.username if user else "—"))
                         ),
                         html.div(
                             {"className": "flex flex-col gap-1 p-3 bg-light-surface-container-low border border-light-outline-variant"},
@@ -342,6 +351,22 @@ def ProfilePage(user):
                         {"className": "grid grid-cols-1 sm:grid-cols-2 gap-gutter-md"},
                         html.div(
                             {"className": "flex flex-col gap-1"},
+                            html.label({"className": "font-mono text-mono-sm font-bold text-light-on-surface uppercase"}, "Roll Number / Student ID"),
+                            html.input(
+                                {
+                                    "data-demo": "profile-roll-number",
+                                    "id": "profile-roll-number",
+                                    "type": "text",
+                                    "value": roll_number,
+                                    "on_change": lambda e: set_roll_number(e.get("target", {}).get("value", "")),
+                                    "className": input_class,
+                                    "style": input_style,
+                                    "placeholder": "e.g. 717622CS101"
+                                }
+                            )
+                        ),
+                        html.div(
+                            {"className": "flex flex-col gap-1"},
                             html.label({"className": "font-mono text-mono-sm font-bold text-light-on-surface uppercase"}, "Email Address"),
                             html.input(
                                 {
@@ -351,6 +376,23 @@ def ProfilePage(user):
                                     "className": input_class,
                                     "style": input_style,
                                     "placeholder": "student@institution.edu"
+                                }
+                            )
+                        )
+                    ),
+                    html.div(
+                        {"className": "grid grid-cols-1 sm:grid-cols-2 gap-gutter-md"},
+                        html.div(
+                            {"className": "flex flex-col gap-1"},
+                            html.label({"className": "font-mono text-mono-sm font-bold text-light-on-surface uppercase"}, "Academic Department"),
+                            html.input(
+                                {
+                                    "type": "text",
+                                    "value": department,
+                                    "on_change": lambda e: set_department(e.get("target", {}).get("value", "")),
+                                    "className": input_class,
+                                    "style": input_style,
+                                    "placeholder": "e.g. Computer Science & Engineering"
                                 }
                             )
                         ),
@@ -375,21 +417,7 @@ def ProfilePage(user):
                         )
                     ),
                     html.div(
-                        {"className": "grid grid-cols-1 sm:grid-cols-2 gap-gutter-md"},
-                        html.div(
-                            {"className": "flex flex-col gap-1"},
-                            html.label({"className": "font-mono text-mono-sm font-bold text-light-on-surface uppercase"}, "Academic Department"),
-                            html.input(
-                                {
-                                    "type": "text",
-                                    "value": department,
-                                    "on_change": lambda e: set_department(e.get("target", {}).get("value", "")),
-                                    "className": input_class,
-                                    "style": input_style,
-                                    "placeholder": "e.g. Computer Science & Engineering"
-                                }
-                            )
-                        ),
+                        {"className": "grid grid-cols-1 gap-gutter-md"},
                         html.div(
                             {"className": "flex flex-col gap-1"},
                             html.label({"className": "font-mono text-mono-sm font-bold text-light-on-surface uppercase"}, "Institution / University"),

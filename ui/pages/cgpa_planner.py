@@ -86,9 +86,20 @@ def CgpaPlanner(user):
     else:
         diff_pct = 100 if status == 'impossible' else 0
 
+    def persist_target(new_val):
+        set_target_cgpa(new_val)
+        if profile and new_val:
+            try:
+                tg = float(new_val)
+                if 0.0 <= tg <= 10.0:
+                    profile.target_cgpa = tg
+                    profile.save(update_fields=['target_cgpa'])
+            except (ValueError, TypeError):
+                pass
+
     def handle_target_change(e):
         val = e.get("target", {}).get("value", "")
-        set_target_cgpa(val)
+        persist_target(val)
 
     # Scenarios table rows
     scenario_rows = []
@@ -274,7 +285,7 @@ def CgpaPlanner(user):
                                     "key": f"{q_val:.1f}",
                                     "data-demo": f"planner-preset-{int(q_val*10)}",
                                     "type": "button",
-                                    "on_click": lambda e, v=q_val: set_target_cgpa(v),
+                                    "on_click": lambda e, v=q_val: persist_target(v),
                                     "class_name": f"px-2.5 py-1 font-mono text-mono-sm border border-light-outline-variant hover:bg-light-surface-container-low transition-colors duration-state-change cursor-pointer {'bg-light-secondary text-light-on-secondary font-bold' if abs(target_f - q_val) < 0.05 else 'bg-light-surface-container-lowest text-light-on-surface'}"
                                 },
                                 f"{q_val:.2f}"

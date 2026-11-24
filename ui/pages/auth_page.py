@@ -382,12 +382,21 @@ def SignupPage(set_page, set_user, theme='dark', toggle_theme=None):
                 department=department.strip(),
                 roll_number=roll_number.strip()
             )
-            if isinstance(reg_res, tuple):
-                user, reg_err = reg_res
+            # Defensively handle both (user, err) and legacy (bool, payload)
+            if isinstance(reg_res, tuple) and len(reg_res) == 2:
+                first, second = reg_res
+                if hasattr(first, 'username') and hasattr(first, 'id'):
+                    user, reg_err = first, second
+                elif hasattr(second, 'username') and hasattr(second, 'id'):
+                    user, reg_err = second, None
+                elif first is False or first is None:
+                    user, reg_err = None, (second if isinstance(second, str) else "Registration failed.")
+                else:
+                    user, reg_err = first, second
             else:
-                user, reg_err = reg_res, None
+                user, reg_err = (reg_res if hasattr(reg_res, 'username') else None), None
 
-            if user:
+            if user and hasattr(user, 'username'):
                 set_user(user)
                 set_page("dashboard")
             else:
