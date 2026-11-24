@@ -132,11 +132,11 @@ def AiAdvisorPage(user):
             {"class_name": "flex flex-wrap items-center justify-between gap-gutter-md pb-gutter-md border-b border-light-outline-variant"},
             html.div(
                 html.h1({"class_name": "font-headline text-headline-md text-light-on-surface uppercase tracking-tight"}, "AI Academic Advisor"),
-                html.p({"class_name": "font-mono text-mono-sm text-light-on-surface-variant uppercase"}, "Grounded Bilingual Academic Guidance • English & தமிழ்")
+                html.p({"class_name": "font-mono text-mono-sm text-light-on-surface-variant uppercase"}, "Grounded Academic Guidance & Mentor • English")
             ),
             html.div(
                 {"class_name": "flex items-center gap-gutter-sm"},
-                html.span({"class_name": "px-3 py-1.5 rounded-full bg-light-primary-container text-light-on-primary-container font-mono text-mono-sm uppercase whitespace-nowrap font-bold"}, "EN / தமிழ் Active")
+                html.span({"class_name": "px-3 py-1.5 rounded-full bg-light-primary-container text-light-on-primary-container font-mono text-mono-sm uppercase whitespace-nowrap font-bold"}, "English AI Active")
             )
         ),
 
@@ -205,33 +205,9 @@ def AiAdvisorPage(user):
                         ]
                     ),
 
-                    # Input form with Tamil/English Voice Mode
+                    # Input form with English Voice Mode
                     html.div(
                         {"class_name": "flex items-center gap-2 mb-1 flex-wrap"},
-                        html.div(
-                            {"class_name": "flex items-center gap-1 border border-light-outline-variant rounded-radius-sm p-0.5 bg-light-surface-container-low"},
-                            html.button(
-                                {
-                                    "type": "button",
-                                    "data-voice-lang": "ta-IN",
-                                    "aria-label": "Set Tamil Language",
-                                    "on_click": lambda e: None,
-                                    "class_name": "px-2 py-0.5 font-mono text-[11px] font-bold text-light-on-surface hover:text-light-primary cursor-pointer"
-                                },
-                                "தமிழ்"
-                            ),
-                            html.span({"class_name": "text-light-outline-variant"}, "|"),
-                            html.button(
-                                {
-                                    "type": "button",
-                                    "data-voice-lang": "en-IN",
-                                    "aria-label": "Set English Language",
-                                    "on_click": lambda e: None,
-                                    "class_name": "px-2 py-0.5 font-mono text-[11px] font-bold text-light-on-surface hover:text-light-primary cursor-pointer"
-                                },
-                                "English"
-                            )
-                        ),
                         html.button(
                             {
                                 "id": "voice-mic-btn",
@@ -257,7 +233,7 @@ def AiAdvisorPage(user):
                         ),
                         html.span(
                             {"id": "voice-lang-label", "class_name": "text-[10px] font-mono text-light-on-surface-variant ml-auto"},
-                            "தமிழ் (ta-IN)"
+                            "English (en-IN)"
                         )
                     ),
                     html.div(
@@ -267,7 +243,7 @@ def AiAdvisorPage(user):
                                 "id": "ai-advisor-input",
                                 "data-demo": "advisor-chat-input",
                                 "type": "text",
-                                "placeholder": "Ask about CGPA targets, weak subjects, or placement prep (EN / தமிழ்)...",
+                                "placeholder": "Ask about CGPA targets, weak subjects, or placement prep...",
                                 "value": input_text,
                                 "on_change": lambda e: set_input_text(e.get("target", {}).get("value", "")),
                                 "on_key_down": lambda e: handle_send(input_text) if e.get("key") == "Enter" else None,

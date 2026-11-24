@@ -107,7 +107,7 @@ def EduGradeApp():
     elif current_page in ["advisor", "ai_advisor", "ai-advisor"]:
         page_content = AiAdvisorPage(user=current_user)
     elif current_page in ["regulations", "syllabus"]:
-        page_content = RegulationsPage()
+        page_content = RegulationsPage(user=current_user)
     elif current_page == "profile":
         page_content = ProfilePage(user=current_user, set_user=set_current_user)
     else:

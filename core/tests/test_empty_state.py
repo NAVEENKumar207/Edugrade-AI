@@ -87,13 +87,6 @@ class EmptyStateEndpointTests(TestCase):
         self.assertIn('not been published yet', data['reply'])
         self.assertEqual(data['source'], 'rule_based')
 
-    def test_advisor_chat_empty_state_tamil(self):
-        self.client.force_authenticate(user=self.student_user)
-        response = self.client.post('/api/advisor/chat/', {'message': 'எனது CGPA என்ன?'})
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        data = response.json()
-        self.assertIn('வெளியிடப்படவில்லை', data['reply'])
-
     def test_pdf_transcript_empty_state(self):
         self.client.force_authenticate(user=self.student_user)
         response = self.client.get('/api/transcript/pdf/')

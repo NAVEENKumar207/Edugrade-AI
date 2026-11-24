@@ -10,6 +10,7 @@ class UserProfile(models.Model):
     roll_number = models.CharField(max_length=50, blank=True, null=True)
     institution_name = models.CharField(max_length=200, default='K.S. Rangasamy College of Technology (Autonomous)', blank=True)
     department = models.CharField(max_length=100, default='Computer Science & Business Systems')
+    syllabus_regulation = models.CharField(max_length=100, default='Regulation 2021 (R2021 CBCS)', blank=True)
     current_semester = models.IntegerField(default=5, blank=True, null=True)
     target_cgpa = models.DecimalField(max_digits=4, decimal_places=2, default=9.00)
     current_cgpa = models.DecimalField(max_digits=4, decimal_places=2, default=8.42)

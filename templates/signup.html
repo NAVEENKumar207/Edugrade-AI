@@ -111,7 +111,16 @@
 
                 <!-- Student specific fields -->
                 <div>
-                    <label>Roll Number / Reg Number</label>
+                    <label>Academic Syllabus / Regulation</label>
+                    <select name="syllabus_regulation" id="signup-syllabus" required>
+                        <option value="Regulation 2021 (R2021 CBCS)" selected>Regulation 2021 (R2021 CBCS - Anna University)</option>
+                        <option value="Regulation 2022 (R2022 Autonomous CBCS)">Regulation 2022 (R2022 Autonomous CBCS - CSBS)</option>
+                        <option value="Regulation 2024 (R2024 AICTE CBCS)">Regulation 2024 (R2024 AICTE CBCS)</option>
+                        <option value="Regulation 2017 (R2017 CBCS)">Regulation 2017 (R2017 CBCS - Anna University)</option>
+                        <option value="Autonomous / Custom College Syllabus">Autonomous / Custom College Syllabus</option>
+                    </select>
+
+                    <label style="margin-top: 8px;">Roll Number / Reg Number</label>
                     <input
                         type="text"
                         name="roll_number"

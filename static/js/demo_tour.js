@@ -814,8 +814,8 @@
 
         // STEP 13: Grounded AI Academic Advisor
         {
-            title: "Grounded AI Academic Advisor (English & தமிழ்)",
-            description: "Transcript-grounded LLM advice synthesized through Groq/OpenAI with fallback rule engines and bilingual voice accessibility.",
+            title: "Grounded AI Academic Advisor",
+            description: "Transcript-grounded LLM advice synthesized through Groq Cloud Llama 3.3 with deterministic academic intelligence fallback and voice accessibility.",
             actions: async () => {
                 await navigateTo('advisor');
                 await waitForElement('[data-demo="advisor-chat-input"]', 5000);

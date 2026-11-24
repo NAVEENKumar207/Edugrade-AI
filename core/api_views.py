@@ -53,7 +53,9 @@ def api_me(request):
         },
         'profile': {
             'roll_number': profile.roll_number,
+            'institution_name': profile.institution_name,
             'department': profile.department,
+            'syllabus_regulation': getattr(profile, 'syllabus_regulation', 'Regulation 2021 (R2021 CBCS)'),
             'current_semester': profile.current_semester,
             'current_cgpa': float(profile.current_cgpa),
             'target_cgpa': float(profile.target_cgpa),
@@ -110,6 +112,8 @@ def api_signup(request):
     confirm_password = data.get('confirm_password', '')
     fullname = data.get('fullname', '').strip()
     department = data.get('department', 'Computer Science & Engineering')
+    institution_name = data.get('institution_name', 'Anna University / Affiliated Institution').strip() or 'Anna University / Affiliated Institution'
+    syllabus_regulation = data.get('syllabus_regulation', data.get('syllabus', 'Regulation 2021 (R2021 CBCS)')).strip() or 'Regulation 2021 (R2021 CBCS)'
     roll_number = data.get('roll_number', '').strip()
     semester = data.get('semester', 1)
 
@@ -139,7 +143,9 @@ def api_signup(request):
         profile = UserProfile.objects.create(
             user=user,
             roll_number=roll_number or ('7176' + username),
+            institution_name=institution_name,
             department=department,
+            syllabus_regulation=syllabus_regulation,
             current_semester=int(semester) if str(semester).isdigit() else 1,
             current_cgpa=0.00,
             target_cgpa=8.50,

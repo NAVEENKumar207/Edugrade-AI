@@ -58,6 +58,7 @@ def signup_view(request):
         username = request.POST.get('username', '').strip()
         institution_name = request.POST.get('institution_name', 'K.S. Rangasamy College of Technology (Autonomous)').strip()
         department = request.POST.get('department', 'Computer Science & Business Systems')
+        syllabus_regulation = request.POST.get('syllabus_regulation', request.POST.get('syllabus', 'Regulation 2021 (R2021 CBCS)')).strip() or 'Regulation 2021 (R2021 CBCS)'
         password = request.POST.get('password', '')
         confirm_password = request.POST.get('confirm_password', '')
         roll_number = request.POST.get('roll_number', '').strip()
@@ -92,6 +93,7 @@ def signup_view(request):
             roll_number=roll_number or ('7176' + username),
             institution_name=institution_name or 'Anna University / Affiliated Institution',
             department=department,
+            syllabus_regulation=syllabus_regulation,
             current_semester=int(semester) if semester.isdigit() else 1
         )
 

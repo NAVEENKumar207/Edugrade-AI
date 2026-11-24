@@ -2,8 +2,8 @@
 AI Academic Advisor Service for EduGrade AI.
 Provides intelligent academic recommendations, customized study plans,
 and CGPA improvement guidance using student's actual performance data.
-Supports Groq Cloud (primary LLM), OpenAI (secondary fallback), and a
-built-in deterministic academic intelligence fallback (English & Tamil).
+Supports Groq Cloud (primary LLM) and a built-in deterministic academic
+intelligence fallback (English).
 """
 
 import os
@@ -18,8 +18,8 @@ logger = logging.getLogger(__name__)
 
 def call_chat_completion(base_url: str, api_key: str, model: str, messages: list, timeout: int = 15) -> str:
     """
-    Executes an OpenAI-compatible chat completion HTTP request via urllib.
-    Used for both Groq Cloud and OpenAI providers without external SDK dependencies.
+    Executes a chat completion HTTP request via urllib.
+    Used for Groq Cloud provider without external SDK dependencies.
     """
     payload = json.dumps({
         "model": model,
@@ -56,14 +56,10 @@ def generate_ai_advice(student_profile, user_message: str) -> dict:
     Generates academic guidance grounded in student records.
     Provider Order:
       1. Groq Cloud (if GROQ_API_KEY is set)
-      2. OpenAI (if OPENAI_API_KEY is set)
-      3. Built-in deterministic academic advisor (fallback)
+      2. Built-in deterministic academic advisor (fallback)
     """
     msg_clean = user_message.strip()
     msg_lower = msg_clean.lower()
-
-    # Detect Tamil query
-    is_tamil = any('\u0b80' <= char <= '\u0bff' for char in msg_clean) or 'tamil' in msg_lower
 
     # Check if student has published results
     has_results = False
@@ -119,7 +115,7 @@ def generate_ai_advice(student_profile, user_message: str) -> dict:
             top_next_move_sentence = ""
 
     # Build student academic context block for AI advisor prompt.
-    # Data privacy: personal fields (name, roll number, email, username) are not sent to Groq/OpenAI.
+    # Data privacy: personal fields (name, roll number, email, username) are not sent to external LLMs.
     # Note: the student's own chat text is sent as typed.
     if has_results:
         student_data_text = (
@@ -140,14 +136,12 @@ def generate_ai_advice(student_profile, user_message: str) -> dict:
             f"Academic Performance: No results available yet."
         )
 
-    # Build system instructions
-    lang_instruction = "Reply in Tamil if the student's latest message is in Tamil (Unicode range U+0B80-U+0BFF) or asks for Tamil, otherwise reply in English."
+    # Build system instructions (English-only)
     system_instruction = (
         "You are a friendly academic advisor for an engineering college student. "
         "Use ONLY the student data given below. Never invent marks, credits, rules, company criteria or policies. "
         "Do not recalculate CGPA/SGPA (use the given values). "
-        "Answer in simple language in under 200 words with clear steps. "
-        f"{lang_instruction}\n"
+        "Answer in clear, simple English in under 200 words with structured steps. "
         "If the student asks for a study plan for their weakest subject, provide a 4-week structured plan "
         "(Week 1: Fundamentals, Week 2: Core Concepts, Week 3: Practice, Week 4: Mock Tests & Revision) "
         "tailored to that course.\n\n"
@@ -193,84 +187,39 @@ def generate_ai_advice(student_profile, user_message: str) -> dict:
         except Exception as err:
             logger.warning(f"Groq API call failed: {type(err).__name__}")
 
-    # Provider 2: OpenAI (optional secondary)
-    openai_key = os.getenv('OPENAI_API_KEY', '').strip()
-    if openai_key:
-        try:
-            content = call_chat_completion(
-                base_url="https://api.openai.com/v1/chat/completions",
-                api_key=openai_key,
-                model="gpt-4o-mini",
-                messages=llm_messages,
-                timeout=groq_timeout
-            )
-            return {'response': content, 'source': 'openai', 'context_used': True}
-        except urllib.error.HTTPError as err:
-            logger.warning(f"OpenAI API call failed: HTTP {err.code} {err.reason}")
-        except urllib.error.URLError as err:
-            reason_name = type(err.reason).__name__ if hasattr(err, 'reason') else type(err).__name__
-            logger.warning(f"OpenAI API call failed: Connection error {reason_name}")
-        except Exception as err:
-            logger.warning(f"OpenAI API call failed: {type(err).__name__}")
-
-    # Provider 3: Built-in deterministic academic advisor fallback
+    # Provider 2: Built-in deterministic academic advisor fallback (English)
     # If no results published yet:
     if not has_results:
-        if is_tamil:
-            reply = (
-                "வணக்கம்! உங்கள் தேர்வு முடிவுகள் இன்னும் வெளியிடப்படவில்லை. "
-                "முடிவுகள் வெளியிடப்பட்டவுடன் உங்கள் CGPA மற்றும் பாடவாரியான ஆலோசனை வழங்கப்படும்."
-            )
-        else:
-            reply = (
-                "Hello! Your semester examination results have not been published yet. "
-                "Once results are published, personalized CGPA planning and academic guidance will be available here."
-            )
-        return {'response': reply, 'source': 'rule_based', 'context_used': False, 'language': 'ta' if is_tamil else 'en'}
+        reply = (
+            "Hello! Your semester examination results have not been published yet. "
+            "Once results are published, personalized CGPA planning and academic guidance will be available here."
+        )
+        return {'response': reply, 'source': 'rule_based', 'context_used': False, 'language': 'en'}
 
     # Weakest Subject Study Plan Request Handling
     weakest_name = weak_subjects[0] if weak_subjects else (weakest_courses[0] if weakest_courses else "Core Engineering Fundamentals")
     is_weak_plan_request = (
         'weakest' in msg_lower
         or 'weak subject' in msg_lower
-        or 'பலவீனமான' in msg_clean
         or ('study plan' in msg_lower and ('weak' in msg_lower or 'subject' in msg_lower or 'lowest' in msg_lower))
-        or 'படிப்புத் திட்டம்' in msg_clean
     )
     if is_weak_plan_request:
-        if is_tamil:
-            plan_text = (
-                f"### {weakest_name} பாடத்திற்கான 4 வார சிறப்பு படிப்புத் திட்டம்\n\n"
-                f"**வாரம் 1 — அடிப்படை கோட்பாடுகள் மற்றும் அறிமுகம்**\n"
-                f"• அலகு 1 மற்றும் 2-ன் முக்கிய கோட்பாடுகள், அடிப்படை வரையறைகள் மற்றும் சூத்திரங்களை ஆழமாக படிக்கவும்.\n"
-                f"• தினமும் 90 நிமிடங்கள் ஒதுக்கி முக்கிய குறிப்புகளை (Short Notes) எழுதி பழகவும்.\n\n"
-                f"**வாரம் 2 — பகுப்பாய்வு மற்றும் சிக்கல் தீர்க்கும் பயிற்சி**\n"
-                f"• அலகு 3 மற்றும் 4-ல் உள்ள கணக்குகள், வரைபடங்கள் மற்றும் அல்காரிதம்களை வரைந்து பயிற்சி பெறவும்.\n"
-                f"• முந்தைய அசைன்மென்ட் வினாக்களை சுயமாக தீர்க்க முயற்சி செய்யவும்.\n\n"
-                f"**வாரம் 3 — முந்தைய ஆண்டு தேர்வு வினாத்தாள்கள் பயிற்சி**\n"
-                f"• கடந்த 5 ஆண்டுகால பல்கலைக்கழக வினாத்தாள்களை ஆராய்ந்து, அடிக்கடி கேட்கப்படும் 13 மற்றும் 16 மதிப்பெண் வினாக்களை பயிற்சி செய்யவும்.\n"
-                f"• நேரக் கட்டுப்பாட்டுடன் மாதிரி வினாக்களுக்கு விடையளித்துப் பழகவும்.\n\n"
-                f"**வாரம் 4 — இறுதி திருப்புதல் மற்றும் மாதிரித் தேர்வுகள்**\n"
-                f"• அனைத்து 5 அலகுகளையும் முழுமையாக திருப்புதல் (Revision) செய்து மாதிரித் தேர்வுகள் எழுதவும்.\n"
-                f"• சூத்திரங்கள் மற்றும் வரைபடங்களை நினைவுகூர்ந்து தேர்வுக்கு முழுமையாக தயாராகுங்கள்."
-            )
-        else:
-            plan_text = (
-                f"### 4-Week Targeted Study Plan for {weakest_name}\n\n"
-                f"**Week 1 — Core Fundamentals & Foundation Review**\n"
-                f"• Review syllabus Units 1 & 2; master fundamental definitions and core concepts.\n"
-                f"• Dedicate 90 minutes daily to reading standard textbook chapters and making formula flashcards.\n\n"
-                f"**Week 2 — Analytical Problem Solving & Assignments**\n"
-                f"• Focus on Units 3 & 4 with emphasis on derivations, numerical problems, and architectural diagrams.\n"
-                f"• Solve end-of-chapter practice problems and write out step-by-step algorithms.\n\n"
-                f"**Week 3 — Past University Papers & Exam Simulation**\n"
-                f"• Work through 5 previous years' university examination papers; prioritize high-weightage 13-mark questions.\n"
-                f"• Practice writing answers under timed exam conditions (45 minutes per section).\n\n"
-                f"**Week 4 — Final Revision & Rapid Recall Drills**\n"
-                f"• Conduct 2 complete mock tests covering all 5 syllabus units; identify remaining weak spots.\n"
-                f"• Review formula cheat sheets and key diagrams for confident exam execution."
-            )
-        return {'response': plan_text, 'source': 'rule_based', 'context_used': True, 'language': 'ta' if is_tamil else 'en'}
+        plan_text = (
+            f"### 4-Week Targeted Study Plan for {weakest_name}\n\n"
+            f"**Week 1 — Core Fundamentals & Foundation Review**\n"
+            f"• Review syllabus Units 1 & 2; master fundamental definitions and core concepts.\n"
+            f"• Dedicate 90 minutes daily to reading standard textbook chapters and making formula flashcards.\n\n"
+            f"**Week 2 — Analytical Problem Solving & Assignments**\n"
+            f"• Focus on Units 3 & 4 with emphasis on derivations, numerical problems, and architectural diagrams.\n"
+            f"• Solve end-of-chapter practice problems and write out step-by-step algorithms.\n\n"
+            f"**Week 3 — Past University Papers & Exam Simulation**\n"
+            f"• Work through 5 previous years' university examination papers; prioritize high-weightage 13-mark questions.\n"
+            f"• Practice writing answers under timed exam conditions (45 minutes per section).\n\n"
+            f"**Week 4 — Final Revision & Rapid Recall Drills**\n"
+            f"• Conduct 2 complete mock tests covering all 5 syllabus units; identify remaining weak spots.\n"
+            f"• Review formula cheat sheets and key diagrams for confident exam execution."
+        )
+        return {'response': plan_text, 'source': 'rule_based', 'context_used': True, 'language': 'en'}
 
     # Calculate real target plan
     plan = plan_target_cgpa(
@@ -281,26 +230,6 @@ def generate_ai_advice(student_profile, user_message: str) -> dict:
     )
 
     weak_msg = f" Specifically focus on {', '.join(weak_subjects)} where your grade points were lower." if weak_subjects else (f" Specifically focus on {weakest_courses[0]}." if weakest_courses else "")
-
-    if is_tamil:
-        if 'cgpa' in msg_lower or 'mark' in msg_lower or 'மதிப்பெண்' in msg_lower:
-            next_line = f" அடுத்த சிறந்த நடவடிக்கை: {top_next_move_sentence}" if top_next_move_sentence else ""
-            reply = (
-                f"வணக்கம்! உங்கள் தற்போதைய CGPA {cgpa:.2f} ஆகும். இலக்கு CGPA {target_cgpa:.2f} அடைய "
-                f"{plan['message']} அடுத்த செமஸ்டர்களில் கடின உழைப்புடன் படியுங்கள்.{weak_msg}{next_line}"
-            )
-        elif 'placement' in msg_lower or 'வேலை' in msg_lower:
-            reply = (
-                f"கேம்பஸ் வேலைவாய்ப்பு (Placement): உங்கள் தற்போதைய CGPA {cgpa:.2f}. "
-                f"{'அரியர்ஸ் இல்லாததால் நீங்கள் பெரும்பாலான முன்னணி நிறுவனங்களுக்கு தகுதி பெற்றுள்ளீர்கள்!' if backlogs == 0 else f'தற்போது {backlogs} அரியர் உள்ளது, உடனடியாக கிளியர் செய்யவும்.'} "
-                f"LeetCode, DSA மற்றும் பைதான்/SQL பயிற்சிகளில் கவனம் செலுத்துங்கள்."
-            )
-        else:
-            reply = (
-                "வணக்கம்! நான் உங்கள் EduGrade AI கல்வி ஆலோசகர். உங்கள் கல்வி முன்னேற்றம், CGPA திட்டமிடல் "
-                "மற்றும் வேலைவாய்ப்பு தகுதிகளுக்கு உதவ நான் தயாராக உள்ளேன். எதைப் பற்றி அறிய விரும்புகிறீர்கள்?"
-            )
-        return {'response': reply, 'source': 'rule_based', 'language': 'ta', 'context_used': True}
 
     # English Responses
     if 'plan' in msg_lower or 'study' in msg_lower or 'schedule' in msg_lower:

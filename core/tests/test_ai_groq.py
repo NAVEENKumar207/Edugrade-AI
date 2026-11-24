@@ -195,26 +195,11 @@ class GroqAdvisorIntegrationTests(TestCase):
         self.assertEqual(result['source'], 'rule_based')
 
     @patch('urllib.request.urlopen')
-    @patch.dict(os.environ, {'GROQ_API_KEY': '', 'OPENAI_API_KEY': ''})
+    @patch.dict(os.environ, {'GROQ_API_KEY': ''})
     def test_no_keys_configured_makes_zero_http_calls(self, mock_urlopen):
         result = generate_ai_advice(self.profile, "Hello")
         self.assertEqual(result['source'], 'rule_based')
         mock_urlopen.assert_not_called()
-
-    @patch('urllib.request.urlopen')
-    @patch.dict(os.environ, {'GROQ_API_KEY': 'gsk_mock_test_key_12345'})
-    def test_tamil_message_system_instruction(self, mock_urlopen):
-        mock_response = MagicMock()
-        mock_response.read.return_value = json.dumps({
-            "choices": [{"message": {"content": "வணக்கம்! உங்கள் CGPA நன்று."}}]
-        }).encode('utf-8')
-        mock_urlopen.return_value.__enter__.return_value = mock_response
-
-        generate_ai_advice(self.profile, "எனது CGPA எப்படி உள்ளது?")
-        req = mock_urlopen.call_args[0][0]
-        payload = json.loads(req.data.decode('utf-8'))
-        system_content = payload['messages'][0]['content']
-        self.assertIn("Tamil", system_content)
 
     @patch('urllib.request.urlopen')
     @patch.dict(os.environ, {'GROQ_API_KEY': 'gsk_mock_super_secret_key_999'})

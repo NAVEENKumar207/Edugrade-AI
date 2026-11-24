@@ -334,6 +334,8 @@ def SignupPage(set_page, set_user, theme='dark', toggle_theme=None):
     username, set_username = use_state("")
     institution_name, set_institution_name = use_state("K.S. Rangasamy College of Technology (Autonomous)")
     department, set_department = use_state("Computer Science and Business Systems")
+    syllabus_regulation, set_syllabus_regulation = use_state("Regulation 2021 (R2021 CBCS)")
+    semester, set_semester = use_state("1")
     roll_number, set_roll_number = use_state("")
     password, set_password = use_state("")
     confirm_password, set_confirm_password = use_state("")
@@ -380,7 +382,9 @@ def SignupPage(set_page, set_user, theme='dark', toggle_theme=None):
                 fullname=fullname.strip(),
                 institution_name=institution_name.strip(),
                 department=department.strip(),
-                roll_number=roll_number.strip()
+                roll_number=roll_number.strip(),
+                syllabus_regulation=syllabus_regulation.strip(),
+                semester=int(semester) if str(semester).isdigit() else 1
             )
             # Defensively handle both (user, err) and legacy (bool, payload)
             if isinstance(reg_res, tuple) and len(reg_res) == 2:
@@ -592,7 +596,7 @@ def SignupPage(set_page, set_user, theme='dark', toggle_theme=None):
                     # Department
                     html.div(
                         {"className": "flex flex-col gap-1.5"},
-                        html.label({"className": "font-mono text-mono-sm uppercase text-light-on-surface-variant font-medium"}, "Department"),
+                        html.label({"className": "font-mono text-mono-sm uppercase text-light-on-surface-variant font-medium"}, "Academic Department"),
                         html.input({
                             "id": "signup-dept",
                             "data-demo": "signup-dept",
@@ -603,6 +607,52 @@ def SignupPage(set_page, set_user, theme='dark', toggle_theme=None):
                             "placeholder": "e.g. Computer Science and Engineering",
                             "on_change": lambda e: set_department(e.get("target", {}).get("value", "") if isinstance(e, dict) else str(e))
                         })
+                    ),
+                    # Academic Syllabus / Regulation & Semester in 2 cols
+                    html.div(
+                        {"className": "grid grid-cols-1 sm:grid-cols-2 gap-4"},
+                        html.div(
+                            {"className": "flex flex-col gap-1.5"},
+                            html.label(
+                                {"className": "font-mono text-mono-sm uppercase text-light-on-surface-variant font-medium flex items-center justify-between"},
+                                html.span("Academic Syllabus / Regulation"),
+                                html.span({"className": "text-[11px] opacity-75"}, "REQUIRED")
+                            ),
+                            html.select(
+                                {
+                                    "id": "signup-syllabus",
+                                    "data-demo": "signup-syllabus",
+                                    "value": syllabus_regulation,
+                                    "className": "w-full px-3 py-2.5 bg-light-surface border border-light-outline-variant focus:border-light-primary focus:ring-0 font-mono text-mono-sm text-light-on-surface outline-none transition-colors cursor-pointer",
+                                    "style": {"backgroundColor": "var(--bg-input)", "color": "var(--text-primary)"},
+                                    "on_change": lambda e: set_syllabus_regulation(e.get("target", {}).get("value", "") if isinstance(e, dict) else str(e))
+                                },
+                                [
+                                    html.option({"value": "Regulation 2021 (R2021 CBCS)"}, "Regulation 2021 (R2021 CBCS - Anna University)"),
+                                    html.option({"value": "Regulation 2022 (R2022 Autonomous CBCS)"}, "Regulation 2022 (R2022 Autonomous CBCS - CSBS)"),
+                                    html.option({"value": "Regulation 2024 (R2024 AICTE CBCS)"}, "Regulation 2024 (R2024 AICTE CBCS)"),
+                                    html.option({"value": "Regulation 2017 (R2017 CBCS)"}, "Regulation 2017 (R2017 CBCS - Anna University)"),
+                                    html.option({"value": "Autonomous / Custom College Syllabus"}, "Autonomous / Custom College Syllabus"),
+                                ]
+                            )
+                        ),
+                        html.div(
+                            {"className": "flex flex-col gap-1.5"},
+                            html.label({"className": "font-mono text-mono-sm uppercase text-light-on-surface-variant font-medium"}, "Current Semester"),
+                            html.select(
+                                {
+                                    "id": "signup-semester",
+                                    "data-demo": "signup-semester",
+                                    "value": semester,
+                                    "className": "w-full px-3 py-2.5 bg-light-surface border border-light-outline-variant focus:border-light-primary focus:ring-0 font-mono text-mono-sm text-light-on-surface outline-none transition-colors cursor-pointer",
+                                    "style": {"backgroundColor": "var(--bg-input)", "color": "var(--text-primary)"},
+                                    "on_change": lambda e: set_semester(e.get("target", {}).get("value", "1") if isinstance(e, dict) else str(e))
+                                },
+                                [
+                                    html.option({"value": str(s)}, f"Semester {s}") for s in range(1, 9)
+                                ]
+                            )
+                        )
                     ),
                     # Roll Number
                     html.div(

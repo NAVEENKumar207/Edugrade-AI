@@ -567,7 +567,7 @@ def StudentDashboard(user, set_page):
                 ),
                 html.footer(
                     {"class_name": "pt-gutter-sm border-t border-light-outline-variant flex items-center justify-between gap-gutter-sm"},
-                    html.span({"class_name": "font-mono text-mono-sm text-light-on-surface-variant uppercase"}, "EN / தமிழ் Study Plans"),
+                    html.span({"class_name": "font-mono text-mono-sm text-light-on-surface-variant uppercase"}, "Personalized Study Plans"),
                     html.button(
                         {
                             "type": "button",

@@ -101,14 +101,3 @@ class AIAdvisorImprovementsTests(TestCase):
         self.assertIn("Week 3", reply)
         self.assertIn("Week 4", reply)
         self.assertEqual(result.get('language'), 'en')
-
-    def test_weakest_subject_study_plan_tamil(self):
-        result = generate_ai_advice(self.student1_profile, "எனது பலவீனமான பாடத்திற்கு ஒரு படிப்புத் திட்டம் உருவாக்கவும்")
-        reply = result['response']
-
-        self.assertIn("Operating Systems", reply)
-        self.assertIn("வாரம் 1", reply)
-        self.assertIn("வாரம் 2", reply)
-        self.assertIn("வாரம் 3", reply)
-        self.assertIn("வாரம் 4", reply)
-        self.assertEqual(result.get('language'), 'ta')

@@ -296,11 +296,6 @@ class AIAdvisorServiceTests(TestCase):
         self.assertIn('8.42', res['response'])
         self.assertIn('Operating Systems', res['response'])
 
-    def test_ai_advisor_tamil_response(self):
-        res = generate_ai_advice(self.profile, "எனது CGPA மதிப்பெண் எப்படி உயர்த்துவது?")
-        self.assertEqual(res.get('language'), 'ta')
-        self.assertIn('8.42', res['response'])
-
 class CgpaPlannerReactPyRenderTests(TestCase):
     """Test 8: ReactPy rendering of CgpaPlanner across all student scenarios."""
 

@@ -7,7 +7,7 @@
 
 <!-- Animated Typing Subtitle -->
 <a href="https://github.com/NAVEENKumar207/Edugrade-AI">
-  <img src="https://readme-typing-svg.demolab.com?font=Space+Grotesk&weight=700&size=24&duration=2800&pause=1100&color=FF3316&center=true&vCenter=true&multiline=true&width=850&height=80&lines=Your+Academic+Digital+Twin+%E2%80%94+See+Your+Future%2C+Not+Just+Your+Past.;10-Point+CBCS+Telemetry+%E2%80%A2+164+Credits+Regulation+2022+Engine;K.S.+Rangasamy+College+of+Technology+(Autonomous)+%E2%80%A2+B.Tech+CSBS;Monte+Carlo+Simulation+%E2%80%A2+Bilingual+AI+Advisor+%E2%80%A2+QR+Verified+Transcripts" alt="Typing SVG" />
+  <img src="https://readme-typing-svg.demolab.com?font=Space+Grotesk&weight=700&size=24&duration=2800&pause=1100&color=FF3316&center=true&vCenter=true&multiline=true&width=850&height=80&lines=Your+Academic+Digital+Twin+%E2%80%94+See+Your+Future%2C+Not+Just+Your+Past.;10-Point+CBCS+Telemetry+%E2%80%A2+164+Credits+Regulation+2022+Engine;K.S.+Rangasamy+College+of+Technology+(Autonomous)+%E2%80%A2+B.Tech+CSBS;Monte+Carlo+Simulation+%E2%80%A2+AI+Academic+Advisor+%E2%80%A2+QR+Verified+Transcripts" alt="Typing SVG" />
 </a>
 
 <br/>
@@ -30,7 +30,7 @@
   <img src="https://img.shields.io/badge/Test_Suite-162_Passed_%E2%9C%94-006A63?style=flat-square&logo=pytest&logoColor=white" />
   <img src="https://img.shields.io/badge/Latency-%3C1.0s_Realtime-blueviolet?style=flat-square&logo=speedtest&logoColor=white" />
   <img src="https://img.shields.io/badge/Scale-10.0_CBCS-orange?style=flat-square&logo=buffer&logoColor=white" />
-  <img src="https://img.shields.io/badge/Bilingual-English_%2B_%E0%AE%A4%E0%AE%AE%E0%AE%BF%E0%AE%B4%E0%AF%8D-purple?style=flat-square&logo=google-translate&logoColor=white" />
+  <img src="https://img.shields.io/badge/Language-English_Only-purple?style=flat-square&logo=google-translate&logoColor=white" />
   <img src="https://img.shields.io/badge/Architecture-Student--Only_Portal-1B0401?style=flat-square&logo=shield&logoColor=white" />
 </p>
 
@@ -63,9 +63,9 @@ Built with a unified, high-performance **Django REST Backend** and an interactiv
                                    │
                                    ▼
        ┌────────────────────────────────────────────────────────┐
-       │       Verifiable Transcripts & Bilingual AI Advice      │
+       │       Verifiable Transcripts & Grounded AI Advice      │
        │  • HMAC-SHA256 QR Digital Verification Gateway         │
-       │  • Context-Grounded Advisor in English & Tamil (தமிழ்) │
+       │  • Context-Grounded Advisor with English Voice Support │
        └────────────────────────────────────────────────────────┘
 ```
 
@@ -96,8 +96,8 @@ Built with a unified, high-performance **Django REST Backend** and an interactiv
   </tr>
   <tr>
     <td width="50%" valign="top">
-      <h3>🤖 5. Grounded Bilingual AI Advisor</h3>
-      <p>Context-aware conversational mentor powered by Groq Cloud (Llama 3.3 70B). Grounded in the student's real semester results, active backlogs, and target CGPA. Fully supports voice speech-to-text and audio synthesis in <strong>English</strong> and <strong>Tamil (தமிழ்)</strong>.</p>
+      <h3>🤖 5. Grounded AI Advisor</h3>
+      <p>Context-aware conversational mentor powered by Groq Cloud (Llama 3.3 70B). Grounded in the student's real semester results, active backlogs, and target CGPA. Fully supports voice speech-to-text and audio synthesis in <strong>English</strong>.</p>
     </td>
     <td width="50%" valign="top">
       <h3>🛡️ 6. Cryptographically Verified Transcripts</h3>
@@ -125,7 +125,7 @@ EduGrade AI mounts 12 specialized pages inside a persistent **Swiss-Brutalist La
 | **6** | **CGPA Planner** | `ui/pages/cgpa_planner.py` | Forward-looking simulator with target CGPA sliders, honors thresholds (Distinction ≥ 8.50), and semester-by-semester SGPA target allocators. |
 | **7** | **Future Lab** | `ui/pages/future_lab.py` | Monte Carlo Digital Twin (100 runs), Next Best Move ranking, and Internal-to-External Marks Target Calculator. |
 | **8** | **Placement Matrix** | `ui/pages/placement_page.py` | Live corporate cutoff comparison (CTC, Min CGPA, Max Arrears) and Academic Skill Radar scoring completed course credits. |
-| **9** | **AI Academic Advisor** | `ui/pages/ai_advisor.py` | Contextually grounded chatbot with prompt chips, bilingual chat history, and Speech-to-Text / Audio Synthesis in English and Tamil. |
+| **9** | **AI Academic Advisor** | `ui/pages/ai_advisor.py` | Contextually grounded chatbot with prompt chips, personalized advice, and English Speech-to-Text / Audio Synthesis. |
 | **10**| **Curriculum & Regulations**| `ui/pages/regulations_page.py`| Authoritative institutional guide displaying the UGC 10-point scale and complete 8-semester syllabus for B.Tech CSBS (R2022). |
 | **11**| **Institutional Profile**| `ui/pages/profile_page.py`| Student identity card with live profile edit mode, target CGPA adjustments, affiliation badges, and password change utility. |
 | **12**| **My Journey & Badges** | `ui/pages/journey_page.py` | Gamified milestone roadmap tracking degree completion (164 credits) and unlocking 7 milestone achievement badges. |
@@ -277,7 +277,7 @@ All modern REST APIs enforce student isolation and return structured JSON respon
 | `GET` | `/api/placements/eligibility/` | Corporate drive audit across Google, Microsoft, Zoho, etc. |
 | `GET` | `/api/skills/` | Credit-weighted skill mastery scores and company fit. |
 | `GET` | `/api/journey/` | Milestone roadmap and 7 unlocked badges. |
-| `POST` | `/api/advisor/chat/` | Bilingual grounded AI academic advising. |
+| `POST` | `/api/advisor/chat/` | Grounded AI academic advising in English. |
 | `DELETE`| `/api/advisor/history/` | Clear AI conversation history. |
 | `GET` | `/api/transcript/pdf/` | Stream official PDF transcript with verification QR code. |
 | `GET` | `/verify/<token>/` | Public tamper-proof transcript verification gateway. |

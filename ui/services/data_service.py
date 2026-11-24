@@ -305,13 +305,15 @@ def change_user_password(user, old_password, new_password, confirm_password):
     )
     return True, "Password changed successfully."
 
-def register_user(username, password, fullname='', department='Computer Science & Engineering', roll_number='', semester=1, institution_name='Anna University / Affiliated Institution', **kwargs):
+def register_user(username, password, fullname='', department='Computer Science & Engineering', roll_number='', semester=1, institution_name='Anna University / Affiliated Institution', syllabus_regulation='Regulation 2021 (R2021 CBCS)', **kwargs):
     """Registers a new student user and student profile."""
     if not username or not password:
         return None, "Username and password are required."
     
     if User.objects.filter(username=username).exists():
         return None, "An account with this username already exists."
+
+    syl = syllabus_regulation or kwargs.get('syllabus') or 'Regulation 2021 (R2021 CBCS)'
 
     with transaction.atomic():
         user = User.objects.create_user(
@@ -332,6 +334,7 @@ def register_user(username, password, fullname='', department='Computer Science 
             roll_number=roll_number or ('7176' + username),
             institution_name=institution_name or 'Anna University / Affiliated Institution',
             department=department,
+            syllabus_regulation=syl.strip(),
             current_semester=int(semester) if str(semester).isdigit() else 1,
             current_cgpa=0.00,
             target_cgpa=8.50,
@@ -367,6 +370,7 @@ def get_student_dashboard_data(user):
             'name': f"{user.first_name} {user.last_name}".strip() or user.username,
             'roll_number': profile.roll_number,
             'department': profile.department,
+            'syllabus_regulation': getattr(profile, 'syllabus_regulation', 'Regulation 2021 (R2021 CBCS)'),
             'current_semester': profile.current_semester,
             'current_cgpa': float(profile.current_cgpa),
             'latest_sgpa': float(latest_sgpa),
@@ -618,7 +622,7 @@ def import_student_grades_csv(user, csv_text: str):
     from core.services.academic_service import process_student_grades_csv
     return process_student_grades_csv(user, csv_text)
 
-def update_user_profile(user, first_name=None, last_name=None, email=None, target_cgpa=None, department=None, institution_name=None, roll_number=None):
+def update_user_profile(user, first_name=None, last_name=None, email=None, target_cgpa=None, department=None, institution_name=None, roll_number=None, syllabus_regulation=None):
     """Updates user and user profile details."""
     try:
         profile = getattr(user, 'profile', None)
@@ -635,6 +639,9 @@ def update_user_profile(user, first_name=None, last_name=None, email=None, targe
 
         if roll_number is not None and roll_number.strip():
             profile.roll_number = roll_number.strip()
+
+        if syllabus_regulation is not None and syllabus_regulation.strip():
+            profile.syllabus_regulation = syllabus_regulation.strip()
 
         if target_cgpa is not None:
             try:

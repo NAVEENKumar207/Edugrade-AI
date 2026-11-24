@@ -7,7 +7,9 @@ Matches New Ui/curriculum_regulations/code.html.
 from reactpy import component, html, use_state
 
 @component
-def RegulationsPage():
+def RegulationsPage(user=None):
+    profile = getattr(user, 'profile', None) if user else None
+    syl_badge = getattr(profile, 'syllabus_regulation', None) or "REGULATION 2022 (CBCS)"
     selected_sem, set_selected_sem = use_state(1)
 
     grade_scale = [
@@ -163,7 +165,7 @@ def RegulationsPage():
                 html.h1({"class_name": "font-headline text-headline-md text-light-on-surface uppercase tracking-tight font-bold"}, "Curriculum & Academic Regulations"),
                 html.p({"class_name": "font-mono text-mono-sm text-light-on-surface-variant uppercase mt-1"}, "UGC 10-Point CBCS Scale • Degree Classifications • B.Tech CSBS Syllabus")
             ),
-            html.span({"class_name": "font-mono text-mono-sm font-bold bg-light-surface-container-highest text-light-on-surface px-3 py-1 border border-light-outline-variant"}, "REGULATION 2022 (2024-2028)")
+            html.span({"class_name": "font-mono text-mono-sm font-bold bg-light-surface-container-highest text-light-on-surface px-3 py-1 border border-light-outline-variant"}, syl_badge.upper())
         ),
 
         # Top 2-Column: 10-Point Scale & Degree Classification

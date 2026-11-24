@@ -19,6 +19,7 @@ def ProfilePage(user, set_user=None):
     first_name, set_first_name = use_state(user.first_name if user else "")
     last_name, set_last_name = use_state(user.last_name if user else "")
     roll_number, set_roll_number = use_state(getattr(profile, 'roll_number', user.username if user else "") or "")
+    syllabus_regulation, set_syllabus_regulation = use_state(getattr(profile, 'syllabus_regulation', 'Regulation 2021 (R2021 CBCS)') or 'Regulation 2021 (R2021 CBCS)')
     email, set_email = use_state(user.email if user else "")
     target_cgpa, set_target_cgpa = use_state(str(profile.target_cgpa) if profile else "8.80")
     department, set_department = use_state(profile.department if profile else "Computer Science & Business Systems")
@@ -58,7 +59,8 @@ def ProfilePage(user, set_user=None):
             target_cgpa=target_cgpa,
             department=department,
             institution_name=institution_name,
-            roll_number=roll_number
+            roll_number=roll_number,
+            syllabus_regulation=syllabus_regulation
         )
         if ok:
             set_save_status(msg)
@@ -76,6 +78,7 @@ def ProfilePage(user, set_user=None):
         set_first_name(user.first_name if user else "")
         set_last_name(user.last_name if user else "")
         set_roll_number(getattr(profile, 'roll_number', user.username if user else "") or "")
+        set_syllabus_regulation(getattr(profile, 'syllabus_regulation', 'Regulation 2021 (R2021 CBCS)') or 'Regulation 2021 (R2021 CBCS)')
         set_email(user.email if user else "")
         set_target_cgpa(str(profile.target_cgpa) if profile else "8.80")
         set_department(profile.department if profile else "Computer Science & Business Systems")
@@ -119,7 +122,7 @@ def ProfilePage(user, set_user=None):
             ),
             html.div(
                 {"className": "flex items-center gap-3 flex-wrap"},
-                html.span({"className": "font-mono text-mono-sm font-bold bg-light-surface-container-highest text-light-on-surface px-3 py-1.5 border border-light-outline-variant"}, "2021 CBCS REGULATION"),
+                html.span({"className": "font-mono text-mono-sm font-bold bg-light-surface-container-highest text-light-on-surface px-3 py-1.5 border border-light-outline-variant"}, syllabus_regulation.upper()),
                 html.button(
                     {
                         "type": "button",
@@ -153,7 +156,7 @@ def ProfilePage(user, set_user=None):
                     {"className": "flex flex-col items-center gap-1"},
                     html.h2({"className": "font-headline text-headline-md text-light-on-surface uppercase font-bold"}, f"{first_name} {last_name}".strip() or (user.username if user else "STUDENT")),
                     html.p({"className": "font-mono text-mono-sm text-light-primary font-bold tracking-wider"}, roll_number or getattr(profile, 'roll_number', user.username if user else "2026")),
-                    html.span({"className": "mt-2 inline-block px-3 py-1 bg-light-surface-container-highest text-light-on-surface font-mono text-mono-sm font-semibold border border-light-outline-variant"}, f"{department} • STUDENT"),
+                    html.span({"className": "mt-2 inline-block px-3 py-1 bg-light-surface-container-highest text-light-on-surface font-mono text-mono-sm font-semibold border border-light-outline-variant"}, f"{department} • {syllabus_regulation}"),
                     html.p(
                         {"className": "mt-2 text-center font-body text-body-xs font-semibold text-light-on-surface flex items-center justify-center gap-1.5 max-w-[240px]"},
                         html.span({"className": "material-symbols-outlined text-[16px] text-light-primary shrink-0"}, "account_balance"),
@@ -295,6 +298,14 @@ def ProfilePage(user, set_user=None):
                         ),
                         html.div(
                             {"className": "flex flex-col gap-1 p-3 bg-light-surface-container-low border border-light-outline-variant"},
+                            html.span({"className": "font-mono text-mono-xs font-bold text-light-on-surface-variant uppercase flex items-center gap-1"},
+                                html.span({"className": "material-symbols-outlined text-[15px] text-light-primary"}, "menu_book"),
+                                "Academic Syllabus"
+                            ),
+                            html.p({"className": "font-mono text-mono-sm font-bold text-light-on-surface truncate"}, syllabus_regulation or "Regulation 2021 (R2021 CBCS)")
+                        ),
+                        html.div(
+                            {"className": "flex flex-col gap-1 p-3 bg-light-surface-container-low border border-light-outline-variant"},
                             html.span({"className": "font-mono text-mono-xs font-bold text-light-on-surface-variant uppercase"}, "Target CGPA"),
                             html.p({"className": "font-mono text-mono-md font-bold text-light-on-surface"}, f"{float(target_cgpa):.2f}" if target_cgpa else "8.80")
                         )
@@ -417,7 +428,7 @@ def ProfilePage(user, set_user=None):
                         )
                     ),
                     html.div(
-                        {"className": "grid grid-cols-1 gap-gutter-md"},
+                        {"className": "grid grid-cols-1 sm:grid-cols-2 gap-gutter-md"},
                         html.div(
                             {"className": "flex flex-col gap-1"},
                             html.label({"className": "font-mono text-mono-sm font-bold text-light-on-surface uppercase"}, "Institution / University"),
@@ -430,6 +441,27 @@ def ProfilePage(user, set_user=None):
                                     "style": input_style,
                                     "placeholder": "e.g. Anna University / Affiliated Institution"
                                 }
+                            )
+                        ),
+                        html.div(
+                            {"className": "flex flex-col gap-1"},
+                            html.label({"className": "font-mono text-mono-sm font-bold text-light-on-surface uppercase"}, "Academic Syllabus / Regulation"),
+                            html.select(
+                                {
+                                    "data-demo": "profile-syllabus",
+                                    "id": "profile-syllabus",
+                                    "value": syllabus_regulation,
+                                    "on_change": lambda e: set_syllabus_regulation(e.get("target", {}).get("value", "")),
+                                    "className": input_class,
+                                    "style": input_style
+                                },
+                                [
+                                    html.option({"value": "Regulation 2021 (R2021 CBCS)"}, "Regulation 2021 (R2021 CBCS - Anna University)"),
+                                    html.option({"value": "Regulation 2022 (R2022 Autonomous CBCS)"}, "Regulation 2022 (R2022 Autonomous CBCS - CSBS)"),
+                                    html.option({"value": "Regulation 2024 (R2024 AICTE CBCS)"}, "Regulation 2024 (R2024 AICTE CBCS)"),
+                                    html.option({"value": "Regulation 2017 (R2017 CBCS)"}, "Regulation 2017 (R2017 CBCS - Anna University)"),
+                                    html.option({"value": "Autonomous / Custom College Syllabus"}, "Autonomous / Custom College Syllabus"),
+                                ]
                             )
                         )
                     ),

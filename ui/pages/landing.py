@@ -40,12 +40,12 @@ def LandingPage(set_page, theme="dark", toggle_theme=None):
             "right": "FEASIBILITY CHECK"
         },
         "advisor": {
-            "tags": ["GROUNDED AI", "EN & தமிழ்", "WEB SPEECH VOICE", "STUDY PLANS"],
-            "title": "Bilingual Voice Academic Mentor",
+            "tags": ["GROUNDED AI", "ENGLISH AI", "WEB SPEECH VOICE", "STUDY PLANS"],
+            "title": "Voice Academic Mentor",
             "value": "24/7",
             "sub": "Automated Guidance",
             "left": "VOICE DICTATION",
-            "right": "TAMIL + ENGLISH"
+            "right": "ENGLISH SPEECH"
         },
         "badges": {
             "tags": ["7 BADGES", "TIMELINE", "LEAST-SQUARES", "TREND ALERT"],
@@ -198,8 +198,8 @@ def LandingPage(set_page, theme="dark", toggle_theme=None):
                             ),
                             html.div(
                                 {"className": "flex flex-col gap-1", "data-demo": "hero-stat-voice"},
-                                html.span({"className": "font-headline text-2xl lg:text-3xl font-bold tabular-nums text-light-on-surface"}, "EN / தமிழ்"),
-                                html.span({"className": "font-mono text-[11px] text-light-on-surface-variant uppercase"}, "Bilingual AI Advisor")
+                                html.span({"className": "font-headline text-2xl lg:text-3xl font-bold tabular-nums text-light-on-surface"}, "AI Copilot"),
+                                html.span({"className": "font-mono text-[11px] text-light-on-surface-variant uppercase"}, "Academic Advisor")
                             )
                         )
                     ),
@@ -343,7 +343,7 @@ def LandingPage(set_page, theme="dark", toggle_theme=None):
                             html.div(
                                 {"className": "flex flex-col gap-1.5 mt-6"},
                                 html.h3({"className": "font-headline text-lg font-bold text-light-on-surface uppercase"}, "Unlock"),
-                                html.p({"className": "font-mono text-mono-sm text-light-on-surface-variant uppercase leading-relaxed"}, "Audit placement cutoffs & follow bilingual EN / தமிழ் AI study plans.")
+                                html.p({"className": "font-mono text-mono-sm text-light-on-surface-variant uppercase leading-relaxed"}, "Audit placement cutoffs & follow personalized AI study plans.")
                             )
                         )
                     )
@@ -419,7 +419,7 @@ def LandingPage(set_page, theme="dark", toggle_theme=None):
                                 {"num": "06", "icon": "receipt_long", "title": "Student Results & CSV Import", "desc": "Direct ownership of your semester records with interactive course CRUD, bulk CSV upload, downloadable template, and automatic SGPA/CGPA updates."},
                                 {"num": "07", "icon": "verified", "title": "QR-Verified Transcripts", "desc": "Tamper-proof ReportLab academic transcripts embedding an autonomous cryptographic HMAC-SHA256 snapshot verification QR code."},
                                 {"num": "08", "icon": "route", "title": "Journey & Milestone Badges", "desc": "Chronological semester progression timeline tracking SGPA changes and gamified achievement badges (Zero Arrears, Comeback, Distinction)."},
-                                {"num": "09", "icon": "mic", "title": "Tamil & English Voice Mode", "desc": "Grounded bilingual academic advising with speech recognition and read-aloud playback right in the browser."},
+                                {"num": "09", "icon": "mic", "title": "Voice Input & Read Aloud", "desc": "Grounded academic advising with speech recognition and read-aloud playback right in the browser."},
                             ]
                         ]
                     )

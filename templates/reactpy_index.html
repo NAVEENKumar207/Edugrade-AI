@@ -348,11 +348,11 @@
         });
 
         // 6. Web Speech API Voice Recognition & Synthesis Bridge
-        var currentSpeechLang = 'ta-IN';
+        var currentSpeechLang = 'en-IN';
         window.setVoiceLang = function(lang) {
-            currentSpeechLang = lang;
+            currentSpeechLang = lang || 'en-IN';
             var lbl = document.getElementById('voice-lang-label');
-            if (lbl) lbl.textContent = lang === 'ta-IN' ? 'தமிழ் (ta-IN)' : 'English (en-IN)';
+            if (lbl) lbl.textContent = 'English (en-IN)';
         };
 
         window.startVoiceInput = function() {

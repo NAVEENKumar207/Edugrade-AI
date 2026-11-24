@@ -27,7 +27,7 @@
 | UI_LNK_019 | `admin_dashboard.py` | Faculty/Admin | Download Sample CSV | Triggers Download Sample CSV | `href=/api/admin/grades/sample-csv/` | `/api/admin/grades/sample-csv/` | PASS | KEPT | Verified official CSV download |
 | UI_BTN_020 | `ai_advisor.py` | All | class_name | Triggers class_name | `handle_clear_chat` | `ReactPy UI Component State` | PASS | KEPT | Verified functional on desktop & 375px mobile |
 | UI_BTN_021 | `ai_advisor.py` | All | Button / Action | Triggers Button / Action | `lambda e` | `ReactPy UI Component State` | PASS | KEPT | Verified functional on desktop & 375px mobile |
-| UI_BTN_022 | `ai_advisor.py` | All | தமிழ் | Triggers தமிழ் | `lambda e: None` | `ReactPy UI Component State` | PASS | KEPT | Verified functional on desktop & 375px mobile |
+| UI_BTN_022 | `ai_advisor.py` | All | English Voice | Triggers English Voice | `lambda e: None` | `ReactPy UI Component State` | PASS | KEPT | Verified functional on desktop & 375px mobile |
 | UI_BTN_023 | `ai_advisor.py` | All | English | Triggers English | `lambda e: None` | `ReactPy UI Component State` | PASS | KEPT | Verified functional on desktop & 375px mobile |
 | UI_BTN_024 | `ai_advisor.py` | All | class_name | Triggers class_name | `lambda e: None` | `ReactPy UI Component State` | PASS | KEPT | Verified functional on desktop & 375px mobile |
 | UI_BTN_025 | `ai_advisor.py` | All | class_name | Triggers class_name | `lambda e: None` | `ReactPy UI Component State` | PASS | KEPT | Verified functional on desktop & 375px mobile |

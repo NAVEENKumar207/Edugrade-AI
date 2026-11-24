@@ -23,7 +23,6 @@ ALLOWED_HOSTS = [h.strip() for h in raw_hosts.split(',') if h.strip()]
 GROQ_API_KEY = os.getenv('GROQ_API_KEY', '')
 GROQ_MODEL = os.getenv('GROQ_MODEL', 'llama-3.3-70b-versatile')
 GROQ_TIMEOUT_SECONDS = int(os.getenv('GROQ_TIMEOUT_SECONDS', '15'))
-OPENAI_API_KEY = os.getenv('OPENAI_API_KEY', '')
 
 # Presentation Auto-Play Demo Mode
 DEMO_MODE_ENABLED = (os.getenv('DEMO_MODE_ENABLED') or 'True').lower() in ('true', '1', 't', 'yes')

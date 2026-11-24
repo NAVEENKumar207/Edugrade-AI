@@ -139,6 +139,31 @@ class StudentPortalHardeningTests(TestCase):
         self.assertTrue(hasattr(created_user, 'profile'))
         self.assertEqual(created_user.profile.roll_number, '717622CS991')
 
+    def test_signup_stores_syllabus_regulation_and_exposes_in_me_api(self):
+        """Student registration accepts syllabus regulation and exposes it in profile and /api/auth/me/."""
+        resp = self.client.post('/api/auth/signup/', {
+            'username': 'student_syllabus_test',
+            'password': 'SyllabusPass123!',
+            'confirm_password': 'SyllabusPass123!',
+            'fullname': 'Syllabus Test Student',
+            'department': 'Computer Science and Business Systems',
+            'roll_number': '717624CB088',
+            'syllabus_regulation': 'Regulation 2022 (R2022 Autonomous CBCS)',
+            'semester': 3
+        }, format='json')
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        user = User.objects.get(username='student_syllabus_test')
+        self.assertEqual(user.profile.syllabus_regulation, 'Regulation 2022 (R2022 Autonomous CBCS)')
+        self.assertEqual(user.profile.current_semester, 3)
+
+        # Call /api/auth/me/ to verify syllabus_regulation is returned
+        self.client.force_authenticate(user=user)
+        me_resp = self.client.get('/api/auth/me/')
+        self.assertEqual(me_resp.status_code, status.HTTP_200_OK)
+        me_data = me_resp.json()
+        self.assertEqual(me_data['profile']['syllabus_regulation'], 'Regulation 2022 (R2022 Autonomous CBCS)')
+
     # -------------------------------------------------------------
     # 3. Recalculation across Add, Edit, Delete, and CSV Import
     # -------------------------------------------------------------

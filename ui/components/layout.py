@@ -40,8 +40,9 @@ def AppLayout(user, current_page, set_page, logout_action, children, theme="ligh
         {"id": "regulations", "label": "Regulations", "icon": "menu_book"},
         {"id": "profile", "label": "Profile", "icon": "person"},
     ]
+    syl_reg = getattr(profile, 'syllabus_regulation', None) or "Regulation 2021 (CBCS)"
     page_title = "Student Dashboard"
-    page_subtitle = f"B.E. {dept.upper()} • REGULATION 2026 (CBCS)"
+    page_subtitle = f"B.E. {dept.upper()} • {syl_reg.upper()}"
 
     nav_links = []
     for item in nav_items:
