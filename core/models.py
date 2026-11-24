@@ -8,13 +8,13 @@ def generate_transcript_token():
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     roll_number = models.CharField(max_length=50, blank=True, null=True)
-    institution_name = models.CharField(max_length=200, default='Anna University / Affiliated Institution', blank=True)
-    department = models.CharField(max_length=100, default='Computer Science & Engineering')
+    institution_name = models.CharField(max_length=200, default='K.S. Rangasamy College of Technology (Autonomous)', blank=True)
+    department = models.CharField(max_length=100, default='Computer Science & Business Systems')
     current_semester = models.IntegerField(default=5, blank=True, null=True)
     target_cgpa = models.DecimalField(max_digits=4, decimal_places=2, default=9.00)
     current_cgpa = models.DecimalField(max_digits=4, decimal_places=2, default=8.42)
     credits_earned = models.IntegerField(default=72)
-    total_credits = models.IntegerField(default=120)
+    total_credits = models.IntegerField(default=164)
     backlogs_count = models.IntegerField(default=0)
     is_placement_eligible = models.BooleanField(default=True)
 

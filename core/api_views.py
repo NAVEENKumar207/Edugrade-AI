@@ -918,3 +918,23 @@ def api_health(request):
         'version': '2.0.0',
         'database': 'sqlite3'
     })
+
+
+@api_view(['GET', 'POST'])
+@permission_classes([AllowAny])
+def api_demo_prepare(request):
+    """Prepares clean demo student state before presentation tour starts."""
+    from ui.services.data_service import prepare_demo_environment, is_demo_mode_enabled
+    if not is_demo_mode_enabled():
+        return Response({'success': False, 'error': 'Demo mode is disabled in settings.'}, status=status.HTTP_403_FORBIDDEN)
+    success, msg = prepare_demo_environment()
+    return Response({'status': 'ok' if success else 'error', 'success': success, 'message': msg})
+
+
+@api_view(['GET', 'POST'])
+@permission_classes([AllowAny])
+def api_demo_cleanup(request):
+    """Cleans up test records created during automated demo presentation."""
+    from ui.services.data_service import cleanup_demo_environment
+    success, msg = cleanup_demo_environment()
+    return Response({'status': 'ok' if success else 'error', 'success': success, 'message': msg})

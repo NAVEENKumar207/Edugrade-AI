@@ -53,10 +53,13 @@ def AppLayout(user, current_page, set_page, logout_action, children, theme="ligh
             "flex items-center gap-gutter-sm px-3 py-2.5 text-light-on-surface-variant hover:bg-light-surface-container-low hover:text-light-on-surface font-label text-label-lg transition-colors duration-state-change ease-state-change cursor-pointer"
         )
         
+        demo_attr = f"nav-{item['id']}"
         nav_links.append(
             html.a(
                 {
                     "key": item["id"],
+                    "id": f"nav-{item['id']}",
+                    "data-demo": demo_attr,
                     "className": link_class,
                     "on_click": lambda e, pid=item["id"]: (set_page(pid), set_mobile_open(False))
                 },
@@ -169,7 +172,7 @@ def AppLayout(user, current_page, set_page, logout_action, children, theme="ligh
                             {"className": "flex items-center justify-between pb-3 border-b border-light-outline-variant"},
                             html.div(
                                 {"className": "flex items-center gap-2 cursor-pointer", "on_click": lambda e: (set_page("landing"), set_mobile_open(False))},
-                                html.div({"className": "w-8 h-8 bg-light-primary text-white font-bold flex items-center justify-center font-display text-sm"}, "EG"),
+                                html.div({"className": "w-8 h-8 bg-light-primary text-light-on-primary font-bold flex items-center justify-center font-display text-sm"}, "EG"),
                                 html.span({"className": "font-headline font-bold uppercase"}, "EduGrade AI")
                             ),
                             html.button(
@@ -222,6 +225,7 @@ def AppLayout(user, current_page, set_page, logout_action, children, theme="ligh
                         {
                             "type": "button",
                             "aria-label": "Toggle navigation menu",
+                            "data-demo": "mobile-menu-btn",
                             "className": "md:hidden flex items-center justify-center p-1.5 text-light-on-surface border border-light-outline-variant hover:bg-light-surface-container cursor-pointer",
                             "on_click": lambda e: set_mobile_open(not mobile_open)
                         },

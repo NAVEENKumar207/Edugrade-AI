@@ -56,8 +56,8 @@ def signup_view(request):
     if request.method == 'POST':
         fullname = request.POST.get('fullname', '').strip()
         username = request.POST.get('username', '').strip()
-        institution_name = request.POST.get('institution_name', 'Anna University / Affiliated Institution').strip()
-        department = request.POST.get('department', 'Computer Science & Engineering')
+        institution_name = request.POST.get('institution_name', 'K.S. Rangasamy College of Technology (Autonomous)').strip()
+        department = request.POST.get('department', 'Computer Science & Business Systems')
         password = request.POST.get('password', '')
         confirm_password = request.POST.get('confirm_password', '')
         roll_number = request.POST.get('roll_number', '').strip()
@@ -164,6 +164,8 @@ def results_view(request):
 
 def cgpa_planner_view(request):
     """Render the Target CGPA Simulator & Planner page."""
+    if not request.user.is_authenticated:
+        return redirect('login')
     return render(request, 'cgpa_planner.html')
 
 def placement_view(request):

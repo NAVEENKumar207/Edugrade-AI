@@ -26,8 +26,8 @@ class Command(BaseCommand):
         )
         parser.add_argument(
             '--roll-number',
-            default='717622CS101',
-            help='Roll number for demo student (default: 717622CS101)'
+            default='717622CB041',
+            help='Roll number for demo student (default: 717622CB041)'
         )
 
     def handle(self, *args, **options):
@@ -45,9 +45,11 @@ class Command(BaseCommand):
 
         profile, _ = UserProfile.objects.get_or_create(user=user)
         profile.roll_number = roll_number
-        profile.department = "Computer Science and Engineering"
+        profile.department = "Computer Science and Business Systems"
+        profile.institution_name = "K.S. Rangasamy College of Technology (Autonomous)"
         profile.current_semester = 6
         profile.target_cgpa = 8.75
+        profile.total_credits = 164
         profile.save()
 
         # Wipe old demo records for this student before reseeding cleanly
@@ -55,52 +57,55 @@ class Command(BaseCommand):
         SemesterRecord.objects.filter(student=profile).delete()
         SubjectInsight.objects.filter(student=profile).delete()
 
-        # 5 Semesters of realistic CBCS Courses
+        # 5 Semesters of realistic CBCS Courses from R2022 B.Tech CSBS (2024-2028 batch)
         semesters_data = [
             (1, [
-                ("CS101", "Programming in Python", 4, "A+", False, ""),
-                ("MA101", "Matrices and Calculus", 4, "A", False, ""),
-                ("PH101", "Engineering Physics", 3, "A", False, ""),
-                ("CY101", "Engineering Chemistry", 3, "B+", False, ""),
-                ("GE101", "Engineering Graphics", 4, "B+", False, ""),
-                ("GE102", "Python Programming Lab", 2, "O", False, ""),
-                ("BS101", "Physics & Chemistry Lab", 2, "O", False, ""),
+                ("60 EN 003", "Business Communication and Value Science I", 2, "A+", False, ""),
+                ("60 MA 002", "Statistics and Probability", 4, "A", False, ""),
+                ("61 PH 008", "Fundamentals of Physics", 3, "A", False, ""),
+                ("61 CB 101", "Computer Programming (Python)", 3, "A+", False, ""),
+                ("60 EE 003", "Principles of Electrical Engineering and Lab", 4, "B+", False, ""),
+                ("60 CB 1P1", "Computer Programming Lab (Python)", 2, "O", False, ""),
+                ("60 PH 0P3", "Fundamentals of Physics Lab", 2, "O", False, ""),
             ]),
             (2, [
-                ("CS201", "Data Structures", 4, "A+", False, ""),
-                ("MA201", "Statistics & Linear Algebra", 4, "B+", True, "U"),  # Cleared Arrear!
-                ("CS202", "Digital Principles & System Design", 3, "A", False, ""),
-                ("CS203", "Programming in C", 3, "A+", False, ""),
-                ("GE201", "Environmental Science", 3, "B", False, ""),
-                ("CS204", "Data Structures Lab", 2, "O", False, ""),
-                ("CS205", "C Programming Lab", 2, "A+", False, ""),
+                ("60 EN 004", "Business Communication and Value Science II", 2, "A", False, ""),
+                ("60 HS 001", "Fundamentals of Economics", 3, "A", False, ""),
+                ("60 MA 005", "Statistical Modeling", 5, "B+", True, "U"),  # Cleared Arrear!
+                ("60 CB 201", "Computer Organization and Architecture", 3, "A+", False, ""),
+                ("61 CB 202", "Object Oriented Programming", 3, "A+", False, ""),
+                ("60 ME 0P1", "Fabrication and Reverse Engineering Laboratory", 2, "O", False, ""),
+                ("61 CB 2P1", "Object Oriented Programming Lab", 2, "O", False, ""),
             ]),
             (3, [
-                ("CS301", "Design and Analysis of Algorithms", 4, "A+", False, ""),
-                ("CS302", "Database Management Systems", 4, "O", False, ""),
-                ("CS303", "Operating Systems", 3, "A", False, ""),
-                ("MA301", "Discrete Mathematics", 4, "B+", False, ""),
-                ("CS304", "Software Engineering", 3, "A", False, ""),
-                ("CS305", "DBMS Laboratory", 2, "O", False, ""),
-                ("CS306", "Operating Systems Lab", 2, "A+", False, ""),
+                ("60 HS 004", "Introduction to Innovation, IP Management & Entrepreneurship", 3, "A+", False, ""),
+                ("60 MA 013", "Computational Statistics", 4, "A", False, ""),
+                ("61 CB 301", "Automata and Compiler Design", 4, "A", False, ""),
+                ("60 CB 302", "Database Management Systems", 3, "O", False, ""),
+                ("60 CB 303", "Data Structures", 3, "A+", False, ""),
+                ("60 CB 304", "Software Engineering", 3, "A", False, ""),
+                ("60 CB 3P1", "Database Management Systems Lab", 2, "O", False, ""),
+                ("60 CB 3P2", "Data Structures Lab", 2, "O", False, ""),
             ]),
             (4, [
-                ("CS401", "Computer Networks", 4, "A", False, ""),
-                ("CS402", "Object Oriented Analysis & Design", 3, "A", False, ""),
-                ("CS403", "Theory of Computation", 4, "B+", False, ""),
-                ("CS404", "Artificial Intelligence & ML", 4, "O", False, ""),
-                ("CS405", "Web Technology", 3, "A+", False, ""),
-                ("CS406", "Networks & Web Lab", 2, "O", False, ""),
-                ("CS407", "AI & ML Laboratory", 2, "O", False, ""),
+                ("60 MA 018", "Optimization Techniques", 4, "A", False, ""),
+                ("60 CB 401", "Operating Systems", 3, "A+", False, ""),
+                ("60 CB 402", "Design and Analysis of Algorithms", 3, "A+", False, ""),
+                ("60 CB 403", "Software Design with UML", 3, "A", False, ""),
+                ("60 CB 404", "MERN Stack", 3, "O", False, ""),
+                ("60 OE L01", "Open Elective-I", 3, "A", False, ""),
+                ("60 CB 4P1", "Operating Systems Lab", 2, "O", False, ""),
+                ("60 CB 4P2", "Design and Analysis of Algorithms Lab", 2, "O", False, ""),
             ]),
             (5, [
-                ("CS501", "Compiler Design", 4, "A", False, ""),
-                ("CS502", "Cryptography & Network Security", 3, "A+", False, ""),
-                ("CS503", "Cloud Computing & DevOps", 4, "O", False, ""),
-                ("CS504", "Mobile Application Development", 3, "A+", False, ""),
-                ("CS505", "Cyber Forensics & Ethics", 3, "A", False, ""),
-                ("CS506", "Cloud & Security Lab", 2, "O", False, ""),
-                ("CS507", "Creative Innovation Project", 2, "O", False, ""),
+                ("60 CB 501", "Computer Networks", 3, "A", False, ""),
+                ("60 CB 502", "C# and .NET Programming", 3, "A+", False, ""),
+                ("60 CB 503", "Artificial Intelligence", 3, "O", False, ""),
+                ("60 IT 003", "Design Thinking", 3, "A+", False, ""),
+                ("60 CB E11", "Modern Software Engineering & DevOps", 3, "O", False, ""),
+                ("60 OE L02", "Open Elective-II", 3, "A", False, ""),
+                ("60 CB 5P1", "Computer Networks Laboratory", 2, "O", False, ""),
+                ("60 CB 5P2", "C# and .NET Programming Laboratory", 2, "O", False, ""),
             ]),
         ]
 
@@ -129,9 +134,10 @@ class Command(BaseCommand):
                 )
 
         SubjectInsight.objects.create(student=profile, subject_name="Database Management Systems", grade_point=10.0, status_label="Strong")
-        SubjectInsight.objects.create(student=profile, subject_name="Cloud Computing & DevOps", grade_point=10.0, status_label="Strong")
+        SubjectInsight.objects.create(student=profile, subject_name="Artificial Intelligence", grade_point=10.0, status_label="Strong")
+        SubjectInsight.objects.create(student=profile, subject_name="MERN Stack", grade_point=10.0, status_label="Strong")
         SubjectInsight.objects.create(student=profile, subject_name="Data Structures", grade_point=9.0, status_label="Strong")
-        SubjectInsight.objects.create(student=profile, subject_name="Theory of Computation", grade_point=7.0, status_label="Good")
+        SubjectInsight.objects.create(student=profile, subject_name="Optimization Techniques", grade_point=8.0, status_label="Good")
 
         # Recalculate all metrics atomically
         recalculate_student_metrics(profile)

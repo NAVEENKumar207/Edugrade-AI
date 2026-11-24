@@ -32,93 +32,97 @@ def RegulationsPage():
         {
             "sem": 1, "credits": 20,
             "courses": [
-                ("HS8151", "Communicative English", 3.0),
-                ("MA8151", "Engineering Mathematics - I", 4.0),
-                ("PH8151", "Engineering Physics", 3.0),
-                ("CY8151", "Engineering Chemistry", 3.0),
-                ("GE8151", "Problem Solving & Python Programming", 3.0),
-                ("GE8161", "Python Programming Laboratory", 2.0),
-                ("BS8161", "Physics & Chemistry Laboratory", 2.0),
+                ("60 EN 003", "Business Communication and Value Science I", 2.0),
+                ("60 MA 002", "Statistics and Probability", 4.0),
+                ("61 PH 008", "Fundamentals of Physics", 3.0),
+                ("61 CB 101", "Computer Programming (Python)", 3.0),
+                ("60 EE 003", "Principles of Electrical Engineering and Lab", 4.0),
+                ("60 CB 1P1", "Computer Programming Lab (Python)", 2.0),
+                ("60 PH 0P3", "Fundamentals of Physics Lab", 2.0),
             ]
         },
         {
             "sem": 2, "credits": 20,
             "courses": [
-                ("HS8251", "Technical English", 3.0),
-                ("MA8251", "Engineering Mathematics - II", 4.0),
-                ("PH8252", "Physics for Information Science", 3.0),
-                ("BE8255", "Basic Electrical & Electronics Engineering", 3.0),
-                ("GE8292", "Engineering Graphics", 4.0),
-                ("CS8261", "C Programming Laboratory", 2.0),
+                ("60 EN 004", "Business Communication and Value Science II", 2.0),
+                ("60 HS 001", "Fundamentals of Economics", 3.0),
+                ("60 MA 005", "Statistical Modeling", 5.0),
+                ("60 CB 201", "Computer Organization and Architecture", 3.0),
+                ("61 CB 202", "Object Oriented Programming", 3.0),
+                ("60 ME 0P1", "Fabrication and Reverse Engineering Laboratory", 2.0),
+                ("61 CB 2P1", "Object Oriented Programming Lab", 2.0),
             ]
         },
         {
-            "sem": 3, "credits": 19,
+            "sem": 3, "credits": 24,
             "courses": [
-                ("MA8351", "Discrete Mathematics", 4.0),
-                ("CS8351", "Digital Principles & System Design", 4.0),
-                ("CS8391", "Data Structures", 3.0),
-                ("CS8392", "Object Oriented Programming", 3.0),
-                ("EC8395", "Communication Engineering", 3.0),
-                ("CS8381", "Data Structures Laboratory", 2.0),
+                ("60 HS 004", "Introduction to Innovation, IP Management & Entrepreneurship", 3.0),
+                ("60 MA 013", "Computational Statistics", 4.0),
+                ("61 CB 301", "Automata and Compiler Design", 4.0),
+                ("60 CB 302", "Database Management Systems", 3.0),
+                ("60 CB 303", "Data Structures", 3.0),
+                ("60 CB 304", "Software Engineering", 3.0),
+                ("60 CB 3P1", "Database Management Systems Lab", 2.0),
+                ("60 CB 3P2", "Data Structures Lab", 2.0),
             ]
         },
         {
-            "sem": 4, "credits": 21,
+            "sem": 4, "credits": 23,
             "courses": [
-                ("MA8402", "Probability & Queueing Theory", 4.0),
-                ("CS8491", "Design & Analysis of Algorithms", 4.0),
-                ("CS8492", "Database Management Systems", 3.0),
-                ("CS8451", "Operating Systems", 3.0),
-                ("CS8461", "Operating Systems Laboratory", 2.0),
-                ("CS8481", "Database Management Systems Laboratory", 2.0),
-                ("GE8291", "Environmental Science & Engineering", 3.0),
+                ("60 MA 018", "Optimization Techniques", 4.0),
+                ("60 CB 401", "Operating Systems", 3.0),
+                ("60 CB 402", "Design and Analysis of Algorithms", 3.0),
+                ("60 CB 403", "Software Design with UML", 3.0),
+                ("60 CB 404", "MERN Stack", 3.0),
+                ("60 OE L01", "Open Elective-I", 3.0),
+                ("60 CB 4P1", "Operating Systems Lab", 2.0),
+                ("60 CB 4P2", "Design and Analysis of Algorithms Lab", 2.0),
             ]
         },
         {
-            "sem": 5, "credits": 23,
+            "sem": 5, "credits": 22,
             "courses": [
-                ("MA8551", "Algebra and Number Theory", 4.0),
-                ("CS8591", "Computer Networks", 3.0),
-                ("EC8691", "Microprocessors and Microcontrollers", 3.0),
-                ("CS8501", "Theory of Computation", 3.0),
-                ("CS8592", "Object Oriented Analysis and Design", 3.0),
-                ("EC8681", "Microprocessors and Microcontrollers Lab", 2.0),
-                ("CS8581", "Networks Laboratory", 2.0),
-                ("CS8582", "Object Oriented Analysis & Design Lab", 2.0),
+                ("60 CB 501", "Computer Networks", 3.0),
+                ("60 CB 502", "C# and .NET Programming", 3.0),
+                ("60 CB 503", "Artificial Intelligence", 3.0),
+                ("60 IT 003", "Design Thinking", 3.0),
+                ("60 CB E11", "Professional Elective I: Modern Software Engineering", 3.0),
+                ("60 OE L02", "Open Elective-II", 3.0),
+                ("60 CB 5P1", "Computer Networks Laboratory", 2.0),
+                ("60 CB 5P2", "C# and .NET Programming Laboratory", 2.0),
             ]
         },
         {
-            "sem": 6, "credits": 24,
+            "sem": 6, "credits": 22,
             "courses": [
-                ("CS8651", "Internet Programming", 3.0),
-                ("CS8691", "Artificial Intelligence", 3.0),
-                ("CS8601", "Mobile Computing", 3.0),
-                ("CS8602", "Compiler Design", 4.0),
-                ("CS8603", "Distributed Systems", 3.0),
-                ("CS8661", "Internet Programming Laboratory", 2.0),
-                ("CS8662", "Mobile Application Development Lab", 2.0),
-                ("CS8611", "Mini Project", 2.0),
+                ("60 HS 005", "Business Strategy", 3.0),
+                ("60 HS 006", "Financial and Cost Accounting", 3.0),
+                ("60 CB 601", "Machine Learning", 3.0),
+                ("60 CB 602", "Usability Design of Software Applications", 3.0),
+                ("60 CB E21", "Professional Elective II: Marketing Research", 3.0),
+                ("60 OE L03", "Open Elective-III", 3.0),
+                ("60 CB 6P1", "Machine Learning Laboratory", 2.0),
+                ("60 CB 6P2", "Usability Design Laboratory", 2.0),
             ]
         },
         {
-            "sem": 7, "credits": 20,
+            "sem": 7, "credits": 22,
             "courses": [
-                ("MG8591", "Principles of Management", 3.0),
-                ("CS8792", "Cryptography & Network Security", 3.0),
-                ("CS8791", "Cloud Computing", 3.0),
-                ("PE8701", "Professional Elective II", 3.0),
-                ("PE8702", "Professional Elective III", 3.0),
-                ("OE8701", "Open Elective II", 3.0),
-                ("CS8711", "Cloud & Security Laboratory", 2.0),
+                ("60 HS 007", "Human Resource Management", 3.0),
+                ("60 CB 701", "Cloud Application Development", 3.0),
+                ("60 CB 702", "Data Analytics", 3.0),
+                ("60 CB 703", "Software Testing and Automation", 3.0),
+                ("60 CB E31", "Professional Elective III", 3.0),
+                ("60 CB E41", "Professional Elective IV", 3.0),
+                ("60 CB 7P1", "Data Analytics Laboratory", 2.0),
+                ("60 CB 7P2", "Project Work Phase-I", 2.0),
             ]
         },
         {
-            "sem": 8, "credits": 13,
+            "sem": 8, "credits": 11,
             "courses": [
-                ("PE8801", "Professional Elective IV", 3.0),
-                ("PE8802", "Professional Elective V", 3.0),
-                ("CS8811", "Project Work", 7.0),
+                ("60 CB E51", "Professional Elective V: Exploratory Data Analysis", 3.0),
+                ("60 CB 8P1", "Project Work Phase-II", 8.0),
             ]
         }
     ]
@@ -139,6 +143,8 @@ def RegulationsPage():
                 {
                     "key": str(sn),
                     "type": "button",
+                    "data-demo": f"curriculum-tab-{sn}",
+                    "id": f"curriculum-tab-{sn}",
                     "on_click": make_sem_click(sn),
                     "class_name": "px-3 py-2 font-mono text-mono-sm uppercase whitespace-nowrap cursor-pointer transition-colors duration-state-change " +
                         ("bg-light-primary text-light-on-primary font-bold" if is_act else "bg-light-surface-container-lowest border border-light-outline-variant text-light-on-surface-variant hover:bg-light-surface-container-low")
@@ -155,9 +161,9 @@ def RegulationsPage():
             {"class_name": "flex flex-wrap items-center justify-between gap-gutter-md pb-gutter-md border-b border-light-outline-variant"},
             html.div(
                 html.h1({"class_name": "font-headline text-headline-md text-light-on-surface uppercase tracking-tight font-bold"}, "Curriculum & Academic Regulations"),
-                html.p({"class_name": "font-mono text-mono-sm text-light-on-surface-variant uppercase mt-1"}, "UGC 10-Point CBCS Scale • Degree Classifications • B.E. Syllabus")
+                html.p({"class_name": "font-mono text-mono-sm text-light-on-surface-variant uppercase mt-1"}, "UGC 10-Point CBCS Scale • Degree Classifications • B.Tech CSBS Syllabus")
             ),
-            html.span({"class_name": "font-mono text-mono-sm font-bold bg-light-surface-container-highest text-light-on-surface px-3 py-1 border border-light-outline-variant"}, "REGULATION 2021 CBCS")
+            html.span({"class_name": "font-mono text-mono-sm font-bold bg-light-surface-container-highest text-light-on-surface px-3 py-1 border border-light-outline-variant"}, "REGULATION 2022 (2024-2028)")
         ),
 
         # Top 2-Column: 10-Point Scale & Degree Classification
@@ -166,7 +172,11 @@ def RegulationsPage():
             
             # UGC CBCS Scale (7 cols)
             html.article(
-                {"class_name": "xl:col-span-7 bg-light-surface-container-lowest border border-light-outline-variant overflow-hidden"},
+                {
+                    "class_name": "xl:col-span-7 bg-light-surface-container-lowest border border-light-outline-variant overflow-hidden",
+                    "data-demo": "regulations-grade-table",
+                    "id": "regulations-grade-table"
+                },
                 html.header(
                     {"class_name": "px-gutter-lg py-gutter-md bg-light-surface-container-low border-b border-light-outline-variant"},
                     html.h2({"class_name": "font-headline text-title-lg text-light-on-surface uppercase"}, "UGC 10-Point CBCS Grade Scale"),
@@ -236,7 +246,7 @@ def RegulationsPage():
             html.header(
                 {"class_name": "px-gutter-lg py-gutter-md bg-light-surface-container-low border-b border-light-outline-variant flex flex-wrap items-center justify-between gap-gutter-md"},
                 html.div(
-                    html.h2({"class_name": "font-headline text-title-lg text-light-on-surface uppercase"}, f"B.E. CSE Curriculum — Semester {selected_sem}"),
+                    html.h2({"class_name": "font-headline text-title-lg text-light-on-surface uppercase"}, f"B.Tech CSBS Curriculum — Semester {selected_sem}"),
                     html.p({"class_name": "font-mono text-mono-sm text-light-on-surface-variant uppercase"}, f"{len(active_sem_data['courses'])} Prescribed Courses • {active_sem_data['credits']} Credits")
                 ),
                 html.div({"class_name": "flex flex-wrap items-center gap-gutter-xs"}, sem_selector_buttons)

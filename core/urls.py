@@ -25,6 +25,8 @@ urlpatterns = [
     path('api/advisor/history/', api_views.api_advisor_clear_history, name='api_advisor_clear_history'),
     path('api/transcript/pdf/', api_views.api_transcript_pdf, name='api_transcript_pdf'),
     path('api/health/', api_views.api_health, name='api_health'),
+    path('api/demo/prepare/', api_views.api_demo_prepare, name='api_demo_prepare'),
+    path('api/demo/cleanup/', api_views.api_demo_cleanup, name='api_demo_cleanup'),
 
     # Digital Twin, Career Readiness, Skills, Verification & Analytics
     path('api/twin/simulate/', api_views.api_twin_simulate, name='api_twin_simulate'),

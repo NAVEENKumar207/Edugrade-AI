@@ -98,6 +98,7 @@ def StudentDashboard(user, set_page):
             html.button(
                 {
                     "key": str(s.semester_number),
+                    "data-demo": f"chart-bar-{s.semester_number}",
                     "type": "button",
                     "on_click": make_select_handler(s.semester_number),
                     "class_name": "sem-bar group flex flex-col items-center gap-gutter-xs p-1 focus:outline-none flex-1",
@@ -172,6 +173,7 @@ def StudentDashboard(user, set_page):
         (
             html.div(
                 {
+                    "data-demo": "next-best-move-banner",
                     "class_name": "p-3 px-4 rounded-radius-md bg-light-surface-container-low border border-light-outline-variant flex items-center justify-between gap-2 cursor-pointer hover:border-light-primary transition-colors",
                     "on_click": lambda e: set_page("future_lab")
                 },
@@ -220,6 +222,7 @@ def StudentDashboard(user, set_page):
         # Personal Trend Alert (Repurposed Early Warning Intervention)
         html.section(
             {
+                "data-demo": "trend-alert-card",
                 "class_name": (
                     "p-4 border-2 bg-light-surface-container-lowest flex flex-col md:flex-row items-start md:items-center justify-between gap-4 " +
                     ("border-light-error bg-red-50/50 dark:bg-red-950/20" if risk_level == "high" else
@@ -295,7 +298,7 @@ def StudentDashboard(user, set_page):
                     {
                         "type": "button",
                         "on_click": lambda e: set_page("advisor"),
-                        "class_name": "px-3 py-1.5 bg-light-primary text-white font-mono text-mono-xs uppercase font-bold hover:bg-light-primary-container hover:text-light-secondary transition-colors cursor-pointer whitespace-nowrap"
+                        "class_name": "px-3 py-1.5 bg-light-primary text-light-on-primary font-mono text-mono-xs uppercase font-bold hover:bg-light-primary-container hover:text-light-secondary transition-colors cursor-pointer whitespace-nowrap"
                     },
                     "Ask Advisor ⚡"
                 )
@@ -308,7 +311,10 @@ def StudentDashboard(user, set_page):
             
             # Card 1: Vermilion Highlight Block
             html.article(
-                {"class_name": "h-full bg-light-primary-container text-light-on-primary-container p-gutter-lg flex flex-col justify-between gap-gutter-md border-b sm:border-b-0 sm:border-r border-light-outline-variant"},
+                {
+                    "data-demo": "card-cgpa",
+                    "class_name": "h-full bg-light-primary-container text-light-on-primary-container p-gutter-lg flex flex-col justify-between gap-gutter-md border-b sm:border-b-0 sm:border-r border-light-outline-variant"
+                },
                 html.header(
                     {"class_name": "flex items-start justify-between gap-gutter-sm"},
                     html.div(
@@ -329,7 +335,10 @@ def StudentDashboard(user, set_page):
 
             # Card 2: Latest SGPA
             html.article(
-                {"class_name": "h-full bg-light-surface-container-lowest p-gutter-lg flex flex-col justify-between gap-gutter-md border-b xl:border-b-0 xl:border-r border-light-outline-variant"},
+                {
+                    "data-demo": "card-sgpa",
+                    "class_name": "h-full bg-light-surface-container-lowest p-gutter-lg flex flex-col justify-between gap-gutter-md border-b xl:border-b-0 xl:border-r border-light-outline-variant"
+                },
                 html.header(
                     {"class_name": "flex items-start justify-between gap-gutter-sm"},
                     html.div(
@@ -347,7 +356,10 @@ def StudentDashboard(user, set_page):
 
             # Card 3: Credits Earned
             html.article(
-                {"class_name": "h-full bg-light-surface-container-lowest p-gutter-lg flex flex-col justify-between gap-gutter-md border-b sm:border-b-0 sm:border-r border-light-outline-variant"},
+                {
+                    "data-demo": "card-credits",
+                    "class_name": "h-full bg-light-surface-container-lowest p-gutter-lg flex flex-col justify-between gap-gutter-md border-b sm:border-b-0 sm:border-r border-light-outline-variant"
+                },
                 html.header(
                     {"class_name": "flex items-start justify-between gap-gutter-sm"},
                     html.div(
@@ -372,7 +384,10 @@ def StudentDashboard(user, set_page):
 
             # Card 4: Deep Espresso Contrast Block
             html.article(
-                {"class_name": "h-full bg-light-secondary text-light-on-secondary p-gutter-lg flex flex-col justify-between gap-gutter-md"},
+                {
+                    "data-demo": "card-arrears",
+                    "class_name": "h-full bg-light-secondary text-light-on-secondary p-gutter-lg flex flex-col justify-between gap-gutter-md"
+                },
                 html.header(
                     {"class_name": "flex items-start justify-between gap-gutter-sm"},
                     html.div(

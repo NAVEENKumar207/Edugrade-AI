@@ -195,11 +195,13 @@ def AiAdvisorPage(user):
                                 {
                                     "key": p_text,
                                     "type": "button",
+                                    "data-demo": f"advisor-chip-{idx}",
+                                    "id": f"advisor-chip-{idx}",
                                     "on_click": lambda e, pt=p_text: handle_send(pt),
                                     "class_name": "px-3 py-1.5 rounded-full bg-light-surface-container-low border border-light-outline-variant font-mono text-label-sm text-light-on-surface hover:bg-light-surface-container hover:border-light-primary transition-colors duration-state-change whitespace-nowrap cursor-pointer"
                                 },
                                 p_text
-                            ) for p_text in prompts
+                            ) for idx, p_text in enumerate(prompts)
                         ]
                     ),
 
@@ -214,7 +216,6 @@ def AiAdvisorPage(user):
                                     "data-voice-lang": "ta-IN",
                                     "aria-label": "Set Tamil Language",
                                     "on_click": lambda e: None,
-                                    "onclick": "window.setVoiceLang('ta-IN')",
                                     "class_name": "px-2 py-0.5 font-mono text-[11px] font-bold text-light-on-surface hover:text-light-primary cursor-pointer"
                                 },
                                 "தமிழ்"
@@ -226,7 +227,6 @@ def AiAdvisorPage(user):
                                     "data-voice-lang": "en-IN",
                                     "aria-label": "Set English Language",
                                     "on_click": lambda e: None,
-                                    "onclick": "window.setVoiceLang('en-IN')",
                                     "class_name": "px-2 py-0.5 font-mono text-[11px] font-bold text-light-on-surface hover:text-light-primary cursor-pointer"
                                 },
                                 "English"
@@ -237,7 +237,6 @@ def AiAdvisorPage(user):
                                 "id": "voice-mic-btn",
                                 "type": "button",
                                 "on_click": lambda e: None,
-                                "onclick": "window.startVoiceInput()",
                                 "title": "Speak query using microphone",
                                 "class_name": "inline-flex items-center gap-1 px-2.5 py-1 border border-light-outline-variant bg-light-surface-container-low font-mono text-label-xs text-light-on-surface hover:border-light-primary transition-colors cursor-pointer"
                             },
@@ -247,9 +246,9 @@ def AiAdvisorPage(user):
                         html.button(
                             {
                                 "id": "voice-speak-btn",
+                                "data-demo": "advisor-speaker-btn",
                                 "type": "button",
                                 "on_click": lambda e: None,
-                                "onclick": "window.readLatestReplyAloud()",
                                 "title": "Read latest advisor reply aloud",
                                 "class_name": "inline-flex items-center gap-1 px-2.5 py-1 border border-light-outline-variant bg-light-surface-container-low font-mono text-label-xs text-light-on-surface hover:border-light-primary transition-colors cursor-pointer"
                             },
@@ -266,6 +265,7 @@ def AiAdvisorPage(user):
                         html.input(
                             {
                                 "id": "ai-advisor-input",
+                                "data-demo": "advisor-chat-input",
                                 "type": "text",
                                 "placeholder": "Ask about CGPA targets, weak subjects, or placement prep (EN / தமிழ்)...",
                                 "value": input_text,
@@ -279,6 +279,8 @@ def AiAdvisorPage(user):
                         html.button(
                             {
                                 "type": "button",
+                                "id": "advisor-send-btn",
+                                "data-demo": "advisor-send-btn",
                                 "on_click": on_form_submit,
                                 "disabled": loading or not input_text.strip(),
                                 "class_name": "inline-flex items-center justify-center gap-gutter-xs px-gutter-md py-2.5 bg-light-primary text-light-on-primary font-mono text-mono-md uppercase hover:bg-light-primary-container hover:text-light-on-primary-container transition-colors duration-state-change whitespace-nowrap shrink-0 disabled:opacity-50 cursor-pointer"

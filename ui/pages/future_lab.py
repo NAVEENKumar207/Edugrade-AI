@@ -114,8 +114,10 @@ def FutureLab(user, set_page=None):
                             html.button(
                                 {
                                     "key": g,
+                                    "id": f"nbm-grade-{g}",
+                                    "data-demo": f"nbm-grade-{g}",
                                     "className": (
-                                        "px-2.5 py-1 text-label-sm font-mono font-bold rounded-radius-sm transition-colors "
+                                        "px-2.5 py-1 text-label-sm font-mono font-bold rounded-radius-sm transition-colors cursor-pointer "
                                         + ("bg-light-primary text-light-on-primary" if assumed_grade == g else "text-light-on-surface-variant hover:text-light-on-surface")
                                     ),
                                     "on_click": lambda e, gr=g: handle_change_assumed_grade(gr)
@@ -216,6 +218,8 @@ def FutureLab(user, set_page=None):
                         html.span({"className": "text-light-primary"}, f"{float(target_cgpa):.2f}")
                     ),
                     html.input({
+                        "id": "twin-cgpa-slider",
+                        "data-demo": "twin-cgpa-slider",
                         "type": "range",
                         "min": "5.00",
                         "max": "10.00",
@@ -237,8 +241,10 @@ def FutureLab(user, set_page=None):
                             html.button(
                                 {
                                     "key": eff,
+                                    "id": f"twin-effort-{eff}",
+                                    "data-demo": f"twin-effort-{eff}",
                                     "className": (
-                                        "py-1.5 text-center text-label-xs font-mono font-bold rounded-radius-sm transition-colors "
+                                        "py-1.5 text-center text-label-xs font-mono font-bold rounded-radius-sm transition-colors cursor-pointer "
                                         + ("bg-light-primary text-light-on-primary" if effort == eff else "text-light-on-surface-variant hover:text-light-on-surface")
                                     ),
                                     "on_click": lambda e, ef=eff: set_effort(ef)
@@ -256,7 +262,10 @@ def FutureLab(user, set_page=None):
                     {"className": "flex items-end"},
                     html.button(
                         {
-                            "className": "btn btn-primary w-full py-2.5 flex items-center justify-center gap-2",
+                            "id": "twin-run-sim-btn",
+                            "data-demo": "twin-run-sim-btn",
+                            "className": "btn btn-primary w-full py-2.5 flex items-center justify-center gap-2 cursor-pointer",
+                            "style": {"backgroundColor": "#2563EB", "color": "#FFFFFF"},
                             "on_click": handle_run_simulation
                         },
                         html.span({"className": "material-symbols-outlined text-[18px]"}, "play_arrow"),
@@ -272,13 +281,13 @@ def FutureLab(user, set_page=None):
                     {"className": "p-gutter-xl text-center border border-dashed border-light-outline-variant rounded-radius-md"},
                     html.span({"className": "material-symbols-outlined text-light-on-surface-variant text-[48px]"}, "lock"),
                     html.h3({"className": "text-title-md font-headline font-bold text-light-on-surface mt-2"}, "Simulator Locked"),
-                    html.p({"className": "text-body-sm text-light-on-surface-variant max-w-md mx-auto mt-1"}, sim_result.get("message", "Add at least 5 course results to unlock the simulator."))
+                    html.p({"className": "text-body-sm text-light-on-surface-variant max-w-md mx-auto mt-1"}, sim_result.get("message", "Add at least 5 course results to unlock the simulator.") if sim_result else "Add at least 5 course results to unlock the simulator.")
                 )
-                if sim_result and not sim_result.get("enough_data", False) else
+                if not sim_result or not sim_result.get("enough_data", False) else
 
                 # Active Results
                 html.div(
-                    {"className": "flex flex-col gap-gutter-lg animate-fade-in"},
+                    {"id": "twin-results-card", "data-demo": "twin-results-card", "className": "flex flex-col gap-gutter-lg animate-fade-in"},
 
                     # Top Metrics Row
                     html.div(
@@ -338,7 +347,7 @@ def FutureLab(user, set_page=None):
                         html.div(
                             {"className": "flex justify-between text-label-xs font-mono text-light-on-surface-variant"},
                             html.span(f"10th Percentile: {sim_result.get('p10_cgpa', 0):.2f}"),
-                            html.span(f"Expected: {sim_result.get('expected_cgpa', 0):.2f}", {"className": "text-light-primary font-bold"}),
+                            html.span({"className": "text-light-primary font-bold"}, f"Expected: {sim_result.get('expected_cgpa', 0):.2f}"),
                             html.span(f"90th Percentile: {sim_result.get('p90_cgpa', 0):.2f}")
                         ),
                         html.div(
@@ -458,6 +467,8 @@ def FutureLab(user, set_page=None):
                     {"className": "flex flex-col gap-1"},
                     html.label({"className": "text-label-sm font-mono text-light-on-surface font-bold"}, "Internal Marks (out of 40):"),
                     html.input({
+                        "id": "marks-internal-input",
+                        "data-demo": "marks-internal-input",
                         "type": "number",
                         "min": "0",
                         "max": "40",
@@ -474,18 +485,20 @@ def FutureLab(user, set_page=None):
                         html.label({"className": "text-label-sm font-mono text-light-on-surface font-bold"}, "Desired Grade:"),
                         html.select(
                             {
+                                "id": "marks-grade-select",
+                                "data-demo": "marks-grade-select",
                                 "className": "input w-full font-mono",
                                 "value": target_letter_grade,
                                 "on_change": lambda e: set_target_letter_grade(e.get("target", {}).get("value", "A+"))
                             },
                             [
-                                html.option({"value": "O"}, "O (Outstanding — 91+)"),
-                                html.option({"value": "A+"}, "A+ (Excellent — 81+)"),
-                                html.option({"value": "A"}, "A (Very Good — 71+)"),
-                                html.option({"value": "B+"}, "B+ (Good — 61+)"),
-                                html.option({"value": "B"}, "B (Above Average — 56+)"),
-                                html.option({"value": "C"}, "C (Average Pass — 50+)"),
-                                html.option({"value": "pass"}, "Minimum Pass (50)"),
+                                html.option({"key": "O", "value": "O"}, "O (Outstanding — 91+)"),
+                                html.option({"key": "A+", "value": "A+"}, "A+ (Excellent — 81+)"),
+                                html.option({"key": "A", "value": "A"}, "A (Very Good — 71+)"),
+                                html.option({"key": "B+", "value": "B+"}, "B+ (Good — 61+)"),
+                                html.option({"key": "B", "value": "B"}, "B (Above Average — 56+)"),
+                                html.option({"key": "C", "value": "C"}, "C (Average Pass — 50+)"),
+                                html.option({"key": "pass", "value": "pass"}, "Minimum Pass (50)"),
                             ]
                         )
                     )
@@ -494,6 +507,8 @@ def FutureLab(user, set_page=None):
                         {"className": "flex flex-col gap-1"},
                         html.label({"className": "text-label-sm font-mono text-light-on-surface font-bold"}, "Expected Paper Marks (out of 100):"),
                         html.input({
+                            "id": "marks-paper-input",
+                            "data-demo": "marks-paper-input",
                             "type": "number",
                             "min": "0",
                             "max": "100",
@@ -508,7 +523,10 @@ def FutureLab(user, set_page=None):
                 html.div(
                     html.button(
                         {
-                            "className": "btn btn-primary w-full py-2 flex items-center justify-center gap-2",
+                            "id": "marks-calc-btn",
+                            "data-demo": "marks-calc-btn",
+                            "className": "btn btn-primary w-full py-2 flex items-center justify-center gap-2 cursor-pointer",
+                            "style": {"backgroundColor": "#2563EB", "color": "#FFFFFF"},
                             "on_click": handle_calculate_marks
                         },
                         html.span({"className": "material-symbols-outlined text-[18px]"}, "functions"),
@@ -520,7 +538,7 @@ def FutureLab(user, set_page=None):
             # Calculator Results or Error
             (
                 html.div(
-                    {"className": "p-3 rounded-radius-md bg-light-surface-container border-l-4 border-light-primary text-body-sm font-mono"},
+                    {"id": "marks-result-card", "data-demo": "marks-result-card", "className": "p-3 rounded-radius-md bg-light-surface-container border-l-4 border-light-primary text-body-sm font-mono"},
                     html.div(
                         {"className": "flex items-center gap-2 mb-1"},
                         html.span(

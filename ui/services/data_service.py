@@ -31,12 +31,65 @@ def is_debug_mode():
     """Returns True if Django DEBUG is active (used by UI for demo shortcuts)."""
     return getattr(settings, 'DEBUG', False)
 
+def is_demo_mode_enabled():
+    """Returns True if auto-play presentation demo mode is enabled."""
+    return getattr(settings, 'DEMO_MODE_ENABLED', True)
+
+def prepare_demo_environment():
+    """
+    Ensures demo_student is provisioned with password student01 and realistic data.
+    Cleans up any leftover DEMO101 courses.
+    """
+    from django.contrib.auth.models import User
+    from django.core.management import call_command
+    from core.models import UserProfile, CourseResult
+    from core.services.academic_service import recalculate_student_metrics
+
+    # Clean up leftover demo course records
+    CourseResult.objects.filter(course_code__iexact='DEMO101').delete()
+
+    user = User.objects.filter(username='demo_student').first()
+    if not user:
+        try:
+            call_command('seed_demo_student')
+            user = User.objects.filter(username='demo_student').first()
+        except Exception:
+            pass
+
+    if user:
+        user.set_password('student123')
+        user.save()
+        profile = getattr(user, 'profile', None)
+        if profile:
+            recalculate_student_metrics(profile)
+        reset_login_attempts('demo_student')
+        return True, "Demo environment prepared successfully."
+    return False, "Failed to prepare demo student."
+
+def cleanup_demo_environment():
+    """
+    Cleans up any test records created during demo (e.g. DEMO101 courses),
+    recalculates student metrics, and restores clean state.
+    """
+    from django.contrib.auth.models import User
+    from core.models import CourseResult
+    from core.services.academic_service import recalculate_student_metrics
+
+    deleted_count, _ = CourseResult.objects.filter(course_code__iexact='DEMO101').delete()
+    user = User.objects.filter(username='demo_student').first()
+    if user and hasattr(user, 'profile'):
+        recalculate_student_metrics(user.profile)
+    return True, f"Cleaned {deleted_count} demo records."
+
 def quick_demo_login(role='student'):
     """
     1-Click Demo Access for development / DEBUG mode.
     Auto-provisions the demo student account (with realistic semester results and telemetry)
     if it does not yet exist, and logs in immediately without manual credential entry.
     """
+    if not settings.DEBUG:
+        return None, "Quick demo login is only available when DEBUG=True in development mode."
+
     user = User.objects.filter(username__in=['demo_student', 'student01']).first()
     password = 'student123'
 
@@ -61,48 +114,66 @@ def quick_demo_login(role='student'):
             )
             profile = UserProfile.objects.create(
                 user=user,
-                roll_number='717622CS041',
-                department='Computer Science & Engineering',
+                roll_number='717622CB041',
+                department='Computer Science & Business Systems',
+                institution_name='K.S. Rangasamy College of Technology (Autonomous)',
                 current_semester=6,
-                current_cgpa=8.42,
+                current_cgpa=8.64,
                 target_cgpa=9.00,
-                credits_earned=88,
-                total_credits=160,
+                credits_earned=109,
+                total_credits=164,
                 backlogs_count=0,
                 is_placement_eligible=True
             )
+            # Curriculum from R2022 B.Tech CSBS (2024-2028 batch)
             sample_courses = [
-                (1, "CS101", "Problem Solving & Python Programming", 4, "A+", 9.0),
-                (1, "MA101", "Matrices and Calculus", 4, "A", 8.0),
-                (1, "PH101", "Engineering Physics", 3, "A", 8.0),
-                (1, "CY101", "Engineering Chemistry", 3, "B+", 7.0),
-                (1, "GE101", "Engineering Graphics", 4, "A", 8.0),
-                (1, "GE102", "Python Programming Lab", 2, "O", 10.0),
-                (1, "BS101", "Physics & Chemistry Lab", 2, "O", 10.0),
+                # Semester 1 (20 Credits)
+                (1, "60 EN 003", "Business Communication and Value Science I", 2, "A+", 9.0),
+                (1, "60 MA 002", "Statistics and Probability", 4, "A", 8.0),
+                (1, "61 PH 008", "Fundamentals of Physics", 3, "A", 8.0),
+                (1, "61 CB 101", "Computer Programming (Python)", 3, "A+", 9.0),
+                (1, "60 EE 003", "Principles of Electrical Engineering and Lab", 4, "B+", 7.0),
+                (1, "60 CB 1P1", "Computer Programming Lab (Python)", 2, "O", 10.0),
+                (1, "60 PH 0P3", "Fundamentals of Physics Lab", 2, "O", 10.0),
 
-                (2, "CS201", "Data Structures", 4, "A+", 9.0),
-                (2, "MA201", "Statistics and Linear Algebra", 4, "A", 8.0),
-                (2, "CS202", "Digital Principles & System Design", 3, "A", 8.0),
-                (2, "CS203", "Programming in C", 3, "A+", 9.0),
-                (2, "GE201", "Environmental Science", 3, "B+", 7.0),
-                (2, "CS204", "Data Structures Lab", 2, "O", 10.0),
-                (2, "CS205", "C Programming Lab", 2, "O", 10.0),
+                # Semester 2 (20 Credits)
+                (2, "60 EN 004", "Business Communication and Value Science II", 2, "A", 8.0),
+                (2, "60 HS 001", "Fundamentals of Economics", 3, "A", 8.0),
+                (2, "60 MA 005", "Statistical Modeling", 5, "B+", 7.0),
+                (2, "60 CB 201", "Computer Organization and Architecture", 3, "A+", 9.0),
+                (2, "61 CB 202", "Object Oriented Programming", 3, "A+", 9.0),
+                (2, "60 ME 0P1", "Fabrication and Reverse Engineering Laboratory", 2, "O", 10.0),
+                (2, "61 CB 2P1", "Object Oriented Programming Lab", 2, "O", 10.0),
 
-                (3, "CS301", "Design and Analysis of Algorithms", 4, "A+", 9.0),
-                (3, "CS302", "Database Management Systems", 4, "O", 10.0),
-                (3, "CS303", "Operating Systems", 3, "A", 8.0),
-                (3, "MA301", "Discrete Mathematics", 4, "B+", 7.0),
-                (3, "CS304", "Software Engineering", 3, "A", 8.0),
-                (3, "CS305", "DBMS Laboratory", 2, "O", 10.0),
-                (3, "CS306", "Operating Systems Lab", 2, "A+", 9.0),
+                # Semester 3 (24 Credits)
+                (3, "60 HS 004", "Introduction to Innovation, IP Management & Entrepreneurship", 3, "A+", 9.0),
+                (3, "60 MA 013", "Computational Statistics", 4, "A", 8.0),
+                (3, "61 CB 301", "Automata and Compiler Design", 4, "A", 8.0),
+                (3, "60 CB 302", "Database Management Systems", 3, "O", 10.0),
+                (3, "60 CB 303", "Data Structures", 3, "A+", 9.0),
+                (3, "60 CB 304", "Software Engineering", 3, "A", 8.0),
+                (3, "60 CB 3P1", "Database Management Systems Lab", 2, "O", 10.0),
+                (3, "60 CB 3P2", "Data Structures Lab", 2, "O", 10.0),
 
-                (4, "CS401", "Computer Networks", 4, "A", 8.0),
-                (4, "CS402", "Object Oriented Analysis & Design", 3, "A", 8.0),
-                (4, "CS403", "Theory of Computation", 4, "B+", 7.0),
-                (4, "CS404", "Artificial Intelligence & ML", 4, "O", 10.0),
-                (4, "CS405", "Web Technology", 3, "A+", 9.0),
-                (4, "CS406", "Networks & Web Lab", 2, "O", 10.0),
-                (4, "CS407", "AI & ML Laboratory", 2, "O", 10.0),
+                # Semester 4 (23 Credits)
+                (4, "60 MA 018", "Optimization Techniques", 4, "A", 8.0),
+                (4, "60 CB 401", "Operating Systems", 3, "A+", 9.0),
+                (4, "60 CB 402", "Design and Analysis of Algorithms", 3, "A+", 9.0),
+                (4, "60 CB 403", "Software Design with UML", 3, "A", 8.0),
+                (4, "60 CB 404", "MERN Stack", 3, "O", 10.0),
+                (4, "60 OE L01", "Open Elective-I", 3, "A", 8.0),
+                (4, "60 CB 4P1", "Operating Systems Lab", 2, "O", 10.0),
+                (4, "60 CB 4P2", "Design and Analysis of Algorithms Lab", 2, "O", 10.0),
+
+                # Semester 5 (22 Credits)
+                (5, "60 CB 501", "Computer Networks", 3, "A", 8.0),
+                (5, "60 CB 502", "C# and .NET Programming", 3, "A+", 9.0),
+                (5, "60 CB 503", "Artificial Intelligence", 3, "O", 10.0),
+                (5, "60 IT 003", "Design Thinking", 3, "A+", 9.0),
+                (5, "60 CB E11", "Modern Software Engineering & DevOps", 3, "O", 10.0),
+                (5, "60 OE L02", "Open Elective-II", 3, "A", 8.0),
+                (5, "60 CB 5P1", "Computer Networks Laboratory", 2, "O", 10.0),
+                (5, "60 CB 5P2", "C# and .NET Programming Laboratory", 2, "O", 10.0),
             ]
             sem_totals = {}
             for s_num, code, name, cr, gr, gp in sample_courses:
@@ -137,7 +208,12 @@ def quick_demo_login(role='student'):
             )
             SubjectInsight.objects.get_or_create(
                 student=profile,
-                subject_name="Artificial Intelligence & ML",
+                subject_name="Artificial Intelligence",
+                defaults={'grade_point': 10.0, 'status_label': 'Strong'}
+            )
+            SubjectInsight.objects.get_or_create(
+                student=profile,
+                subject_name="MERN Stack",
                 defaults={'grade_point': 10.0, 'status_label': 'Strong'}
             )
             SubjectInsight.objects.get_or_create(
@@ -147,8 +223,8 @@ def quick_demo_login(role='student'):
             )
             SubjectInsight.objects.get_or_create(
                 student=profile,
-                subject_name="Theory of Computation",
-                defaults={'grade_point': 7.0, 'status_label': 'Good'}
+                subject_name="Optimization Techniques",
+                defaults={'grade_point': 8.0, 'status_label': 'Good'}
             )
     else:
         username = user.username
@@ -156,6 +232,14 @@ def quick_demo_login(role='student'):
             user.first_name = 'Naveenkumar'
             user.last_name = 'S'
             user.save(update_fields=['first_name', 'last_name'])
+        if hasattr(user, 'profile') and user.profile:
+            p = user.profile
+            if p.department in ('Computer Science & Engineering', 'Computer Science and Engineering'):
+                p.department = 'Computer Science & Business Systems'
+            if not p.institution_name or 'Anna University / Affiliated' in p.institution_name:
+                p.institution_name = 'K.S. Rangasamy College of Technology (Autonomous)'
+            p.total_credits = 164
+            p.save()
         if not user.check_password(password):
             user.set_password(password)
             user.save()
@@ -171,6 +255,13 @@ def authenticate_user(username, password):
     if locked:
         return None, get_lockout_message(mins)
     user = authenticate(username=clean_username, password=password)
+    if not user and clean_username == 'demo_student' and password in ('student01', 'student123'):
+        from django.contrib.auth.models import User
+        demo_u = User.objects.filter(username='demo_student').first()
+        if demo_u:
+            demo_u.set_password(password)
+            demo_u.save()
+            user = authenticate(username=clean_username, password=password)
     if user:
         reset_login_attempts(clean_username)
         return user, None

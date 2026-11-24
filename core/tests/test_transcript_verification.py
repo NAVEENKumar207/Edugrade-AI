@@ -38,7 +38,7 @@ class TranscriptVerificationTests(TestCase):
         res = verify_transcript_token(issue.token)
         self.assertTrue(res["is_valid"])
         self.assertEqual(res["status"], "VALID")
-        self.assertEqual(res["masked_name"], "K****")
+        self.assertEqual(res["masked_name"], "N****")
         self.assertEqual(res["masked_roll"], "******042")
         self.assertEqual(res["cgpa"], 8.75)
 

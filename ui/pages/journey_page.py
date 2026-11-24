@@ -56,7 +56,11 @@ def JourneyPage(user):
         # BADGE SHELF
         # ==============================================================
         html.div(
-            {"className": "card p-gutter-lg border border-light-outline-variant rounded-radius-lg bg-light-surface-container-lowest shadow-sm flex flex-col gap-gutter-md"},
+            {
+                "className": "card p-gutter-lg border border-light-outline-variant rounded-radius-lg bg-light-surface-container-lowest shadow-sm flex flex-col gap-gutter-md",
+                "data-demo": "journey-badges-shelf",
+                "id": "journey-badges-shelf",
+            },
             html.div(
                 {"className": "flex items-center justify-between border-b border-light-outline-variant pb-gutter-xs"},
                 html.div(
@@ -72,6 +76,7 @@ def JourneyPage(user):
                     html.div(
                         {
                             "key": b["id"],
+                            "data-demo": f"journey-badge-{idx}",
                             "className": (
                                 "p-3 rounded-radius-md border transition-all flex flex-col justify-between "
                                 + ("border-light-primary bg-light-surface-container shadow-sm" if b["earned"] else "border-light-outline-variant bg-light-surface-container-low opacity-60")
@@ -97,7 +102,7 @@ def JourneyPage(user):
                             )
                         )
                     )
-                    for b in all_badges
+                    for idx, b in enumerate(all_badges)
                 ]
             )
         ),
@@ -106,7 +111,11 @@ def JourneyPage(user):
         # VERTICAL TIMELINE
         # ==============================================================
         html.div(
-            {"className": "card p-gutter-lg border border-light-outline-variant rounded-radius-lg bg-light-surface-container-lowest shadow-sm flex flex-col gap-gutter-lg"},
+            {
+                "className": "card p-gutter-lg border border-light-outline-variant rounded-radius-lg bg-light-surface-container-lowest shadow-sm flex flex-col gap-gutter-lg",
+                "data-demo": "journey-timeline",
+                "id": "journey-timeline",
+            },
             html.div(
                 {"className": "flex items-center gap-2 border-b border-light-outline-variant pb-gutter-xs"},
                 html.span({"className": "material-symbols-outlined text-light-primary text-[22px]"}, "timeline"),

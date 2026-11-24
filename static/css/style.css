@@ -19,18 +19,18 @@
     --danger: #BA1A1A;
 }
 
-[data-theme="dark"] {
+[data-theme="dark"], html.dark, body.dark, .dark, .theme-dark {
     --bg: #111111;
-    --white: #1B0401;
+    --white: #1A1A1A;
     --dark: #FFFFFF;
-    --text: #FFFFFF;
-    --muted: #9E9594;
+    --text: #F2F1F1;
+    --muted: #B8B0AF;
     --border: #3A2D2B;
     --primary: #FF6B54;
     --primary-dark: #C81E06;
-    --success: #006A63;
-    --warning: #9A4A00;
-    --danger: #BA1A1A;
+    --success: #00A389;
+    --warning: #F59E0B;
+    --danger: #FF6B6B;
 }
 
 body {
@@ -167,9 +167,9 @@ body {
 
     padding: 8px 14px;
 
-    background: #eeedff;
+    background: var(--border);
 
-    color: var(--primary);
+    color: var(--dark);
 
     border-radius: 30px;
 
@@ -695,7 +695,9 @@ footer .copyright {
 
 
 .auth-card {
-    background: white;
+    background: var(--white);
+
+    color: var(--text);
 
     padding: 40px;
 
@@ -825,6 +827,10 @@ footer .copyright {
 .auth-card input[type="password"],
 .auth-card input[type="text"],
 .auth-card select {
+    background: var(--bg);
+
+    color: var(--text);
+
     padding: 13px;
 
     border: 1px solid var(--border);

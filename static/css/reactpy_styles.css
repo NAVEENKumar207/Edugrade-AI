@@ -305,6 +305,7 @@ a {
 }
 
 .btn-primary {
+  background-color: #2563EB;
   background: linear-gradient(135deg, #38BDF8 0%, #2563EB 100%);
   color: #FFFFFF;
   box-shadow: 0 2px 10px rgba(56, 189, 248, 0.25);

@@ -69,11 +69,14 @@ def PlacementPage(user):
             return handle_click
 
         is_active = (filter_mode == mode_key)
+        demo_id = "placement-tab-action" if mode_key == "ineligible" else f"placement-tab-{mode_key}"
         filter_buttons.append(
             html.button(
                 {
                     "key": mode_key,
                     "type": "button",
+                    "data-demo": demo_id,
+                    "id": demo_id,
                     "on_click": make_tab_handler(mode_key),
                     "class_name": "px-3 py-2 font-mono text-mono-sm uppercase whitespace-nowrap cursor-pointer transition-colors duration-state-change " +
                         ("bg-light-primary text-light-on-primary font-bold" if is_active else "bg-light-surface-container-lowest border border-light-outline-variant text-light-on-surface-variant hover:bg-light-surface-container-low")
@@ -84,7 +87,7 @@ def PlacementPage(user):
 
     # Company cards
     cards = []
-    for c in filtered_companies:
+    for idx, c in enumerate(filtered_companies):
         is_el = c.get("is_eligible", False)
         c_name = c.get("company_name", "Company")
         r_title = c.get("role_title", "Position")
@@ -111,7 +114,12 @@ def PlacementPage(user):
 
         cards.append(
             html.article(
-                {"key": str(c.get("id", c_name)), "class_name": "company-card h-full bg-light-surface-container-lowest border border-light-outline-variant p-gutter-lg flex flex-col justify-between gap-gutter-md rounded-radius-md"},
+                {
+                    "key": str(c.get("id", c_name)),
+                    "data-demo": f"placement-company-card-{idx}",
+                    "id": f"placement-company-card-{idx}",
+                    "class_name": "company-card h-full bg-light-surface-container-lowest border border-light-outline-variant p-gutter-lg flex flex-col justify-between gap-gutter-md rounded-radius-md"
+                },
                 html.div(
                     {"class_name": "flex flex-col gap-gutter-sm"},
                     html.header(
@@ -199,7 +207,11 @@ def PlacementPage(user):
 
         # Academic Skill Map & Gap Analysis Section
         html.section(
-            {"class_name": "card p-gutter-lg border border-light-outline-variant rounded-radius-lg bg-light-surface-container-lowest flex flex-col gap-gutter-md"},
+            {
+                "class_name": "card p-gutter-lg border border-light-outline-variant rounded-radius-lg bg-light-surface-container-lowest flex flex-col gap-gutter-md",
+                "data-demo": "skill-map-container",
+                "id": "skill-map-container"
+            },
             html.div(
                 {"class_name": "flex flex-col md:flex-row md:items-center justify-between gap-2 border-b border-light-outline-variant pb-gutter-xs"},
                 html.div(
@@ -271,6 +283,8 @@ def PlacementPage(user):
                 html.span({"class_name": "material-symbols-outlined text-light-on-surface-variant text-[18px] mr-2"}, "search"),
                 html.input(
                     {
+                        "data-demo": "placement-search-input",
+                        "id": "placement-search-input",
                         "type": "search",
                         "placeholder": "Search company or skill...",
                         "value": search_query,

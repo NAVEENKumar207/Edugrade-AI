@@ -187,6 +187,8 @@ def ResultsPage(user):
             {
                 "key": "all",
                 "type": "button",
+                "data-demo": "results-tab-all",
+                "id": "results-tab-all",
                 "on_click": lambda e: set_selected_sem("all"),
                 "class_name": "px-3 py-2 font-mono text-mono-sm uppercase whitespace-nowrap cursor-pointer transition-colors duration-state-change " +
                     ("bg-light-primary text-light-on-primary font-bold" if selected_sem == "all" else "bg-light-surface-container-lowest border border-light-outline-variant text-light-on-surface-variant hover:bg-light-surface-container-low")
@@ -208,6 +210,8 @@ def ResultsPage(user):
                 {
                     "key": s_num,
                     "type": "button",
+                    "data-demo": f"results-tab-{s_num}",
+                    "id": f"results-tab-{s_num}",
                     "on_click": make_tab_handler(s_num),
                     "class_name": "px-3 py-2 font-mono text-mono-sm uppercase whitespace-nowrap cursor-pointer transition-colors duration-state-change " +
                         ("bg-light-primary text-light-on-primary font-bold" if is_active else "bg-light-surface-container-lowest border border-light-outline-variant text-light-on-surface-variant hover:bg-light-surface-container-low")
@@ -359,6 +363,8 @@ def ResultsPage(user):
                 html.button(
                     {
                         "type": "button",
+                        "data-demo": "results-add-btn",
+                        "id": "results-add-btn",
                         "on_click": lambda e: (handle_reset_form() if show_form else handle_open_add()),
                         "class_name": "inline-flex items-center gap-2 px-gutter-md py-2 bg-light-primary text-light-on-primary font-mono text-mono-sm font-bold uppercase hover:bg-light-primary-container hover:text-light-on-primary-container transition-colors duration-state-change whitespace-nowrap cursor-pointer shadow-sm"
                     },
@@ -368,6 +374,8 @@ def ResultsPage(user):
                 html.button(
                     {
                         "type": "button",
+                        "data-demo": "results-csv-btn",
+                        "id": "results-csv-btn",
                         "on_click": lambda e: set_show_csv_modal(not show_csv_modal),
                         "class_name": "inline-flex items-center gap-2 px-gutter-md py-2 border-2 border-light-outline-variant text-light-on-surface font-mono text-mono-sm font-bold uppercase hover:bg-light-surface-container-high transition-colors whitespace-nowrap cursor-pointer"
                     },
@@ -379,6 +387,8 @@ def ResultsPage(user):
                         "href": "/api/transcript/pdf/",
                         "target": "_blank",
                         "rel": "noopener noreferrer",
+                        "data-demo": "results-export-pdf",
+                        "id": "results-export-pdf",
                         "class_name": "inline-flex items-center gap-2 px-gutter-md py-2 bg-light-secondary text-light-on-secondary font-mono text-mono-sm font-bold uppercase hover:opacity-90 transition-opacity whitespace-nowrap cursor-pointer"
                     },
                     html.span({"class_name": "material-symbols-outlined text-[18px]"}, "picture_as_pdf"),
@@ -427,6 +437,8 @@ def ResultsPage(user):
                         html.label({"class_name": "font-mono text-mono-xs font-bold uppercase text-light-on-surface-variant"}, "Semester (1-8)"),
                         html.select(
                             {
+                                "data-demo": "modal-semester",
+                                "id": "modal-semester",
                                 "value": form_sem,
                                 "on_change": lambda e: set_form_sem(e.get("target", {}).get("value", "1")),
                                 "class_name": input_class,
@@ -441,6 +453,8 @@ def ResultsPage(user):
                         html.label({"class_name": "font-mono text-mono-xs font-bold uppercase text-light-on-surface-variant"}, "Course Code"),
                         html.input(
                             {
+                                "data-demo": "modal-course-code",
+                                "id": "modal-course-code",
                                 "type": "text",
                                 "placeholder": "e.g. CS301",
                                 "value": form_code,
@@ -456,6 +470,8 @@ def ResultsPage(user):
                         html.label({"class_name": "font-mono text-mono-xs font-bold uppercase text-light-on-surface-variant"}, "Course Title"),
                         html.input(
                             {
+                                "data-demo": "modal-course-name",
+                                "id": "modal-course-name",
                                 "type": "text",
                                 "placeholder": "e.g. Design and Analysis of Algorithms",
                                 "value": form_name,
@@ -471,6 +487,8 @@ def ResultsPage(user):
                         html.label({"class_name": "font-mono text-mono-xs font-bold uppercase text-light-on-surface-variant"}, "Credits (1-10)"),
                         html.input(
                             {
+                                "data-demo": "modal-credits",
+                                "id": "modal-credits",
                                 "type": "number",
                                 "min": "1",
                                 "max": "10",
@@ -487,6 +505,8 @@ def ResultsPage(user):
                         html.label({"class_name": "font-mono text-mono-xs font-bold uppercase text-light-on-surface-variant"}, "Letter Grade"),
                         html.select(
                             {
+                                "data-demo": "modal-grade",
+                                "id": "modal-grade",
                                 "value": form_grade,
                                 "on_change": lambda e: set_form_grade(e.get("target", {}).get("value", "A")),
                                 "class_name": input_class,
@@ -501,8 +521,10 @@ def ResultsPage(user):
                     html.button(
                         {
                             "type": "button",
+                            "data-demo": "modal-save-btn",
+                            "id": "modal-save-btn",
                             "on_click": handle_save_result,
-                            "class_name": "px-6 py-2.5 bg-light-primary text-white font-mono text-mono-sm font-bold uppercase hover:bg-light-primary-container transition-colors cursor-pointer shadow-sm flex items-center gap-2"
+                            "class_name": "px-6 py-2.5 bg-light-primary text-light-on-primary font-mono text-mono-sm font-bold uppercase hover:bg-light-primary-container transition-colors cursor-pointer shadow-sm flex items-center gap-2"
                         },
                         html.span({"class_name": "material-symbols-outlined text-[18px]"}, "save"),
                         html.span("Update Course Result" if editing_id else "Save Course Result")
@@ -510,6 +532,8 @@ def ResultsPage(user):
                     html.button(
                         {
                             "type": "button",
+                            "data-demo": "modal-cancel-btn",
+                            "id": "modal-cancel-btn",
                             "on_click": lambda e: handle_reset_form(),
                             "class_name": "px-4 py-2.5 border border-light-outline-variant font-mono text-mono-sm uppercase text-light-on-surface hover:bg-light-surface-container transition-colors cursor-pointer"
                         },
@@ -556,6 +580,8 @@ def ResultsPage(user):
                 # CSV Textarea
                 html.textarea(
                     {
+                        "data-demo": "csv-textarea",
+                        "id": "csv-textarea",
                         "rows": "6",
                         "value": csv_text,
                         "on_change": lambda e: set_csv_text(e.get("target", {}).get("value", "")),
@@ -588,6 +614,8 @@ def ResultsPage(user):
                     html.button(
                         {
                             "type": "button",
+                            "data-demo": "csv-submit-btn",
+                            "id": "csv-submit-btn",
                             "disabled": csv_loading,
                             "on_click": handle_run_csv_import,
                             "class_name": "px-6 py-2.5 bg-light-secondary text-light-on-secondary font-mono text-mono-sm font-bold uppercase hover:bg-light-primary hover:text-white transition-colors cursor-pointer shadow-sm flex items-center gap-2 disabled:opacity-50"
@@ -598,6 +626,8 @@ def ResultsPage(user):
                     html.button(
                         {
                             "type": "button",
+                            "data-demo": "csv-close-btn",
+                            "id": "csv-close-btn",
                             "on_click": lambda e: set_show_csv_modal(False),
                             "class_name": "px-4 py-2.5 border border-light-outline-variant font-mono text-mono-sm uppercase text-light-on-surface hover:bg-light-surface-container transition-colors cursor-pointer"
                         },
@@ -645,6 +675,8 @@ def ResultsPage(user):
                 html.span({"class_name": "material-symbols-outlined text-light-on-surface-variant text-[18px] mr-2"}, "search"),
                 html.input(
                     {
+                        "data-demo": "results-search-input",
+                        "id": "results-search-input",
                         "type": "search",
                         "placeholder": "Filter course code or title...",
                         "value": search_query,
@@ -668,7 +700,7 @@ def ResultsPage(user):
                         {
                             "type": "button",
                             "on_click": lambda e: handle_open_add(),
-                            "class_name": "mt-2 px-6 py-2.5 bg-light-primary text-white font-mono text-mono-sm font-bold uppercase hover:bg-light-primary-container transition-colors cursor-pointer shadow-sm inline-flex items-center gap-2"
+                            "class_name": "mt-2 px-6 py-2.5 bg-light-primary text-light-on-primary font-mono text-mono-sm font-bold uppercase hover:bg-light-primary-container transition-colors cursor-pointer shadow-sm inline-flex items-center gap-2"
                         },
                         html.span({"class_name": "material-symbols-outlined text-[18px]"}, "add_circle"),
                         "+ Add First Course Result"

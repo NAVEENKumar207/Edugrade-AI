@@ -6,12 +6,13 @@ Matches New Ui/landing_page/code.html.
 
 from reactpy import component, html, use_state
 from ui.components.theme_toggle import ThemeToggle
-from ui.services.data_service import get_landing_stats
+from ui.services.data_service import get_landing_stats, is_demo_mode_enabled
 
 @component
 def LandingPage(set_page, theme="dark", toggle_theme=None):
     stats = get_landing_stats()
     selected_feature, set_selected_feature = use_state("twin")
+    demo_enabled = is_demo_mode_enabled()
 
     feature_data = {
         "twin": {
@@ -92,6 +93,19 @@ def LandingPage(set_page, theme="dark", toggle_theme=None):
                     ThemeToggle(theme=theme, toggle_theme=toggle_theme, compact=True) if toggle_theme else None,
                     html.button(
                         {
+                            "id": "btn-watch-demo",
+                            "data-demo": "watch-demo",
+                            "className": "px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-600 text-white hover:from-amber-600 hover:to-orange-700 font-mono text-mono-sm uppercase font-bold transition-all shadow-md flex items-center gap-1.5 cursor-pointer border border-amber-400 animate-pulse hover:animate-none",
+                            "style": {"backgroundColor": "#b45309", "color": "#ffffff"},
+                            "on_click": lambda e: None
+                        },
+                        html.span({"className": "material-symbols-outlined text-base"}, "play_circle"),
+                        html.span("Watch Demo ⚡")
+                    ) if demo_enabled else None,
+                    html.button(
+                        {
+                            "id": "btn-landing-register",
+                            "data-demo": "landing-register-btn",
                             "className": "px-4 py-2 border border-light-outline-variant hover:border-light-secondary font-mono text-mono-sm uppercase transition-colors cursor-pointer",
                             "on_click": lambda e: set_page("signup")
                         },
@@ -99,7 +113,9 @@ def LandingPage(set_page, theme="dark", toggle_theme=None):
                     ),
                     html.button(
                         {
-                            "className": "px-4 py-2 bg-light-primary text-white hover:bg-light-primary-container hover:text-light-secondary font-mono text-mono-sm uppercase font-semibold transition-colors cursor-pointer",
+                            "id": "btn-landing-login",
+                            "data-demo": "landing-login-btn",
+                            "className": "px-4 py-2 bg-light-primary text-light-on-primary hover:bg-light-primary-container hover:text-light-secondary font-mono text-mono-sm uppercase font-semibold transition-colors cursor-pointer",
                             "on_click": lambda e: set_page("login")
                         },
                         "Student Portal Login"
@@ -137,9 +153,23 @@ def LandingPage(set_page, theme="dark", toggle_theme=None):
                         # CTAs
                         html.div(
                             {"className": "flex flex-wrap items-center gap-4 pt-2"},
+                            (
+                                html.button(
+                                    {
+                                        "id": "btn-hero-watch-demo",
+                                        "data-demo": "hero-watch-demo",
+                                        "className": "px-6 py-3.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white hover:from-amber-600 hover:to-orange-700 font-mono text-mono-sm uppercase font-bold transition-all shadow-md flex items-center gap-2 cursor-pointer border border-amber-400 animate-pulse hover:animate-none",
+                                        "style": {"backgroundColor": "#b45309", "color": "#ffffff"},
+                                        "on_click": lambda e: None
+                                    },
+                                    html.span({"className": "material-symbols-outlined text-base"}, "play_circle"),
+                                    html.span("Watch Auto-Play Demo ⚡")
+                                )
+                                if demo_enabled else None
+                            ),
                             html.button(
                                 {
-                                    "className": "px-6 py-3.5 bg-light-primary text-white hover:bg-light-primary-container hover:text-light-secondary font-mono text-mono-sm uppercase font-semibold transition-colors flex items-center gap-2 cursor-pointer shadow-sm",
+                                    "className": "px-6 py-3.5 bg-light-primary text-light-on-primary hover:bg-light-primary-container hover:text-light-secondary font-mono text-mono-sm uppercase font-semibold transition-colors flex items-center gap-2 cursor-pointer shadow-sm",
                                     "on_click": lambda e: set_page("login")
                                 },
                                 html.span("Launch CGPA Simulator"),
@@ -157,17 +187,17 @@ def LandingPage(set_page, theme="dark", toggle_theme=None):
                         html.div(
                             {"className": "grid grid-cols-3 gap-4 border-t border-light-outline-variant pt-6 mt-4"},
                             html.div(
-                                {"className": "flex flex-col gap-1"},
+                                {"className": "flex flex-col gap-1", "data-demo": "hero-stat-scale"},
                                 html.span({"className": "font-headline text-2xl lg:text-3xl font-bold tabular-nums text-light-on-surface"}, "10.0"),
                                 html.span({"className": "font-mono text-[11px] text-light-on-surface-variant uppercase"}, "Max CBCS Scale")
                             ),
                             html.div(
-                                {"className": "flex flex-col gap-1"},
+                                {"className": "flex flex-col gap-1", "data-demo": "hero-stat-latency"},
                                 html.span({"className": "font-headline text-2xl lg:text-3xl font-bold tabular-nums text-light-primary"}, "< 1.0s"),
                                 html.span({"className": "font-mono text-[11px] text-light-on-surface-variant uppercase"}, "Simulation Latency")
                             ),
                             html.div(
-                                {"className": "flex flex-col gap-1"},
+                                {"className": "flex flex-col gap-1", "data-demo": "hero-stat-voice"},
                                 html.span({"className": "font-headline text-2xl lg:text-3xl font-bold tabular-nums text-light-on-surface"}, "EN / தமிழ்"),
                                 html.span({"className": "font-mono text-[11px] text-light-on-surface-variant uppercase"}, "Bilingual AI Advisor")
                             )
@@ -184,6 +214,7 @@ def LandingPage(set_page, theme="dark", toggle_theme=None):
                                 {"className": "flex flex-wrap items-center gap-4 border-b border-light-on-primary-container/20 pb-4 font-mono text-mono-sm uppercase"},
                                 html.button(
                                     {
+                                        "data-demo": "feat-tab-twin",
                                         "className": f"cursor-pointer transition-colors {'underline underline-offset-4 font-bold' if selected_feature == 'twin' else 'text-light-on-primary-container/70 hover:text-light-on-primary-container'}",
                                         "on_click": lambda e: set_selected_feature("twin")
                                     },
@@ -191,6 +222,7 @@ def LandingPage(set_page, theme="dark", toggle_theme=None):
                                 ),
                                 html.button(
                                     {
+                                        "data-demo": "feat-tab-moves",
                                         "className": f"cursor-pointer transition-colors {'underline underline-offset-4 font-bold' if selected_feature == 'moves' else 'text-light-on-primary-container/70 hover:text-light-on-primary-container'}",
                                         "on_click": lambda e: set_selected_feature("moves")
                                     },
@@ -198,10 +230,19 @@ def LandingPage(set_page, theme="dark", toggle_theme=None):
                                 ),
                                 html.button(
                                     {
+                                        "data-demo": "feat-tab-target",
                                         "className": f"cursor-pointer transition-colors {'underline underline-offset-4 font-bold' if selected_feature == 'target' else 'text-light-on-primary-container/70 hover:text-light-on-primary-container'}",
                                         "on_click": lambda e: set_selected_feature("target")
                                     },
                                     "Marks Target"
+                                ),
+                                html.button(
+                                    {
+                                        "data-demo": "feat-tab-journey",
+                                        "className": f"cursor-pointer transition-colors {'underline underline-offset-4 font-bold' if selected_feature == 'journey' else 'text-light-on-primary-container/70 hover:text-light-on-primary-container'}",
+                                        "on_click": lambda e: set_selected_feature("journey")
+                                    },
+                                    "Journey & Badges"
                                 ),
                                 html.button(
                                     {

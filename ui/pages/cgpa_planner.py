@@ -179,6 +179,8 @@ def CgpaPlanner(user):
                             html.label({"class_name": "font-mono text-mono-sm text-light-on-surface uppercase font-bold"}, "Earned Credits"),
                             html.input(
                                 {
+                                    "data-demo": "planner-completed-credits",
+                                    "id": "planner-completed-credits",
                                     "type": "number",
                                     "min": "0",
                                     "max": "200",
@@ -212,6 +214,8 @@ def CgpaPlanner(user):
                         html.label({"class_name": "font-mono text-mono-sm text-light-on-surface uppercase font-bold"}, "Remaining Semesters"),
                         html.input(
                             {
+                                "data-demo": "planner-remaining-sem",
+                                "id": "planner-remaining-sem",
                                 "type": "number",
                                 "min": "1",
                                 "max": "8",
@@ -233,6 +237,8 @@ def CgpaPlanner(user):
                         ),
                         html.input(
                             {
+                                "data-demo": "planner-target-slider",
+                                "id": "planner-target-slider",
                                 "type": "range",
                                 "min": "6.0",
                                 "max": "10.0",
@@ -245,6 +251,8 @@ def CgpaPlanner(user):
                         ),
                         html.input(
                             {
+                                "data-demo": "planner-target-input",
+                                "id": "planner-target-input",
                                 "type": "number",
                                 "step": "0.01",
                                 "min": "0",
@@ -264,6 +272,7 @@ def CgpaPlanner(user):
                             html.button(
                                 {
                                     "key": f"{q_val:.1f}",
+                                    "data-demo": f"planner-preset-{int(q_val*10)}",
                                     "type": "button",
                                     "on_click": lambda e, v=q_val: set_target_cgpa(v),
                                     "class_name": f"px-2.5 py-1 font-mono text-mono-sm border border-light-outline-variant hover:bg-light-surface-container-low transition-colors duration-state-change cursor-pointer {'bg-light-secondary text-light-on-secondary font-bold' if abs(target_f - q_val) < 0.05 else 'bg-light-surface-container-lowest text-light-on-surface'}"
@@ -281,7 +290,11 @@ def CgpaPlanner(user):
                 
                 # Feasibility Output Card
                 html.article(
-                    {"class_name": "bg-light-surface-container-lowest border border-light-outline-variant p-gutter-lg flex flex-col gap-gutter-md"},
+                    {
+                        "class_name": "bg-light-surface-container-lowest border border-light-outline-variant p-gutter-lg flex flex-col gap-gutter-md",
+                        "data-demo": "planner-verdict-card",
+                        "id": "planner-verdict-card"
+                    },
                     html.header(
                         {"class_name": "flex items-center justify-between gap-gutter-sm"},
                         html.div(
@@ -346,7 +359,11 @@ def CgpaPlanner(user):
 
                 # 7 What-If Scenario Projections
                 html.article(
-                    {"class_name": "bg-light-surface-container-lowest border border-light-outline-variant overflow-hidden"},
+                    {
+                        "class_name": "bg-light-surface-container-lowest border border-light-outline-variant overflow-hidden",
+                        "data-demo": "planner-scenarios-table",
+                        "id": "planner-scenarios-table"
+                    },
                     html.header(
                         {"class_name": "px-gutter-lg py-gutter-md bg-light-surface-container-low border-b border-light-outline-variant"},
                         html.h3({"class_name": "font-headline text-title-lg text-light-on-surface uppercase"}, "What-If Graduation Projections"),

@@ -20,11 +20,11 @@ def ProfilePage(user):
     last_name, set_last_name = use_state(user.last_name if user else "")
     email, set_email = use_state(user.email if user else "")
     target_cgpa, set_target_cgpa = use_state(str(profile.target_cgpa) if profile else "8.80")
-    department, set_department = use_state(profile.department if profile else "Computer Science & Engineering")
+    department, set_department = use_state(profile.department if profile else "Computer Science & Business Systems")
     institution_name, set_institution_name = use_state(
-        getattr(profile, 'institution_name', 'Anna University / Affiliated Institution')
+        getattr(profile, 'institution_name', 'K.S. Rangasamy College of Technology (Autonomous)')
         if profile and getattr(profile, 'institution_name', None)
-        else "Anna University / Affiliated Institution"
+        else "K.S. Rangasamy College of Technology (Autonomous)"
     )
 
     save_status, set_save_status = use_state("")
@@ -69,11 +69,11 @@ def ProfilePage(user):
         set_last_name(user.last_name if user else "")
         set_email(user.email if user else "")
         set_target_cgpa(str(profile.target_cgpa) if profile else "8.80")
-        set_department(profile.department if profile else "Computer Science & Engineering")
+        set_department(profile.department if profile else "Computer Science & Business Systems")
         set_institution_name(
-            getattr(profile, 'institution_name', 'Anna University / Affiliated Institution')
+            getattr(profile, 'institution_name', 'K.S. Rangasamy College of Technology (Autonomous)')
             if profile and getattr(profile, 'institution_name', None)
-            else "Anna University / Affiliated Institution"
+            else "K.S. Rangasamy College of Technology (Autonomous)"
         )
         set_save_error("")
         set_is_editing(False)
@@ -114,11 +114,13 @@ def ProfilePage(user):
                 html.button(
                     {
                         "type": "button",
+                        "data-demo": "profile-edit-btn",
+                        "id": "profile-edit-btn",
                         "on_click": lambda e: (handle_cancel_edit() if is_editing else (set_is_editing(True), set_save_status(""), set_save_error(""))),
                         "className": (
                             "inline-flex items-center gap-2 px-4 py-2 border-2 border-light-outline-variant text-light-on-surface hover:bg-light-surface-container-high font-headline font-bold text-label-md uppercase transition-colors cursor-pointer"
                             if is_editing else
-                            "inline-flex items-center gap-2 px-4 py-2 bg-light-primary text-white hover:bg-light-primary-container font-headline font-bold text-label-md uppercase transition-colors cursor-pointer shadow-sm"
+                            "inline-flex items-center gap-2 px-4 py-2 bg-light-primary text-light-on-primary hover:bg-light-primary-container font-headline font-bold text-label-md uppercase transition-colors cursor-pointer shadow-sm"
                         )
                     },
                     html.span({"className": "material-symbols-outlined text-[18px]"}, "close" if is_editing else "edit"),
@@ -149,7 +151,7 @@ def ProfilePage(user):
                         html.span({"className": "truncate"}, institution_name)
                     ),
                     html.span(
-                        {"className": "mt-2 inline-flex items-center gap-1.5 font-mono text-mono-xs uppercase text-success font-semibold"},
+                        {"className": "mt-2 inline-flex items-center gap-1.5 font-mono text-mono-xs uppercase text-emerald-700 dark:text-emerald-400 font-semibold"},
                         html.span({"className": "material-symbols-outlined text-[15px]"}, "verified"),
                         "Institutional Account Verified"
                     )
@@ -294,7 +296,7 @@ def ProfilePage(user):
                             {
                                 "type": "button",
                                 "on_click": lambda e: (set_is_editing(True), set_save_status(""), set_save_error("")),
-                                "className": "inline-flex items-center gap-2 px-6 py-2.5 bg-light-primary text-white hover:bg-light-primary-container font-headline font-bold text-label-md uppercase transition-colors cursor-pointer shadow-sm"
+                                "className": "inline-flex items-center gap-2 px-6 py-2.5 bg-light-primary text-light-on-primary hover:bg-light-primary-container font-headline font-bold text-label-md uppercase transition-colors cursor-pointer shadow-sm"
                             },
                             html.span({"className": "material-symbols-outlined text-[18px]"}, "edit"),
                             "Edit Profile Details"
@@ -357,6 +359,8 @@ def ProfilePage(user):
                             html.label({"className": "font-mono text-mono-sm font-bold text-light-on-surface uppercase"}, "Target CGPA (0.00 – 10.00)"),
                             html.input(
                                 {
+                                    "data-demo": "profile-target-cgpa",
+                                    "id": "profile-target-cgpa",
                                     "type": "number",
                                     "step": "0.01",
                                     "min": "0",
@@ -407,8 +411,10 @@ def ProfilePage(user):
                         html.button(
                             {
                                 "type": "button",
+                                "data-demo": "profile-save-btn",
+                                "id": "profile-save-btn",
                                 "on_click": handle_save_profile,
-                                "className": "inline-flex items-center gap-2 px-gutter-lg py-2.5 bg-light-primary text-white font-headline font-bold text-label-md hover:bg-light-primary-container transition-colors uppercase cursor-pointer shadow-sm"
+                                "className": "inline-flex items-center gap-2 px-gutter-lg py-2.5 bg-light-primary text-light-on-primary font-headline font-bold text-label-md hover:bg-light-primary-container transition-colors uppercase cursor-pointer shadow-sm"
                             },
                             html.span({"className": "material-symbols-outlined text-[18px]"}, "save"),
                             "SAVE PROFILE DETAILS"
@@ -416,6 +422,8 @@ def ProfilePage(user):
                         html.button(
                             {
                                 "type": "button",
+                                "data-demo": "profile-cancel-btn",
+                                "id": "profile-cancel-btn",
                                 "on_click": handle_cancel_edit,
                                 "className": "inline-flex items-center gap-2 px-gutter-lg py-2.5 border-2 border-light-outline-variant text-light-on-surface hover:bg-light-surface-container font-headline font-bold text-label-md uppercase transition-colors cursor-pointer"
                             },

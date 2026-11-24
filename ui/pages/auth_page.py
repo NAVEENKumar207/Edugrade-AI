@@ -68,7 +68,7 @@ def LoginPage(set_page, set_user, theme='dark', toggle_theme=None):
         },
         # Left Matte Carbon Institutional Showcase Panel (5 cols on lg)
         html.aside(
-            {"className": "hidden lg:flex lg:col-span-5 bg-light-inverse-surface text-light-inverse-on-surface p-10 flex-col justify-between border-r border-light-outline-variant relative overflow-hidden"},
+            {"className": "hidden lg:flex lg:col-span-5 bg-stone-950 text-stone-100 p-10 flex-col justify-between border-r border-stone-800 relative overflow-hidden"},
             # Top Brand header
             html.div(
                 {"className": "flex items-center justify-between gap-4"},
@@ -84,7 +84,7 @@ def LoginPage(set_page, set_user, theme='dark', toggle_theme=None):
                     }),
                     html.span({"className": "font-headline font-bold text-sm tracking-tight text-light-on-surface uppercase"}, "EduGrade AI")
                 ),
-                html.span({"className": "font-mono text-mono-sm uppercase text-light-inverse-on-surface/60"}, "CBCS 2026")
+                html.span({"className": "font-mono text-mono-sm uppercase text-stone-400"}, "CBCS 2026")
             ),
 
             # Mid Showcase Bento Grid
@@ -92,30 +92,30 @@ def LoginPage(set_page, set_user, theme='dark', toggle_theme=None):
                 {"className": "flex flex-col gap-6 my-auto py-8"},
                 html.div(
                     {"className": "flex flex-col gap-2"},
-                    html.span({"className": "font-mono text-mono-sm uppercase text-light-primary tracking-wider font-semibold"}, "Institutional Portal"),
+                    html.span({"className": "font-mono text-mono-sm uppercase text-orange-400 tracking-wider font-semibold"}, "Institutional Portal"),
                     html.h1({"className": "font-headline text-3xl font-bold uppercase tracking-tight leading-tight"}, "Precision Grading. Guaranteed Placement Clearance.")
                 ),
                 html.div(
                     {"className": "grid grid-cols-1 gap-4 font-mono text-mono-sm"},
                     # Telemetry Card 1
                     html.div(
-                        {"className": "p-4 bg-light-surface-container-highest/20 border border-light-outline-variant/30 flex flex-col gap-1"},
-                        html.span({"className": "text-light-inverse-on-surface/60 uppercase text-[11px]"}, "Target Simulator"),
+                        {"className": "p-4 bg-stone-900 border border-stone-800 flex flex-col gap-1"},
+                        html.span({"className": "text-stone-400 uppercase text-[11px]"}, "Target Simulator"),
                         html.div(
                             {"className": "flex items-baseline justify-between"},
                             html.span({"className": "text-white font-bold text-base"}, "Target: 8.50 CGPA"),
-                            html.span({"className": "text-light-primary font-bold"}, "Req: 8.78 SGPA")
+                            html.span({"className": "text-orange-400 font-bold"}, "Req: 8.78 SGPA")
                         ),
                         html.span({"className": "text-[11px] text-emerald-400 uppercase mt-1"}, "● Status: Feasible Clearance")
                     ),
                     # Telemetry Card 2
                     html.div(
-                        {"className": "p-4 bg-light-surface-container-highest/20 border border-light-outline-variant/30 flex flex-col gap-1"},
-                        html.span({"className": "text-light-inverse-on-surface/60 uppercase text-[11px]"}, "Placement Cutoff Matrix"),
+                        {"className": "p-4 bg-stone-900 border border-stone-800 flex flex-col gap-1"},
+                        html.span({"className": "text-stone-400 uppercase text-[11px]"}, "Placement Cutoff Matrix"),
                         html.div(
                             {"className": "flex items-baseline justify-between"},
                             html.span({"className": "text-white font-bold text-base"}, "Microsoft • Tier 1"),
-                            html.span({"className": "text-light-inverse-on-surface/80"}, "Cutoff: 8.50")
+                            html.span({"className": "text-stone-300"}, "Cutoff: 8.50")
                         ),
                         html.span({"className": "text-[11px] text-emerald-400 uppercase mt-1"}, "● Eligible with Zero Arrears")
                     )
@@ -124,7 +124,7 @@ def LoginPage(set_page, set_user, theme='dark', toggle_theme=None):
 
             # Bottom Security Footnote
             html.div(
-                {"className": "flex items-center justify-between font-mono text-mono-sm uppercase text-light-inverse-on-surface/60 border-t border-light-inverse-on-surface/20 pt-4"},
+                {"className": "flex items-center justify-between font-mono text-mono-sm uppercase text-stone-400 border-t border-stone-800 pt-4"},
                 html.span("PBKDF2 SHA-256 Encryption"),
                 html.span("Atomic Audit Log")
             )
@@ -150,6 +150,7 @@ def LoginPage(set_page, set_user, theme='dark', toggle_theme=None):
                     ),
                     html.button(
                         {
+                            "data-demo": "goto-signup-btn",
                             "className": "px-4 py-1.5 text-light-on-surface-variant hover:text-light-on-surface transition-colors cursor-pointer",
                             "on_click": lambda e: set_page("signup")
                         },
@@ -179,7 +180,7 @@ def LoginPage(set_page, set_user, theme='dark', toggle_theme=None):
                     html.h2({"className": "font-headline text-3xl font-bold uppercase tracking-tight text-light-on-surface"}, "Secure Access Gateway"),
                     html.p({"className": "font-mono text-mono-sm text-light-on-surface-variant uppercase"}, "Authenticate using student credentials to access academic records."),
                     html.div(
-                        {"className": "p-3 border border-light-primary bg-light-primary text-white font-mono text-mono-sm uppercase text-left flex flex-col gap-1"},
+                        {"className": "p-3 border border-light-primary bg-light-primary text-light-on-primary font-mono text-mono-sm uppercase text-left flex flex-col gap-1"},
                         html.span({"className": "text-[11px] opacity-75"}, "Undergraduate Academic Portal"),
                         html.span({"className": "text-sm font-bold"}, "Student Sign In")
                     )
@@ -197,6 +198,8 @@ def LoginPage(set_page, set_user, theme='dark', toggle_theme=None):
                         {"className": "grid grid-cols-1 gap-2"},
                         html.button(
                             {
+                                "id": "login-quick-demo-btn",
+                                "data-demo": "login-quick-demo-btn",
                                 "type": "button",
                                 "disabled": loading,
                                 "className": "px-3 py-2 bg-light-surface border border-light-outline-variant hover:border-light-primary font-mono text-[11px] uppercase text-left transition-colors cursor-pointer flex items-center justify-between shadow-sm",
@@ -237,6 +240,8 @@ def LoginPage(set_page, set_user, theme='dark', toggle_theme=None):
                             {"className": "relative flex items-center"},
                             html.span({"className": "material-symbols-outlined absolute left-3 text-light-on-surface-variant pointer-events-none text-lg"}, "badge"),
                             html.input({
+                                "id": "login-username",
+                                "data-demo": "login-username",
                                 "type": "text",
                                 "value": username,
                                 "className": "w-full pl-10 pr-3 py-2.5 bg-light-surface border border-light-outline-variant focus:border-light-primary focus:ring-0 font-mono text-mono-sm text-light-on-surface outline-none transition-colors",
@@ -265,6 +270,8 @@ def LoginPage(set_page, set_user, theme='dark', toggle_theme=None):
                             {"className": "relative flex items-center"},
                             html.span({"className": "material-symbols-outlined absolute left-3 text-light-on-surface-variant pointer-events-none text-lg"}, "lock"),
                             html.input({
+                                "id": "login-password",
+                                "data-demo": "login-password",
                                 "type": "text" if show_password else "password",
                                 "value": password,
                                 "className": "w-full pl-10 pr-10 py-2.5 bg-light-surface border border-light-outline-variant focus:border-light-primary focus:ring-0 font-mono text-mono-sm text-light-on-surface outline-none transition-colors",
@@ -285,9 +292,11 @@ def LoginPage(set_page, set_user, theme='dark', toggle_theme=None):
                     # Submit Button
                     html.button(
                         {
+                            "id": "login-submit-btn",
+                            "data-demo": "login-submit-btn",
                             "type": "button",
                             "disabled": loading,
-                            "className": "w-full py-3.5 bg-light-primary text-white hover:bg-light-primary-container hover:text-light-secondary font-mono text-mono-sm uppercase font-semibold transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-sm mt-2 disabled:opacity-50",
+                            "className": "w-full py-3.5 bg-light-primary text-light-on-primary hover:bg-light-primary-container hover:text-light-secondary font-mono text-mono-sm uppercase font-semibold transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-sm mt-2 disabled:opacity-50",
                             "on_click": lambda e: handle_submit()
                         },
                         html.span("Verifying..." if loading else "Sign In to Student Portal"),
@@ -323,8 +332,8 @@ def LoginPage(set_page, set_user, theme='dark', toggle_theme=None):
 def SignupPage(set_page, set_user, theme='dark', toggle_theme=None):
     fullname, set_fullname = use_state("")
     username, set_username = use_state("")
-    institution_name, set_institution_name = use_state("Anna University / Affiliated Institution")
-    department, set_department = use_state("Computer Science and Engineering")
+    institution_name, set_institution_name = use_state("K.S. Rangasamy College of Technology (Autonomous)")
+    department, set_department = use_state("Computer Science and Business Systems")
     roll_number, set_roll_number = use_state("")
     password, set_password = use_state("")
     confirm_password, set_confirm_password = use_state("")
@@ -394,7 +403,7 @@ def SignupPage(set_page, set_user, theme='dark', toggle_theme=None):
         },
         # Left Matte Carbon Panel
         html.aside(
-            {"className": "hidden lg:flex lg:col-span-5 bg-light-inverse-surface text-light-inverse-on-surface p-10 flex-col justify-between border-r border-light-outline-variant relative overflow-hidden"},
+            {"className": "hidden lg:flex lg:col-span-5 bg-stone-950 text-stone-100 p-10 flex-col justify-between border-r border-stone-800 relative overflow-hidden"},
             html.div(
                 {"className": "flex items-center justify-between gap-4"},
                 html.div(
@@ -409,22 +418,22 @@ def SignupPage(set_page, set_user, theme='dark', toggle_theme=None):
                     }),
                     html.span({"className": "font-headline font-bold text-sm tracking-tight text-light-on-surface uppercase"}, "EduGrade AI")
                 ),
-                html.span({"className": "font-mono text-mono-sm uppercase text-light-inverse-on-surface/60"}, "CBCS 2026")
+                html.span({"className": "font-mono text-mono-sm uppercase text-stone-400"}, "CBCS 2026")
             ),
             html.div(
                 {"className": "flex flex-col gap-6 my-auto py-8"},
                 html.div(
                     {"className": "flex flex-col gap-2"},
-                    html.span({"className": "font-mono text-mono-sm uppercase text-light-primary tracking-wider font-semibold"}, "Institutional Enrollment"),
+                    html.span({"className": "font-mono text-mono-sm uppercase text-orange-400 tracking-wider font-semibold"}, "Institutional Enrollment"),
                     html.h1({"className": "font-headline text-3xl font-bold uppercase tracking-tight leading-tight"}, "Create Your Verified Academic Ledger Identity.")
                 ),
                 html.p(
-                    {"className": "font-mono text-mono-sm text-light-inverse-on-surface/80 uppercase leading-relaxed"},
+                    {"className": "font-mono text-mono-sm text-stone-300 uppercase leading-relaxed"},
                     "Once registered, your transcripts, semester credits, target CGPA models, and placement audits are stored securely with zero third-party telemetry."
                 )
             ),
             html.div(
-                {"className": "flex items-center justify-between font-mono text-mono-sm uppercase text-light-inverse-on-surface/60 border-t border-light-inverse-on-surface/20 pt-4"},
+                {"className": "flex items-center justify-between font-mono text-mono-sm uppercase text-stone-400 border-t border-stone-800 pt-4"},
                 html.span("Anna Univ CBCS Scale"),
                 html.span("Atomic Audit Trail")
             )
@@ -479,7 +488,7 @@ def SignupPage(set_page, set_user, theme='dark', toggle_theme=None):
 
                 # Portal Badge
                 html.div(
-                    {"className": "p-3 border border-light-primary bg-light-primary text-white font-mono text-mono-sm uppercase text-left flex flex-col gap-1"},
+                    {"className": "p-3 border border-light-primary bg-light-primary text-light-on-primary font-mono text-mono-sm uppercase text-left flex flex-col gap-1"},
                     html.span({"className": "text-[11px] opacity-75"}, "Undergraduate Academic Portal"),
                     html.span({"className": "text-sm font-bold"}, "New Student Registration")
                 ),
@@ -496,6 +505,8 @@ def SignupPage(set_page, set_user, theme='dark', toggle_theme=None):
                         {"className": "grid grid-cols-1 gap-2"},
                         html.button(
                             {
+                                "id": "login-quick-demo-btn",
+                                "data-demo": "login-quick-demo-btn",
                                 "type": "button",
                                 "disabled": loading,
                                 "className": "px-3 py-2 bg-light-surface border border-light-outline-variant hover:border-light-primary font-mono text-[11px] uppercase text-left transition-colors cursor-pointer flex items-center justify-between shadow-sm",
@@ -529,6 +540,8 @@ def SignupPage(set_page, set_user, theme='dark', toggle_theme=None):
                         {"className": "flex flex-col gap-1.5"},
                         html.label({"className": "font-mono text-mono-sm uppercase text-light-on-surface-variant font-medium"}, "Full Name"),
                         html.input({
+                            "id": "signup-fullname",
+                            "data-demo": "signup-fullname",
                             "type": "text",
                             "value": fullname,
                             "className": "w-full px-3.5 py-2.5 bg-light-surface border border-light-outline-variant focus:border-light-primary focus:ring-0 font-mono text-mono-sm text-light-on-surface outline-none transition-colors",
@@ -542,6 +555,8 @@ def SignupPage(set_page, set_user, theme='dark', toggle_theme=None):
                         {"className": "flex flex-col gap-1.5"},
                         html.label({"className": "font-mono text-mono-sm uppercase text-light-on-surface-variant font-medium"}, "Username"),
                         html.input({
+                            "id": "signup-username",
+                            "data-demo": "signup-username",
                             "type": "text",
                             "value": username,
                             "className": "w-full px-3.5 py-2.5 bg-light-surface border border-light-outline-variant focus:border-light-primary focus:ring-0 font-mono text-mono-sm text-light-on-surface outline-none transition-colors",
@@ -555,6 +570,8 @@ def SignupPage(set_page, set_user, theme='dark', toggle_theme=None):
                         {"className": "flex flex-col gap-1.5"},
                         html.label({"className": "font-mono text-mono-sm uppercase text-light-on-surface-variant font-medium"}, "Institution Name"),
                         html.input({
+                            "id": "signup-institution",
+                            "data-demo": "signup-institution",
                             "type": "text",
                             "value": institution_name,
                             "className": "w-full px-3.5 py-2.5 bg-light-surface border border-light-outline-variant focus:border-light-primary focus:ring-0 font-mono text-mono-sm text-light-on-surface outline-none transition-colors",
@@ -568,6 +585,8 @@ def SignupPage(set_page, set_user, theme='dark', toggle_theme=None):
                         {"className": "flex flex-col gap-1.5"},
                         html.label({"className": "font-mono text-mono-sm uppercase text-light-on-surface-variant font-medium"}, "Department"),
                         html.input({
+                            "id": "signup-dept",
+                            "data-demo": "signup-dept",
                             "type": "text",
                             "value": department,
                             "className": "w-full px-3.5 py-2.5 bg-light-surface border border-light-outline-variant focus:border-light-primary focus:ring-0 font-mono text-mono-sm text-light-on-surface outline-none transition-colors",
@@ -581,6 +600,8 @@ def SignupPage(set_page, set_user, theme='dark', toggle_theme=None):
                         {"className": "flex flex-col gap-1.5"},
                         html.label({"className": "font-mono text-mono-sm uppercase text-light-on-surface-variant font-medium"}, "Register / Roll Number"),
                         html.input({
+                            "id": "signup-roll",
+                            "data-demo": "signup-roll",
                             "type": "text",
                             "value": roll_number,
                             "className": "w-full px-3.5 py-2.5 bg-light-surface border border-light-outline-variant focus:border-light-primary focus:ring-0 font-mono text-mono-sm text-light-on-surface outline-none transition-colors",
@@ -596,6 +617,8 @@ def SignupPage(set_page, set_user, theme='dark', toggle_theme=None):
                             {"className": "flex flex-col gap-1.5"},
                             html.label({"className": "font-mono text-mono-sm uppercase text-light-on-surface-variant font-medium"}, "Password"),
                             html.input({
+                                "id": "signup-password",
+                                "data-demo": "signup-password",
                                 "type": "password",
                                 "value": password,
                                 "className": "w-full px-3.5 py-2.5 bg-light-surface border border-light-outline-variant focus:border-light-primary focus:ring-0 font-mono text-mono-sm text-light-on-surface outline-none transition-colors",
@@ -608,6 +631,8 @@ def SignupPage(set_page, set_user, theme='dark', toggle_theme=None):
                             {"className": "flex flex-col gap-1.5"},
                             html.label({"className": "font-mono text-mono-sm uppercase text-light-on-surface-variant font-medium"}, "Confirm Password"),
                             html.input({
+                                "id": "signup-confirm",
+                                "data-demo": "signup-confirm",
                                 "type": "password",
                                 "value": confirm_password,
                                 "className": "w-full px-3.5 py-2.5 bg-light-surface border border-light-outline-variant focus:border-light-primary focus:ring-0 font-mono text-mono-sm text-light-on-surface outline-none transition-colors",
@@ -620,9 +645,11 @@ def SignupPage(set_page, set_user, theme='dark', toggle_theme=None):
                     # Submit Button
                     html.button(
                         {
+                            "id": "signup-submit-btn",
+                            "data-demo": "signup-submit-btn",
                             "type": "button",
                             "disabled": loading,
-                            "className": "w-full py-3.5 bg-light-primary text-white hover:bg-light-primary-container hover:text-light-secondary font-mono text-mono-sm uppercase font-semibold transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-sm mt-3 disabled:opacity-50",
+                            "className": "w-full py-3.5 bg-light-primary text-light-on-primary hover:bg-light-primary-container hover:text-light-secondary font-mono text-mono-sm uppercase font-semibold transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-sm mt-3 disabled:opacity-50",
                             "on_click": lambda e: handle_signup()
                         },
                         html.span("Registering..." if loading else "Register Student Account"),
@@ -635,6 +662,7 @@ def SignupPage(set_page, set_user, theme='dark', toggle_theme=None):
                     html.span("Already registered? "),
                     html.button(
                         {
+                            "data-demo": "goto-login-btn",
                             "className": "text-light-primary font-semibold hover:underline uppercase cursor-pointer",
                             "on_click": lambda e: set_page("login")
                         },

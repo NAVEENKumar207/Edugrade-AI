@@ -164,9 +164,9 @@
 
     <script src="{% static 'js/script.js' %}"></script>
     <script>
-        const currentCGPA = {{ user.profile.current_cgpa }};
-        const creditsEarned = {{ user.profile.credits_earned }};
-        const totalCredits = {{ user.profile.total_credits }};
+        const currentCGPA = {{ user.profile.current_cgpa|default:8.5 }};
+        const creditsEarned = {{ user.profile.credits_earned|default:136 }};
+        const totalCredits = {{ user.profile.total_credits|default:160 }};
 
         function updatePlannerCalculations(targetVal) {
             const val = parseFloat(targetVal);
