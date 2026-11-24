@@ -39,7 +39,7 @@ class DemoTourModeTests(TestCase):
         self.assertTrue(hasattr(demo_user, 'profile'))
 
         profile = demo_user.profile
-        self.assertEqual(profile.roll_number, '717622CS101')
+        self.assertEqual(profile.roll_number, '717622CB041')
         self.assertGreater(profile.current_cgpa, 8.0)
         self.assertGreater(profile.credits_earned, 100)
 
